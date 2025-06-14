@@ -1,7 +1,7 @@
 {
-  "name": "𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿",
-  "description": "Javascript WhatsApp bot made by Silva.",
-  "keywords": ["Keenly-xmd"],
+  "name": "DARKZONE 𝙓𝙈𝘿",
+  "description": "Javascript WhatsApp bot made by DARKZONE.",
+  "keywords": ["DARKZONE-MD"],
   "success_url": "/",
 
     "stack": "container",
@@ -15,7 +15,7 @@
     "ALIVE_IMG": {
       "description": "paste your image url if you don't have you can use this public url.",
       "required": false,
-      "value": "https://files.catbox.moe/9yic1a.jpg"
+      "value": "https://files.catbox.moe/r2ncqh"
     }, 
     
     "LIVE_MSG": {
@@ -106,14 +106,14 @@
     "OWNER_NUMBER": {
       "description": "put the owner number for bot.",
       "required": false,
-      "value": "254740694462"
+      "value": "923306137477"
 
     }, 
 
     "BOT_NAME": {
-      "description": "Type here the bot name.",
+      ": "Type here the bot name.",
       "required": false,
-      "value": "✦ 𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿 ✦"
+      "value": "✦ DARKZONE 𝙓𝙈𝘿 ✦"
 
       }, 
 
@@ -133,7 +133,7 @@
      "DESCRIPTION": {
       "description": "add caption for menu and other",
       "required": false,
-      "value": "*© ✦ 𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿 ✦*"
+      "value": "*© ✦ DARKZONE 𝙓𝙈𝘿 ✦*"
     },
 
       "DELETE_LINKS": {

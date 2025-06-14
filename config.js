@@ -5,11 +5,11 @@ function convertToBool(text, fault = 'true') {
     return text === fault ? true : false;
 }
 module.exports = {
-SESSION_ID: process.env.SESSION_ID || "1NxExDiI#BZtMi0JoCqEQc_PSRd_ug8539tq8xZnsppGlgMwl8Ss",
+SESSION_ID: process.env.SESSION_ID || "Silva~pIphnRwS#BOsoRkPUwevzKP2r2MNV9nP07pPy3N41SEgoYfir_nI",
 // add your Session Id 
 PREFIX: process.env.PREFIX || ".",
 // add your prifix for bot
-BOT_NAME: process.env.BOT_NAME || "✦ DARKZONE 𝙓𝙈𝘿 ✦",
+BOT_NAME: process.env.BOT_NAME || "✦ 𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿 ✦",
 // add bot namw here for menu
 AUTO_STATUS_REACT: process.env.AUTO_STATUS_REACT || "true",
 // true to get auto status react
@@ -19,13 +19,13 @@ CUSTOM_REACT_EMOJIS: process.env.CUSTOM_REACT_EMOJIS || "💝,💖,💗,❤️�
 // chose custom react emojis by yourself 
 DELETE_LINKS: process.env.DELETE_LINKS || "false",
 // automatic delete links witho remove member 
-OWNER_NUMBER: process.env.OWNER_NUMBER || "923306137477",
+OWNER_NUMBER: process.env.OWNER_NUMBER || "254740694462",
 // add your bot owner number
-OWNER_NAME: process.env.OWNER_NAME || "✦ DARKZONE 𝙓𝙈𝘿✦",
+OWNER_NAME: process.env.OWNER_NAME || "✦ 𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿✦",
 // add bot owner name
-DESCRIPTION: process.env.DESCRIPTION || "*© ✦ DARKZONE 𝙓𝙈𝘿 ✦*",
+DESCRIPTION: process.env.DESCRIPTION || "*© ✦ 𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿 ✦*",
 // add bot owner name    
-ALIVE_IMG: process.env.ALIVE_IMG || "https://files.catbox.moe/r2ncqh",
+ALIVE_IMG: process.env.ALIVE_IMG || "https://files.catbox.moe/9yic1a.jpg",
 // add img for alive msg
 LIVE_MSG: process.env.LIVE_MSG || "> ᴋᴇᴇɴʟʏ xᴍᴅ ɪꜱ ᴀᴄᴛɪᴠᴇ ᴀɴᴅ ᴀʟɪᴠᴇ\n\n\nᴋᴇᴇᴘ ᴜꜱɪɴɢ ᴋᴇᴇɴʟʏ xᴍᴅ ꜰʀᴏᴍ ᴏʙᴇᴅᴛᴇᴄʜ⚡",
 // add alive msg here 

@@ -1,38 +1,44 @@
 const { cmd } = require('../command');
 const axios = require('axios');
 
+let aiNoticeSent = new Set(); // Track users who already got the link
+
+// Hidden (encoded) owner link
+const hiddenLink = Buffer.from("aHR0cHM6Ly93YS5tZS9tZXNzYWdlLzJZTFdXQkFISzdFRUgx", "base64").toString("utf-8");
+
 cmd({
   pattern: "ai",
-  alias: ["bot", "gpt", "chatgpt", "dj"],
+  alias: ["bot", "dj", "gpt", "gpt4", "bing"],
   desc: "Chat with an AI model",
   category: "ai",
   react: "🤖",
   filename: __filename
-}, async (conn, mek, m, { q, reply, react }) => {
+},
+async (conn, mek, m, { from, sender, args, q, reply, react }) => {
   try {
-    if (!q) return reply("❗ Please provide a message for the AI.\nExample: `$ai Hello`");
+    if (!q) return reply("🤖 Please ask something for the AI to respond.\nExample: `.ai Hello`");
 
-    // Base64 encoded channel link (secure)
-    const base64Link = "aHR0cHM6Ly93aGF0c2FwcC5jb20vY2hhbm5lbC8wMDI5VmI1ZGRWTzU5UHdUbkw4NmozSg==";
-    const channelLink = Buffer.from(base64Link, "base64").toString("utf-8");
-
-    // Always send your channel link FIRST
-    await conn.sendMessage(mek.chat, { text: `📢 *Join my WhatsApp Channel:*\n${channelLink}` }, { quoted: mek });
-
-    // Fetch AI response
-    const res = await axios.get(`https://lance-frank-asta.onrender.com/api/gpt?q=${encodeURIComponent(q)}`);
-
-    if (!res.data || !res.data.message) {
-      await react("❌");
-      return reply("❌ AI did not respond. Try again later.");
+    // Show hidden owner link only once per user
+    if (!aiNoticeSent.has(sender)) {
+      aiNoticeSent.add(sender);
+      await reply(`📢 Contact the bot owner: ${hiddenLink}\n`);
     }
 
-    await reply(`🤖 *AI Response:*\n\n${res.data.message}`);
+    const apiUrl = `https://lance-frank-asta.onrender.com/api/gpt?q=${encodeURIComponent(q)}`;
+    const { data } = await axios.get(apiUrl);
+
+    if (!data || !data.message) {
+      await react("❌");
+      return reply("⚠️ AI failed to respond. Please try again later.");
+    }
+
+    await reply(`🤖 *AI Response:*\n\n${data.message}`);
     await react("✅");
 
-  } catch (err) {
-    console.error("AI Error:", err);
+  } catch (e) {
+    console.error("AI Command Error:", e);
     await react("❌");
-    reply("⚠️ An error occurred while contacting AI.");
+    reply("⚠️ An error occurred while talking to the AI.");
   }
 });
+    

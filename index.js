@@ -65,7 +65,7 @@ const {
   //===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
 if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!')
-const sessdata = config.SESSION_ID.replace("keenly~", '');
+const sessdata = config.SESSION_ID.replace("DARKZONE-MD~", '');
 const filer = File.fromURL(`https://mega.nz/file/${sessdata}`)
 filer.download((err, data) => {
 if(err) throw err
@@ -100,7 +100,7 @@ console.log("Session downloaded ✅")
   connectToWA()
   }
   } else if (connection === 'open') {
-  console.log('🧬 Installing KEENLY XMD Plugins')
+  console.log('🧬 Installing DARKZONE-MD Plugins')
   const path = require('path');
   fs.readdirSync("./plugins/").forEach((plugin) => {
   if (path.extname(plugin).toLowerCase() == ".js") {
@@ -110,7 +110,7 @@ console.log("Session downloaded ✅")
   console.log('Plugins installed successful ✅')
   console.log('Bot connected to whatsapp ✅')
   
-  let up = `*Hello there ✦ 𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿 ✦ User! \ud83d\udc4b\ud83c\udffb* \n\n> This is auser friendly whatsapp bot created by ᴏʙᴇᴅ ᴛᴇᴄʜ \ud83c\udf8a, Meet ✦ 𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿 ✦  WhatsApp Bot.\n\n *Thanks for using ✦ 𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿 ✦ \ud83d\udea9* \n\n> follow WhatsApp Channel :- 💖\n \nhttps://whatsapp.com/channel/0029VbAKbSjBA1ep4NkKGd1Y\n\n- *YOUR PREFIX:* = ${prefix}\n\nDont forget to give star to repo ⬇️\n\nhttps://github.com/Obedweb/KEENLY-XMD\n\n> © Powered BY ✦ 𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿 ✦ \ud83d\udda4`;
+  let up = `*Hello there ✦ DARKZONE-MD ✦ User! \ud83d\udc4b\ud83c\udffb* \n\n> This is auser friendly whatsapp bot created by 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟 \ud83c\udf8a, Meet DARKZONE-MD   WhatsApp Bot.\n\n *Thanks for using DARKZONE-MD  \ud83d\udea9* \n\n> follow WhatsApp Channel :- 💖\n \nhttps://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J\n\n- *YOUR PREFIX:* = ${prefix}\n\nDont forget to give star to repo ⬇️\n\nhttps://github.com/DARKZONE-MD\DARKZONE-MD\n\n> © Powered BY ✦  𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟 ✦ \ud83d\udda4`;
   conn.sendMessage(conn.user.id, { image: { url:`https://files.catbox.moe/9yic1a.jpg` }, caption: up })
   }
   })
@@ -623,7 +623,7 @@ if (!isReact && senderNumber === botNumber) {
   }
   
   app.get("/", (req, res) => {
-  res.send("𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿 RUNNING ✅");
+  res.send("DARKZONE-MD  RUNNING ✅");
   });
   app.listen(port, () => console.log(`Server listening on port http://localhost:${port}`));
   setTimeout(() => {

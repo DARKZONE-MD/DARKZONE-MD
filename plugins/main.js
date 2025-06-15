@@ -18,11 +18,10 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 ┃★╭──────────────
 ┃★│ Owner : *${config.OWNER_NAME}*
 ┃★│ Baileys : *Multi Device*
-┃★│ Type : *NodeJs*
 ┃★│ Platform : *Heroku*
 ┃★│ Mode : *[${config.MODE}]*
 ┃★│ Prifix : *[${config.PREFIX}]*
-┃★│ Version : *1.0.0*
+┃★│ creater : *𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟*
 ┃★╰──────────────
 ╰━━━━━━━━━━━━━━━┈⊷
 ╭━━〔 *Download Menu* 〕━━┈⊷
@@ -234,15 +233,15 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         await conn.sendMessage(
             from,
             {
-                image: { url: `https://files.catbox.moe/9yic1a.jpg` },
+                image: { url: `https://files.catbox.moe/r2ncqh` },
                 caption: dec,
                 contextInfo: {
                     mentionedJid: [m.sender],
                     forwardingScore: 999,
                     isForwarded: true,
                     forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363416335506023@newsletter',
-                        newsletterName: '𝙆𝙚𝙚𝙣𝙡𝙮 𝙭𝙢𝙙 💖🦄',
+                        newsletterJid: '120363416743041101@newsletter',
+                        newsletterName: '𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟 💖🦄',
                         serverMessageId: 143
                     }
                 }

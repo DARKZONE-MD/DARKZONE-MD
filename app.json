@@ -1,7 +1,7 @@
 {
-  "name": "𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿",
-  "description": "Javascript WhatsApp bot made by Silva.",
-  "keywords": ["Keenly-xmd"],
+  "name": "DARKZONE-MD",
+  "description": "Javascript WhatsApp bot made by 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟.",
+  "keywords": ["DARKZONE-MD"],
   "success_url": "/",
 
     "stack": "container",
@@ -15,13 +15,13 @@
     "ALIVE_IMG": {
       "description": "paste your image url if you don't have you can use this public url.",
       "required": false,
-      "value": "https://files.catbox.moe/9yic1a.jpg"
+      "value": "https://files.catbox.moe/r2ncqh"
     }, 
     
     "LIVE_MSG": {
       "description": "paste your alive message hear.",
       "required": false,
-      "value": "> ᴋᴇᴇɴʟʏ xᴍᴅ ɪꜱ ᴀᴄᴛɪᴠᴇ ᴀɴᴅ ᴀʟɪᴠᴇ⚡"
+      "value": "> *I am ready for you sir how  can i help you* ⚡"
     },
     "ANTIDELETE_PRIVATE": {
       "description": "when someone deletes a message on dm the bot restores it.",
@@ -94,26 +94,26 @@
     "AUTO_STATUS__MSG": {
       "description": "Type custom message on status reply",
       "required": true,
-      "value": "*🎉👀 ꜱᴇᴇɴ ʙʏ ᴋᴇᴇɴʏ xᴍᴅ 🚀🔥*"
+      "value": "*🎉👀 i am watching  you 🚀🔥*"
     }, 
 
     "OWNER_NAME": {
       "description": "Type Bot Owner Name.",
       "required": false,
-      "value": "ᴏʙᴇᴅ ᴛᴇᴄʜ"
+      "value": "𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟"
 }, 
 
     "OWNER_NUMBER": {
       "description": "put the owner number for bot.",
       "required": false,
-      "value": "254740694462"
+      "value": "923306137477"
 
     }, 
 
     "BOT_NAME": {
       "description": "Type here the bot name.",
       "required": false,
-      "value": "✦ 𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿 ✦"
+      "value": "✦ DARKZONE-MD ✦"
 
       }, 
 
@@ -133,7 +133,7 @@
      "DESCRIPTION": {
       "description": "add caption for menu and other",
       "required": false,
-      "value": "*© ✦ 𝙆𝙀𝙀𝙉𝙇𝙔 𝙓𝙈𝘿 ✦*"
+      "value": "*© ✦ DARKZONE-MD ✦*"
     },
 
       "DELETE_LINKS": {

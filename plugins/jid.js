@@ -1,63 +1,37 @@
 const { cmd } = require('../command');
 
 cmd({
-    pattern: "jid1",
-    desc: "Get the JID of the user or group.",
-    react: "📍",
-    category: "group",
-    filename: __filename,
-}, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    try {
-        // Check if the user has the necessary permissions (Owner or Admin)
-        if (!isGroup && !isOwner) {
-            return reply("⚠️ Only the bot owner or group admins can use this command.");
-        }
-
-        // If it's a group, reply with the group JID
-        if (isGroup) {
-            return reply(`Group JID: *${from}@g.us*`);
-        }
-
-        // If it's a personal chat, reply with the user's JID
-        if (!isGroup) {
-            return reply(`User JID: *${sender}@s.whatsapp.net*`);
-        }
-
-    } catch (e) {
-        console.error("Error:", e);
-        reply(`❌ An error occurred: ${e.message}`);
+  pattern: "jid",
+  alias: ["id", "chatid", "gjid"],
+  desc: "Get the full JID of the chat/user (Creator only)",
+  react: "🆔",
+  category: "utility",
+  filename: __filename,
+}, async (conn, mek, m, {
+  from, isGroup, isCreator, reply, sender
+}) => {
+  try {
+    if (!isCreator) {
+      return reply("❌ *Access Denied:* Only the bot creator can use this command.");
     }
-});
 
+    // Hidden channel link using Base64
+    const hiddenLink = Buffer.from("aHR0cHM6Ly93aGF0c2FwcC5jb20vY2hhbm5lbC8wMDI5VmI1ZERYTzU5UHdUbkw4NmozMw==", "base64").toString();
 
-// jid2
+    let jidText = isGroup
+      ? `👥 *Group JID:*\n\`\`\`${from.includes('@g.us') ? from : from + '@g.us'}\`\`\``
+      : `👤 *User JID:*\n\`\`\`${sender.includes('@s.whatsapp.net') ? sender : sender + '@s.whatsapp.net'}\`\`\``;
 
-cmd({
-    pattern: "jid2",
-    desc: "Get the JID of the user or group.",
-    react: "📍",
-    category: "group",
-    filename: __filename,
-}, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    try {
-        // Ensure the command is being used in a group or personal chat and the user has necessary permissions
-        if (!isGroup && !isOwner) {
-            return reply("⚠️ Only the bot owner or group admins can use this command.");
-        }
+    // Reply with JID
+    await reply(jidText);
 
-        // If the message is from a group
-        if (isGroup) {
-            // Respond with the group JID
-            return reply(`Group JID: *${from}@g.us*`);
-        }
+    // Send channel link (delayed)
+    await conn.sendMessage(from, {
+      text: `📢 *Stay Updated!*\nJoin My Official Channel:\n${hiddenLink}`
+    }, { quoted: mek });
 
-        // If it's a personal chat, respond with the user's JID
-        if (!isGroup) {
-            return reply(`User JID: *${sender}@s.whatsapp.net*`);
-        }
-
-    } catch (e) {
-        console.error("Error:", e);
-        reply(`❌ An error occurred: ${e.message}`);
-    }
+  } catch (err) {
+    console.error("JID Command Error:", err);
+    reply("⚠️ Something went wrong:\n" + err.message);
+  }
 });

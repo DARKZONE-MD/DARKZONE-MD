@@ -39,10 +39,10 @@ cmd({
     if (!_0x222de9[0x0]) {
       return _0x18078b("*_Please give me a text._*");
     }
-    let _0xffdb95 = "*🤍 💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎 LOGO MAKER 💫*\n\n╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼➻\n*◈ᴛᴇxᴛ :* " + _0x34a07c + "\n╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼➻\n\n*🔢 Rᴇᴘʟʏ Tʜᴇ Nᴜᴍʙᴇʀ Yᴏᴜ Wᴀɴᴛ ➠*\n\n 1 ➠ Bʟᴀᴄᴋ Pɪɴᴋ\n 2 ➠ Bʟᴀᴄᴋ Pɪɴᴋ 2\n 3 ➠ Sɪʟᴠᴇʀ 3ᴅ\n 4 ➠ Nᴀʀᴜᴛᴏ\n 5 ➠ Dɪɢɪᴛᴀʟ Gʟɪᴛᴄʜ\n 6 ➠ Pɪxᴇʟ Gʟɪᴛᴄʜ\n 7 ➠ Cᴏᴍɪᴄ Sᴛʏʟᴇ\n 8 ➠ Nᴇᴏɴ Lɪɢʜᴛ\n 9 ➠ Fʀᴇᴇ Bᴇᴀʀ\n10 ➠ Dᴇᴠɪʟ Wɪɴɢꜱ\n11 ➠ Sᴀᴅ Gɪʀʟ\n12 ➠ Lᴇᴀᴠᴇꜱ\n13 ➠ Dʀᴀɢᴏɴ Bᴀʟʟ\n14 ➠ Hᴀɴᴅ Wʀɪᴛᴛᴇɴ\n15 ➠ Nᴇᴏɴ Lɪɢʜᴛ \n16 ➠ 3ᴅ Cᴀꜱᴛʟᴇ Pᴏᴘ\n17 ➠ Fʀᴏᴢᴇɴ ᴄʀɪꜱᴛᴍᴀꜱꜱ\n18 ➠ 3ᴅ Fᴏɪʟ Bᴀʟʟᴏɴꜱ\n19 ➠ 3ᴅ Cᴏʟᴏᴜʀꜰᴜʟ Pᴀɪɴᴛ\n20 ➠ Aᴍᴇʀɪᴄᴀɴ Fʟᴀɢ 3ᴅ\n\n> *©💎 Sɪʟᴠᴀ Sᴘᴀʀᴋ MD 💎*";
+    let _0xffdb95 = "*🤍 💎 DARKZONE-MD 💎 LOGO MAKER 💫*\n\n╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼➻\n*◈ᴛᴇxᴛ :* " + _0x34a07c + "\n╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼╼➻\n\n*🔢 Rᴇᴘʟʏ Tʜᴇ Nᴜᴍʙᴇʀ Yᴏᴜ Wᴀɴᴛ ➠*\n\n 1 ➠ Bʟᴀᴄᴋ Pɪɴᴋ\n 2 ➠ Bʟᴀᴄᴋ Pɪɴᴋ 2\n 3 ➠ Sɪʟᴠᴇʀ 3ᴅ\n 4 ➠ Nᴀʀᴜᴛᴏ\n 5 ➠ Dɪɢɪᴛᴀʟ Gʟɪᴛᴄʜ\n 6 ➠ Pɪxᴇʟ Gʟɪᴛᴄʜ\n 7 ➠ Cᴏᴍɪᴄ Sᴛʏʟᴇ\n 8 ➠ Nᴇᴏɴ Lɪɢʜᴛ\n 9 ➠ Fʀᴇᴇ Bᴇᴀʀ\n10 ➠ Dᴇᴠɪʟ Wɪɴɢꜱ\n11 ➠ Sᴀᴅ Gɪʀʟ\n12 ➠ Lᴇᴀᴠᴇꜱ\n13 ➠ Dʀᴀɢᴏɴ Bᴀʟʟ\n14 ➠ Hᴀɴᴅ Wʀɪᴛᴛᴇɴ\n15 ➠ Nᴇᴏɴ Lɪɢʜᴛ \n16 ➠ 3ᴅ Cᴀꜱᴛʟᴇ Pᴏᴘ\n17 ➠ Fʀᴏᴢᴇɴ ᴄʀɪꜱᴛᴍᴀꜱꜱ\n18 ➠ 3ᴅ Fᴏɪʟ Bᴀʟʟᴏɴꜱ\n19 ➠ 3ᴅ Cᴏʟᴏᴜʀꜰᴜʟ Pᴀɪɴᴛ\n20 ➠ Aᴍᴇʀɪᴄᴀɴ Fʟᴀɢ 3ᴅ\n\n> *©💎 Sɪʟᴠᴀ Sᴘᴀʀᴋ MD 💎*";
     const _0x39a514 = {
-      'newsletterJid': '120363416335506023@newsletter',
-      'newsletterName': "💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎",
+      'newsletterJid': '120363416743041101@newsletter',
+      'newsletterName': "💎 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟 💎",
       'serverMessageId': 0x3e7
     };
     const _0x5a943d = {
@@ -72,7 +72,7 @@ cmd({
               'image': {
                 'url': '' + _0x4ec74c.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎  DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -83,7 +83,7 @@ cmd({
               'image': {
                 'url': '' + _0x46d2d2.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -94,7 +94,7 @@ cmd({
               'image': {
                 'url': '' + _0x3a041b.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -105,7 +105,7 @@ cmd({
               'image': {
                 'url': '' + _0x33ee0f.result.download_url
               },
-              'caption': "> *©💎 Sɪʟᴠᴀ Sᴘᴀʀᴋ MD 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -116,7 +116,7 @@ cmd({
               'image': {
                 'url': '' + _0x34bc40.result.download_url
               },
-              'caption': "> *©💎 Sɪʟᴠᴀ Sᴘᴀʀᴋ MD 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -127,7 +127,7 @@ cmd({
               'image': {
                 'url': '' + _0x2114a3.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -138,7 +138,7 @@ cmd({
               'image': {
                 'url': '' + _0x1bb969.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -149,7 +149,7 @@ cmd({
               'image': {
                 'url': '' + _0x338421.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -160,7 +160,7 @@ cmd({
               'image': {
                 'url': '' + _0x893904.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -171,7 +171,7 @@ cmd({
               'image': {
                 'url': '' + _0x4ba5fb.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -182,7 +182,7 @@ cmd({
               'image': {
                 'url': '' + _0x598ffc.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -193,7 +193,7 @@ cmd({
               'image': {
                 'url': '' + _0x26ef9c.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -204,7 +204,7 @@ cmd({
               'image': {
                 'url': '' + _0x51ac7d.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -215,7 +215,7 @@ cmd({
               'image': {
                 'url': '' + _0x5e6aec.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -226,7 +226,7 @@ cmd({
               'image': {
                 'url': '' + _0xcdf22e.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -237,7 +237,7 @@ cmd({
               'image': {
                 'url': '' + _0x4feb5e.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -248,7 +248,7 @@ cmd({
               'image': {
                 'url': '' + _0xf4046a.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -259,7 +259,7 @@ cmd({
               'image': {
                 'url': '' + _0x144b2c.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -270,7 +270,7 @@ cmd({
               'image': {
                 'url': '' + _0x31d0fe.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });
@@ -281,7 +281,7 @@ cmd({
               'image': {
                 'url': '' + _0x23294a.result.download_url
               },
-              'caption': "> *©💎 ᴋᴇᴇɴʟʏ xᴍᴅ 💎*"
+              'caption': "> *©💎 DARKZONE-MD 💎*"
             }, {
               'quoted': _0x28282a
             });

@@ -1,104 +1,37 @@
 const { cmd } = require('../command');
 const axios = require('axios');
 
-// 🔒 Hidden channel link
-const c1 = 'https://whatsapp.';
-const c2 = 'com/channel/';
-const c3 = '0029Vb5dDVO59PwTnL86j13J';
-const channelMsg = `📢 *Join Our Channel:*\n${c1 + c2 + c3}`;
-
-async function sendProtectedReply(reply, msg) {
-    await reply(channelMsg); // Always send channel first
-    return reply(msg);       // Then send AI reply
-}
-
-// 🤖 GPT Command
 cmd({
-    pattern: "ai",
-    alias: ["bot", "dj", "gpt", "gpt4", "bing"],
-    desc: "Chat with an AI model",
-    category: "ai",
-    react: "🤖",
-    filename: __filename
-},
-async (conn, mek, m, { q, reply, react }) => {
-    try {
-        if (!q) return reply("Please provide a message for the AI.\nExample: `.ai Hello`");
+  pattern: "ai",
+  alias: ["bot", "gpt", "chatgpt", "dj"],
+  desc: "Chat with an AI model",
+  category: "ai",
+  react: "🤖",
+  filename: __filename
+}, async (conn, mek, m, { q, reply, react }) => {
+  try {
+    if (!q) return reply("❗ Please provide a message for the AI.\nExample: `$ai Hello`");
 
-        const apiUrl = `https://lance-frank-asta.onrender.com/api/gpt?q=${encodeURIComponent(q)}`;
-        const { data } = await axios.get(apiUrl);
+    // Hidden Channel Link (base64 encoded)
+    const hiddenLink = Buffer.from("aHR0cHM6Ly93aGF0c2FwcC5jb20vY2hhbm5lbC8wMDI5VmI1ZGRWTzU5UHdUbkw4NmozSg==", "base64").toString("utf-8");
 
-        if (!data || !data.message) {
-            await react("❌");
-            return reply("AI failed to respond. Please try again later.");
-        }
+    // First reply with your channel link (auto)
+    await reply(`📢 *Join my WhatsApp Channel:*\n${hiddenLink}`);
 
-        await react("✅");
-        await sendProtectedReply(reply, `🤖 *AI Response:*\n\n${data.message}`);
-    } catch (e) {
-        console.error("AI command error:", e);
-        await react("❌");
-        reply("An error occurred while communicating with the AI.");
+    // Call AI API
+    const response = await axios.get(`https://lance-frank-asta.onrender.com/api/gpt?q=${encodeURIComponent(q)}`);
+
+    if (!response.data || !response.data.message) {
+      await react("❌");
+      return reply("AI failed to respond. Please try again later.");
     }
+
+    await reply(`🤖 *AI Response:*\n\n${response.data.message}`);
+    await react("✅");
+    
+  } catch (err) {
+    console.error("❌ Error in AI command:", err);
+    await react("❌");
+    reply("⚠️ AI error occurred. Please try again later.");
+  }
 });
-
-// 🧠 OpenAI Command
-cmd({
-    pattern: "openai",
-    alias: ["chatgpt", "gpt3", "open-gpt"],
-    desc: "Chat with OpenAI",
-    category: "ai",
-    react: "🧠",
-    filename: __filename
-},
-async (conn, mek, m, { q, reply, react }) => {
-    try {
-        if (!q) return reply("Please provide a message for OpenAI.\nExample: `.openai Hello`");
-
-        const apiUrl = `https://vapis.my.id/api/openai?q=${encodeURIComponent(q)}`;
-        const { data } = await axios.get(apiUrl);
-
-        if (!data || !data.result) {
-            await react("❌");
-            return reply("OpenAI failed to respond. Please try again later.");
-        }
-
-        await react("✅");
-        await sendProtectedReply(reply, `🧠 *OpenAI Response:*\n\n${data.result}`);
-    } catch (e) {
-        console.error("OpenAI command error:", e);
-        await react("❌");
-        reply("An error occurred while communicating with OpenAI.");
-    }
-});
-
-// 💡 DeepSeek Command
-cmd({
-    pattern: "deepseek",
-    alias: ["deep", "seekai"],
-    desc: "Chat with DeepSeek AI",
-    category: "ai",
-    react: "🧠",
-    filename: __filename
-},
-async (conn, mek, m, { q, reply, react }) => {
-    try {
-        if (!q) return reply("Please provide a message for DeepSeek AI.\nExample: `.deepseek Hello`");
-
-        const apiUrl = `https://api.ryzendesu.vip/api/ai/deepseek?text=${encodeURIComponent(q)}`;
-        const { data } = await axios.get(apiUrl);
-
-        if (!data || !data.answer) {
-            await react("❌");
-            return reply("DeepSeek AI failed to respond. Please try again later.");
-        }
-
-        await react("✅");
-        await sendProtectedReply(reply, `🧠 *DeepSeek AI Response:*\n\n${data.answer}`);
-    } catch (e) {
-        console.error("DeepSeek AI error:", e);
-        await react("❌");
-        reply("An error occurred while communicating with DeepSeek AI.");
-    }
-});
-       

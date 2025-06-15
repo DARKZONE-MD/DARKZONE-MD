@@ -15,16 +15,16 @@ const divider = (length = 20, char = '─') => char.repeat(length);
 async function sendMenu(conn, from, mek, sender, text, title, sendAudio = false) {
   try {
     await conn.sendMessage(from, {
-      image: { url: `https://files.catbox.moe/9yic1a.jpg` },
+      image: { url: `https://files.catbox.moe/r2ncqh` },
       caption: text,
       contextInfo: {
         mentionedJid: [sender],
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363416335506023@newsletter',
-          newsletterName: '𝙆𝙚𝙚𝙣𝙡𝙮 𝙭𝙢𝙙 💖🦄',
-          serverMessageId: 143
+          newsletterJid: '120363416743041101@newsletter',
+          newsletterName: '𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟💖🦄',
+          serverMessageId: 143 
         }
       }
     }, { quoted: mek });
@@ -53,7 +53,7 @@ cmd({
   try {
     const menuText = `
 ╭━━━━━━━━━━━━━━━━━━━━╮
-  ✨ 𝐊𝐄𝐄𝐍𝐋𝐘 𝐗𝐌𝐃 ✨
+  ✨ DARKZONE-MD ✨
 ╰━━━━━━━━━━━━━━━━━━━━╯
 
 ${rainbow.join('')} BOT INFORMATION ${rainbow.reverse().join('')}

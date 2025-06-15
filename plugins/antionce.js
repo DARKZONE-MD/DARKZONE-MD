@@ -1,18 +1,15 @@
 const { cmd } = require("../command");
 
 cmd({
-  pattern: "vv",
-  alias: ["viewonce", 'retrive'],
-  react: '🐳',
+  pattern: "vv2",
+  alias: ["wah", "ohh", "oho", "🙂", "nice", "ok"],
   desc: "Owner Only - retrieve quoted message back to user",
   category: "owner",
   filename: __filename
 }, async (client, message, match, { from, isCreator }) => {
   try {
     if (!isCreator) {
-      return await client.sendMessage(from, {
-        text: "*📛 This is an owner command.*"
-      }, { quoted: message });
+      return; // Simply return without any response if not owner
     }
 
     if (!match.quoted) {
@@ -54,7 +51,8 @@ cmd({
         }, { quoted: message });
     }
 
-    await client.sendMessage(from, messageContent, options);
+    // Forward to user's DM
+    await client.sendMessage(message.sender, messageContent, options);
   } catch (error) {
     console.error("vv Error:", error);
     await client.sendMessage(from, {
@@ -62,4 +60,3 @@ cmd({
     }, { quoted: message });
   }
 });
-    

@@ -40,7 +40,7 @@ async (conn, mek, m, { from, quoted, reply }) => {
         const arch = os.arch().toUpperCase();
 
         const msg = `
-┏━━━『 *👨‍💻 KEENLY XMD Info* 』━━━✦
+┏━━━『 *👨‍💻 DARKZONE-MD Info* 』━━━✦
 ┃ 🔗 *Repo*: 
 ┃   github.com/DARKZONE-MD/DARKZONE-MD 
 ┃ 

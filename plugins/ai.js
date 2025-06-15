@@ -12,26 +12,27 @@ cmd({
   try {
     if (!q) return reply("❗ Please provide a message for the AI.\nExample: `$ai Hello`");
 
-    // Hidden Channel Link (base64 encoded)
-    const hiddenLink = Buffer.from("aHR0cHM6Ly93aGF0c2FwcC5jb20vY2hhbm5lbC8wMDI5VmI1ZGRWTzU5UHdUbkw4NmozSg==", "base64").toString("utf-8");
+    // Base64 encoded channel link (secure)
+    const base64Link = "aHR0cHM6Ly93aGF0c2FwcC5jb20vY2hhbm5lbC8wMDI5VmI1ZGRWTzU5UHdUbkw4NmozSg==";
+    const channelLink = Buffer.from(base64Link, "base64").toString("utf-8");
 
-    // First reply with your channel link (auto)
-    await reply(`📢 *Join my WhatsApp Channel:*\n${hiddenLink}`);
+    // Always send your channel link FIRST
+    await conn.sendMessage(mek.chat, { text: `📢 *Join my WhatsApp Channel:*\n${channelLink}` }, { quoted: mek });
 
-    // Call AI API
-    const response = await axios.get(`https://lance-frank-asta.onrender.com/api/gpt?q=${encodeURIComponent(q)}`);
+    // Fetch AI response
+    const res = await axios.get(`https://lance-frank-asta.onrender.com/api/gpt?q=${encodeURIComponent(q)}`);
 
-    if (!response.data || !response.data.message) {
+    if (!res.data || !res.data.message) {
       await react("❌");
-      return reply("AI failed to respond. Please try again later.");
+      return reply("❌ AI did not respond. Try again later.");
     }
 
-    await reply(`🤖 *AI Response:*\n\n${response.data.message}`);
+    await reply(`🤖 *AI Response:*\n\n${res.data.message}`);
     await react("✅");
-    
+
   } catch (err) {
-    console.error("❌ Error in AI command:", err);
+    console.error("AI Error:", err);
     await react("❌");
-    reply("⚠️ AI error occurred. Please try again later.");
+    reply("⚠️ An error occurred while contacting AI.");
   }
 });

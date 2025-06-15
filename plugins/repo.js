@@ -23,7 +23,7 @@ const commandCount = Object.keys(require.cache)
 cmd({
     pattern: "repo",
     alias: ["sc", "script", "info"],
-    desc: "Show KEENLY XMD repository details",
+    desc: "Show DARKZONE-MD repository details",
     category: "main",
     react: "👨‍💻",
     filename: __filename
@@ -31,7 +31,7 @@ cmd({
 async (conn, mek, m, { from, quoted, reply }) => {
     try {
         // GitHub repo stats
-        const { data } = await axios.get('https://api.github.com/repos/Obedweb/KEENLY-XMD');
+        const { data } = await axios.get('https://api.github.com/repos/DARKZONE-MD/DARKZONE-MD');
         const { stargazers_count, forks_count } = data;
         const users = Math.round((stargazers_count + forks_count) * 5); // ×5 stats
 
@@ -42,7 +42,7 @@ async (conn, mek, m, { from, quoted, reply }) => {
         const msg = `
 ┏━━━『 *👨‍💻 KEENLY XMD Info* 』━━━✦
 ┃ 🔗 *Repo*: 
-┃   github.com/Obedweb/KEENLY-XMD
+┃   github.com/DARKZONE-MD/DARKZONE-MD 
 ┃ 
 ┃ ⭐ *Stars*: ${stargazers_count}
 ┃ 🍴 *Forks*: ${forks_count}
@@ -54,13 +54,13 @@ async (conn, mek, m, { from, quoted, reply }) => {
 ┃ 💽 *System*: ${platform} (${arch})
 ┗━━━━━━━━━━━━━━━━━━━━━━✦
 
-✨ *KEENLY XMD* – your feature-packed WhatsApp bot for automation, fun, and more!
+✨ *DARKZONE-MD* – your feature-packed WhatsApp bot for automation, fun, and more!
 
 📌 *Main MD Repo*:
-https://github.com/Obedweb/KEENLY-XMD
+https://github.com/DARKZONE-MD/DARKZONE-MD 
 
 💡 *Tip*: Fork & ⭐ to show love!
-💖 Thanks for choosing KEENLY XMD!
+💖 Thanks for choosing DARKZONE-MD!
         `.trim();
 
         const contextTag = {
@@ -68,8 +68,8 @@ https://github.com/Obedweb/KEENLY-XMD
             forwardingScore: 999,
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
-                newsletterJid: '120363416335506023@newsletter',
-                newsletterName: '𝙺𝙴𝙴𝙽𝙻𝚈 𝚇𝙼𝙳 💖🦄',
+                newsletterJid: '120363416743041101@newsletter',
+                newsletterName: '𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟 💖🦄',
                 serverMessageId: 143
             }
         };
@@ -82,14 +82,14 @@ https://github.com/Obedweb/KEENLY-XMD
 
         // Send a related image with forward tag
         await conn.sendMessage(from, {
-            image: { url: `https://files.catbox.moe/9yic1a.jpg` },
-            caption: "🌟 *𝙺𝙴𝙴𝙽𝙻𝚈 𝚇𝙼𝙳: Powering smart chats everywhere!*",
+            image: { url: `https://files.catbox.moe/r2ncqh` },
+            caption: "🌟 *DARKZONE-MD: Powering smart chats everywhere!*",
             contextInfo: contextTag
         }, { quoted: mek });
 
         // Send the audio response (voice note)
         await conn.sendMessage(from, {
-            audio: { url: 'https://files.catbox.moe/gq9uht.mp3' },
+            audio: { url: 'https://files.catbox.moe/r2ncqh' },
             mimetype: 'audio/mp4',
             ptt: true
         }, { quoted: mek });

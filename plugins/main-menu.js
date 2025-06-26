@@ -1,95 +1,114 @@
 const config = require('../config')
-const { cmd } = require('../command')
-const fs = require('fs')
-const path = require('path')
-const { runtime } = require('../lib/functions')
+const { cmd, commands } = require('../command');
+const path = require('path'); 
+const os = require("os")
+const fs = require('fs');
+const {runtime} = require('../lib/functions')
+const axios = require('axios')
 
 cmd({
     pattern: "menu2",
-    alias: ["allmenu", "fullmenu"],
+    alias: ["allmenu","fullmenu"],
+    use: '.menu2',
     desc: "Show all bot commands",
     category: "menu",
     react: "📜",
     filename: __filename
-}, async (conn, mek, m, { from, sender, reply }) => {
+}, 
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        // System information
-        const memoryUsage = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)
-        const totalMemory = (os.totalmem() / 1024 / 1024).toFixed(2)
-        const uptime = runtime(process.uptime())
-
-        // Create the header with bot info
-        const header = `
-╭───「 ✨ *${config.BOT_NAME || "DARKZONE-MD"}* ✨ 」───
-│
-│ ⏱️ *Runtime:* ${uptime}
-│ 👑 *Owner:* @${config.OWNER_NAME || "MR MANUL"}
-│ 💾 *Memory:* ${memoryUsage}MB / ${totalMemory}MB
-│
-╰─────────────────────`
-
-        // Create all button sections
-        const sections = [
-            // MAIN MENU
-            {
-                title: "⚡ MAIN MENU",
-                rows: [
-                    { title: "🏓 Ping", rowId: `${config.PREFIX}ping` },
-                    { title: "💚 Alive", rowId: `${config.PREFIX}alive` },
-                    { title: "📊 Speed", rowId: `${config.PREFIX}speed` },
-                    { title: "📡 Live", rowId: `${config.PREFIX}live` }
-                ]
-            },
-            // DOWNLOAD MENU
-            {
-                title: "📥 DOWNLOAD MENU",
-                rows: [
-                    { title: "🔵 Facebook", rowId: `${config.PREFIX}fb` },
-                    { title: "🎵 Tiktok", rowId: `${config.PREFIX}tiktok` },
-                    { title: "📷 Instagram", rowId: `${config.PREFIX}insta` },
-                    { title: "🐦 Twitter", rowId: `${config.PREFIX}twitter` }
-                ]
-            },
-            // GROUP MENU
-            {
-                title: "👥 GROUP MENU",
-                rows: [
-                    { title: "👢 Kick", rowId: `${config.PREFIX}kick` },
-                    { title: "⬆️ Promote", rowId: `${config.PREFIX}promote` },
-                    { title: "@ Tag All", rowId: `${config.PREFIX}tagall` },
-                    { title: "🎉 Welcome", rowId: `${config.PREFIX}setwelcome` }
-                ]
-            },
-            // OWNER MENU
-            {
-                title: "👑 OWNER MENU",
-                rows: [
-                    { title: "👑 Owner", rowId: `${config.PREFIX}owner` },
-                    { title: "🔄 Restart", rowId: `${config.PREFIX}restart` },
-                    { title: "🚫 Block", rowId: `${config.PREFIX}block` },
-                    { title: "✅ Unblock", rowId: `${config.PREFIX}unblock` }
-                ]
-            }
+        // Main menu buttons
+        const buttons = [
+            {buttonId: `${config.PREFIX}downloadmenu`, buttonText: {displayText: '📥 DOWNLOAD'}, type: 1},
+            {buttonId: `${config.PREFIX}groupmenu`, buttonText: {displayText: '👥 GROUP'}, type: 1},
+            {buttonId: `${config.PREFIX}reactmenu`, buttonText: {displayText: '🎭 REACTIONS'}, type: 1},
+            {buttonId: `${config.PREFIX}logomenu`, buttonText: {displayText: '🎨 LOGO MAKER'}, type: 1},
+            {buttonId: `${config.PREFIX}ownermenu`, buttonText: {displayText: '👑 OWNER'}, type: 1},
+            {buttonId: `${config.PREFIX}funmenu`, buttonText: {displayText: '🎉 FUN'}, type: 1},
+            {buttonId: `${config.PREFIX}convertmenu`, buttonText: {displayText: '🔄 CONVERT'}, type: 1},
+            {buttonId: `${config.PREFIX}aimenu`, buttonText: {displayText: '🤖 AI'}, type: 1},
+            {buttonId: `${config.PREFIX}animemenu`, buttonText: {displayText: '🎎 ANIME'}, type: 1},
+            {buttonId: `${config.PREFIX}othermenu`, buttonText: {displayText: 'ℹ️ OTHER'}, type: 1}
         ]
 
-        // Send the interactive button menu
-        await conn.sendMessage(from, {
-            text: header,
-            footer: "Powered By - @MR MANUL | OFC",
-            title: "COMMANDS PANEL",
-            buttonText: "CLICK FOR COMMANDS ▼",
-            sections: sections,
-            mentions: [sender]
-        }, { quoted: mek })
+        const buttonMessage = {
+            image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/r2ncqh' },
+            caption: `╭━━〔 🚀 *${config.BOT_NAME}* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 👑 Owner : *${config.OWNER_NAME}*
+┃◈┃• ⚙️ Prefix : *[${config.PREFIX}]*
+┃◈┃• 🌐 Platform : *Heroku*
+┃◈┃• 📦 Version : *4.0.0*
+┃◈┃• ⏱️ Runtime : *${runtime(process.uptime())}*
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷
 
-        // Optional: Send menu image
-        await conn.sendMessage(from, {
-            image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/71l0oz.jpg' },
-            caption: "✨ *DARKZONE-MD Bot Menu* ✨"
-        }, { quoted: mek })
+Click the buttons below to navigate to different menus`,
+            footer: `Powered by ${config.OWNER_NAME}`,
+            buttons: buttons,
+            headerType: 4,
+            contextInfo: {
+                mentionedJid: [m.sender],
+                forwardingScore: 999,
+                isForwarded: true
+            }
+        }
 
+        await conn.sendMessage(from, buttonMessage, { quoted: mek });
+
+        // Share local audio
+        const audioPath = path.join(__dirname, '../assets/menu.m4a');
+        await conn.sendMessage(from, {
+            audio: fs.readFileSync(audioPath),
+            mimetype: 'audio/mp4',
+            ptt: true,
+        }, { quoted: mek });
+        
     } catch (e) {
-        console.error("Menu Error:", e)
-        reply(`❌ Error loading menu: ${e.message}`)
+        console.log(e);
+        reply(`❌ Error: ${e}`);
     }
-})
+});
+
+// Individual menu handlers
+cmd({
+    pattern: "downloadmenu",
+    desc: "Download menu",
+    category: "menu",
+    filename: __filename
+}, async (conn, mek, m, { from, reply }) => {
+    const downloadMenu = `╭━━〔 📥 *DOWNLOAD MENU* 〕━━┈⊷
+┃◈╭─────────────────·๏
+┃◈┃• 🟦 facebook
+┃◈┃• 📁 mediafire
+┃◈┃• 🎵 tiktok
+┃◈┃• 🐦 twitter
+┃◈┃• 📷 insta
+┃◈┃• 📦 apk
+┃◈┃• 🖼️ img
+┃◈┃• ▶️ tt2
+┃◈┃• 📌 pins
+┃◈┃• 🔄 apk2
+┃◈┃• 🔵 fb2
+┃◈┃• 📍 pinterest
+┃◈┃• 🎶 spotify
+┃◈┃• 🎧 play
+┃◈┃• 🎧 play2
+┃◈┃• 🔉 audio
+┃◈┃• 🎬 video
+┃◈┃• 📹 video2
+┃◈┃• 🎵 ytmp3
+┃◈┃• 📹 ytmp4
+┃◈┃• 🎶 song
+┃◈┃• 🎬 darama
+┃◈┃• ☁️ gdrive
+┃◈┃• 🌐 ssweb
+┃◈┃• 🎵 tiks
+┃◈╰─────────────────┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷`;
+
+    await reply(downloadMenu);
+});
+
+// Add similar handlers for other menus (groupmenu, reactmenu, etc.)
+// Each menu should have its own command handler like the downloadmenu above

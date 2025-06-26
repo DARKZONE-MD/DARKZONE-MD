@@ -5,7 +5,7 @@ const path = require('path')
 const { runtime } = require('../lib/functions')
 
 cmd({
-    pattern: "menu",
+    pattern: "menu2",
     alias: ["allmenu", "fullmenu"],
     desc: "Show all bot commands",
     category: "menu",

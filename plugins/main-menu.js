@@ -15,7 +15,7 @@ cmd({
     try {
         // Header with bot info
         const header = `
-╭───「 ✨ *${config.BOT_NAME || "DARKZONE-MD"}* ✨ 」───
+╭───「 ✨ *${config.BOT_NAME || "YourBot"}* ✨ 」───
 │
 │ 👑 *Owner:* ${config.OWNER_NAME || "Erfan Ahmad"}
 │ ⚡ *Prefix:* [${config.PREFIX || "."}]
@@ -23,100 +23,61 @@ cmd({
 │
 ╰─────────────────────`
 
-        // Create all button sections
-        const sections = [
-            // DOWNLOAD MENU
+        // Create button sections
+        const buttonSections = [
             {
                 title: "📥 DOWNLOAD MENU",
                 rows: [
                     { title: "🔵 Facebook", rowId: `${config.PREFIX}fb` },
                     { title: "🎵 Tiktok", rowId: `${config.PREFIX}tiktok` },
                     { title: "📷 Instagram", rowId: `${config.PREFIX}insta` },
-                    { title: "🐦 Twitter", rowId: `${config.PREFIX}twitter` },
-                    { title: "📦 Mediafire", rowId: `${config.PREFIX}mediafire` }
+                    { title: "🐦 Twitter", rowId: `${config.PREFIX}twitter` }
                 ]
             },
-            // GROUP MENU
             {
                 title: "👥 GROUP MENU",
                 rows: [
                     { title: "👢 Kick", rowId: `${config.PREFIX}kick` },
                     { title: "⬆️ Promote", rowId: `${config.PREFIX}promote` },
                     { title: "@ Tag All", rowId: `${config.PREFIX}tagall` },
-                    { title: "🎉 Welcome", rowId: `${config.PREFIX}setwelcome` },
-                    { title: "🔗 Group Link", rowId: `${config.PREFIX}grouplink` }
+                    { title: "🎉 Welcome", rowId: `${config.PREFIX}setwelcome` }
                 ]
             },
-            // OWNER MENU
             {
-                title: "👑 OWNER MENU",
+                title: "🎨 CREATIVE MENU",
                 rows: [
-                    { title: "👑 Owner", rowId: `${config.PREFIX}owner` },
-                    { title: "🔄 Restart", rowId: `${config.PREFIX}restart` },
-                    { title: "🚫 Block", rowId: `${config.PREFIX}block` },
-                    { title: "✅ Unblock", rowId: `${config.PREFIX}unblock` },
-                    { title: "💚 Alive", rowId: `${config.PREFIX}alive` }
+                    { title: "💡 Neon Logo", rowId: `${config.PREFIX}neonlight` },
+                    { title: "🏷️ Sticker", rowId: `${config.PREFIX}sticker` },
+                    { title: "🌌 Galaxy", rowId: `${config.PREFIX}galaxy` },
+                    { title: "🎭 Comic", rowId: `${config.PREFIX}3dcomic` }
                 ]
             },
-            // FUN MENU
             {
-                title: "🎉 FUN MENU",
+                title: "⚡ UTILITIES",
                 rows: [
-                    { title: "😆 Joke", rowId: `${config.PREFIX}joke` },
-                    { title: "💘 Ship", rowId: `${config.PREFIX}ship` },
-                    { title: "⭐ Rate", rowId: `${config.PREFIX}rate` },
-                    { title: "🤬 Insult", rowId: `${config.PREFIX}insult` },
-                    { title: "💋 Kiss", rowId: `${config.PREFIX}kiss` }
-                ]
-            },
-            // AI MENU
-            {
-                title: "🤖 AI MENU",
-                rows: [
-                    { title: "🧠 AI", rowId: `${config.PREFIX}ai` },
-                    { title: "🤖 GPT", rowId: `${config.PREFIX}gpt` },
-                    { title: "🎨 Imagine", rowId: `${config.PREFIX}imagine` },
-                    { title: "🔍 Bing", rowId: `${config.PREFIX}bing` },
-                    { title: "📦 Blackbox", rowId: `${config.PREFIX}blackbox` }
-                ]
-            },
-            // LOGO MENU
-            {
-                title: "🎨 LOGO MENU",
-                rows: [
-                    { title: "💡 Neon", rowId: `${config.PREFIX}neonlight` },
-                    { title: "🎀 Blackpink", rowId: `${config.PREFIX}blackpink` },
-                    { title: "🐉 Dragonball", rowId: `${config.PREFIX}dragonball` },
-                    { title: "🎭 3D Comic", rowId: `${config.PREFIX}3dcomic` },
-                    { title: "🌌 Galaxy", rowId: `${config.PREFIX}galaxy` }
+                    { title: "🏓 Ping", rowId: `${config.PREFIX}ping` },
+                    { title: "💚 Alive", rowId: `${config.PREFIX}alive` },
+                    { title: "🔍 AI", rowId: `${config.PREFIX}ai` },
+                    { title: "📜 Full Menu", rowId: `${config.PREFIX}allmenu` }
                 ]
             }
         ]
 
-        // Send the interactive button menu
+        // Send the button menu
         await conn.sendMessage(from, {
             text: header,
-            footer: "DARKZONE-MD | Multi-Device WhatsApp Bot",
+            footer: config.DESCRIPTION || "Powered by Erfan Ahmad",
             title: "BOT COMMAND MENU",
-            buttonText: "Click For Commands",
-            sections: sections,
+            buttonText: "CLICK FOR COMMANDS ▼",
+            sections: buttonSections,
             mentions: [sender]
         }, { quoted: mek })
 
         // Optional: Send menu image
         await conn.sendMessage(from, {
-            image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/71l0oz.jpg' },
-            caption: "✨ *DARKZONE-MD Bot Menu* ✨"
+            image: { url: config.MENU_IMAGE_URL || '' },
+            caption: "✨ *Bot Menu* ✨"
         }, { quoted: mek })
-
-        // Optional: Send audio menu
-        const audioPath = path.join(__dirname, '../assets/menu.m4a')
-        if (fs.existsSync(audioPath)) {
-            await conn.sendMessage(from, {
-                audio: { url: audioPath },
-                mimetype: 'audio/mp4'
-            }, { quoted: mek })
-        }
 
     } catch (e) {
         console.error("Menu Error:", e)

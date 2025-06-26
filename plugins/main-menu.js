@@ -1,10 +1,8 @@
 const config = require('../config')
-const { cmd, commands } = require('../command');
-const path = require('path'); 
-const os = require("os")
-const fs = require('fs');
+const { cmd } = require('../command')
+const fs = require('fs')
+const path = require('path')
 const { runtime } = require('../lib/functions')
-const axios = require('axios')
 
 cmd({
     pattern: "menu2",
@@ -13,85 +11,83 @@ cmd({
     category: "menu",
     react: "📜",
     filename: __filename
-}, 
-async (conn, mek, m, { from, sender, reply }) => {
+}, async (conn, mek, m, { from, sender, reply }) => {
     try {
         // Header with bot info
         const header = `
-╭───「 ✨ *${config.BOT_NAME}* ✨ 」───
+╭───「 ✨ *${config.BOT_NAME || "YourBot"}* ✨ 」───
 │
-│ 👑 *Owner:* ${config.OWNER_NAME}
-│ ⚡ *Prefix:* [${config.PREFIX}]
+│ 👑 *Owner:* ${config.OWNER_NAME || "Erfan Ahmad"}
+│ ⚡ *Prefix:* [${config.PREFIX || "."}]
 │ 🕒 *Runtime:* ${runtime(process.uptime())}
 │
-╰─────────────────────`;
+╰─────────────────────`
 
         // Create button sections
         const buttons = [
             {
-                title: "📥 DOWNLOAD MENU",
+                title: "📥 DOWNLOAD",
                 rows: [
-                    { title: "🎵 Tiktok", description: "Download tiktok videos", rowId: `${config.PREFIX}tiktok` },
-                    { title: "🔵 Facebook", description: "Download facebook videos", rowId: `${config.PREFIX}fb` },
-                    { title: "📷 Instagram", description: "Download instagram content", rowId: `${config.PREFIX}insta` },
-                    { title: "🐦 Twitter", description: "Download twitter videos", rowId: `${config.PREFIX}twitter` }
+                    { title: "🔵 Facebook", rowId: `${config.PREFIX}fb` },
+                    { title: "🎵 Tiktok", rowId: `${config.PREFIX}tiktok` },
+                    { title: "📷 Instagram", rowId: `${config.PREFIX}insta` },
+                    { title: "🐦 Twitter", rowId: `${config.PREFIX}twitter` }
                 ]
             },
             {
-                title: "👥 GROUP MENU",
+                title: "👥 GROUP",
                 rows: [
-                    { title: "👢 Kick", description: "Remove member from group", rowId: `${config.PREFIX}kick` },
-                    { title: "⬆️ Promote", description: "Make member admin", rowId: `${config.PREFIX}promote` },
-                    { title: "🎉 Welcome", description: "Set welcome message", rowId: `${config.PREFIX}setwelcome` },
-                    { title: "@ Tag All", description: "Mention all members", rowId: `${config.PREFIX}tagall` }
+                    { title: "👢 Kick", rowId: `${config.PREFIX}kick` },
+                    { title: "⬆️ Promote", rowId: `${config.PREFIX}promote` },
+                    { title: "@ Tag All", rowId: `${config.PREFIX}tagall` },
+                    { title: "🎉 Welcome", rowId: `${config.PREFIX}setwelcome` }
                 ]
             },
             {
-                title: "🎨 CREATIVE MENU",
+                title: "🎨 CREATIVE",
                 rows: [
-                    { title: "💡 Neon Logo", description: "Create neon text logo", rowId: `${config.PREFIX}neonlight` },
-                    { title: "🎭 Comic Logo", description: "3D comic style text", rowId: `${config.PREFIX}3dcomic` },
-                    { title: "🌌 Galaxy Logo", description: "Galaxy style text", rowId: `${config.PREFIX}galaxy` },
-                    { title: "🏷️ Sticker", description: "Convert image to sticker", rowId: `${config.PREFIX}sticker` }
+                    { title: "💡 Neon Logo", rowId: `${config.PREFIX}neonlight` },
+                    { title: "🏷️ Sticker", rowId: `${config.PREFIX}sticker` },
+                    { title: "🌌 Galaxy", rowId: `${config.PREFIX}galaxy` },
+                    { title: "🎭 Comic", rowId: `${config.PREFIX}3dcomic` }
                 ]
             },
             {
                 title: "⚡ UTILITIES",
                 rows: [
-                    { title: "🏓 Ping", description: "Check bot speed", rowId: `${config.PREFIX}ping` },
-                    { title: "💚 Alive", description: "Check bot status", rowId: `${config.PREFIX}alive` },
-                    { title: "🔍 Search", description: "Search anything", rowId: `${config.PREFIX}ai` },
-                    { title: "📜 Full Menu", description: "See all commands", rowId: `${config.PREFIX}allmenu` }
+                    { title: "🏓 Ping", rowId: `${config.PREFIX}ping` },
+                    { title: "💚 Alive", rowId: `${config.PREFIX}alive` },
+                    { title: "🔍 AI", rowId: `${config.PREFIX}ai` },
+                    { title: "📜 Full Menu", rowId: `${config.PREFIX}allmenu` }
                 ]
             }
-        ];
+        ]
 
         // Send interactive message with buttons
         await conn.sendMessage(from, {
-            image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/71l0oz.jpg' },
-            caption: header,
-            footer: config.DESCRIPTION || "A powerful WhatsApp bot",
+            text: header,
+            footer: config.DESCRIPTION || "Powered by Erfan Ahmad",
             templateButtons: buttons,
-            viewOnce: true,
             mentions: [sender]
-        }, { quoted: mek });
+        }, { quoted: mek })
 
-        // Send audio if available
-        try {
-            const audioPath = path.join(__dirname, '../assets/menu.m4a');
-            if (fs.existsSync(audioPath)) {
-                await conn.sendMessage(from, {
-                    audio: { url: audioPath },
-                    mimetype: 'audio/mp4',
-                    ptt: true
-                }, { quoted: mek });
-            }
-        } catch (audioError) {
-            console.log("Audio send error:", audioError);
+        // Optional: Send menu image if you want
+        await conn.sendMessage(from, {
+            image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/71l0oz.jpg' },
+            caption: "✨ *Bot Menu* ✨"
+        }, { quoted: mek })
+
+        // Optional: Send audio if available
+        const audioPath = path.join(__dirname, '../assets/menu.m4a')
+        if (fs.existsSync(audioPath)) {
+            await conn.sendMessage(from, {
+                audio: { url: audioPath },
+                mimetype: 'audio/mp4'
+            }, { quoted: mek })
         }
 
     } catch (e) {
-        console.error("Menu Error:", e);
-        reply(`❌ Error loading menu: ${e.message}`);
+        console.error("Menu Error:", e)
+        reply(`❌ Error loading menu: ${e.message}`)
     }
-});
+})

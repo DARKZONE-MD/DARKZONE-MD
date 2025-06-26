@@ -15,7 +15,7 @@ cmd({
     try {
         // Header with bot info
         const header = `
-╭───「 ✨ *${config.BOT_NAME || "YourBot"}* ✨ 」───
+╭───「 ✨ *${config.BOT_NAME || "DARKZONE-MD"}* ✨ 」───
 │
 │ 👑 *Owner:* ${config.OWNER_NAME || "Erfan Ahmad"}
 │ ⚡ *Prefix:* [${config.PREFIX || "."}]
@@ -23,10 +23,11 @@ cmd({
 │
 ╰─────────────────────`
 
-        // Create button sections
-        const buttons = [
+        // Create all button sections
+        const buttonSections = [
+            // DOWNLOAD MENU
             {
-                title: "📥 DOWNLOAD",
+                title: "📥 DOWNLOAD MENU",
                 rows: [
                     { title: "🔵 Facebook", rowId: `${config.PREFIX}fb` },
                     { title: "🎵 Tiktok", rowId: `${config.PREFIX}tiktok` },
@@ -34,8 +35,9 @@ cmd({
                     { title: "🐦 Twitter", rowId: `${config.PREFIX}twitter` }
                 ]
             },
+            // GROUP MENU
             {
-                title: "👥 GROUP",
+                title: "👥 GROUP MENU",
                 rows: [
                     { title: "👢 Kick", rowId: `${config.PREFIX}kick` },
                     { title: "⬆️ Promote", rowId: `${config.PREFIX}promote` },
@@ -43,48 +45,53 @@ cmd({
                     { title: "🎉 Welcome", rowId: `${config.PREFIX}setwelcome` }
                 ]
             },
+            // OWNER MENU
             {
-                title: "🎨 CREATIVE",
+                title: "👑 OWNER MENU",
                 rows: [
-                    { title: "💡 Neon Logo", rowId: `${config.PREFIX}neonlight` },
-                    { title: "🏷️ Sticker", rowId: `${config.PREFIX}sticker` },
-                    { title: "🌌 Galaxy", rowId: `${config.PREFIX}galaxy` },
-                    { title: "🎭 Comic", rowId: `${config.PREFIX}3dcomic` }
+                    { title: "👑 Owner", rowId: `${config.PREFIX}owner` },
+                    { title: "🔄 Restart", rowId: `${config.PREFIX}restart` },
+                    { title: "🚫 Block", rowId: `${config.PREFIX}block` },
+                    { title: "✅ Unblock", rowId: `${config.PREFIX}unblock` }
                 ]
             },
+            // FUN MENU
             {
-                title: "⚡ UTILITIES",
+                title: "🎉 FUN MENU",
                 rows: [
-                    { title: "🏓 Ping", rowId: `${config.PREFIX}ping` },
-                    { title: "💚 Alive", rowId: `${config.PREFIX}alive` },
-                    { title: "🔍 AI", rowId: `${config.PREFIX}ai` },
-                    { title: "📜 Full Menu", rowId: `${config.PREFIX}allmenu` }
+                    { title: "😆 Joke", rowId: `${config.PREFIX}joke` },
+                    { title: "💘 Ship", rowId: `${config.PREFIX}ship` },
+                    { title: "⭐ Rate", rowId: `${config.PREFIX}rate` },
+                    { title: "🤬 Insult", rowId: `${config.PREFIX}insult` }
+                ]
+            },
+            // AI MENU
+            {
+                title: "🤖 AI MENU",
+                rows: [
+                    { title: "🧠 AI", rowId: `${config.PREFIX}ai` },
+                    { title: "🤖 GPT", rowId: `${config.PREFIX}gpt` },
+                    { title: "🎨 Imagine", rowId: `${config.PREFIX}imagine` },
+                    { title: "🔍 Bing", rowId: `${config.PREFIX}bing` }
                 ]
             }
         ]
 
-        // Send interactive message with buttons
+        // Send the main menu with buttons
         await conn.sendMessage(from, {
             text: header,
-            footer: config.DESCRIPTION || "Powered by Erfan Ahmad",
-            templateButtons: buttons,
+            footer: "DARKZONE-MD | Multi-Device WhatsApp Bot",
+            title: "BOT MENU",
+            buttonText: "Click Here For Commands",
+            sections: buttonSections,
             mentions: [sender]
         }, { quoted: mek })
 
-        // Optional: Send menu image if you want
+        // Optional: Send menu image
         await conn.sendMessage(from, {
-            image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/71l0oz.jpg' },
-            caption: "✨ *Bot Menu* ✨"
+            image: { url: 'https://files.catbox.moe/71l0oz.jpg' },
+            caption: "✨ *DARKZONE-MD Bot Menu* ✨"
         }, { quoted: mek })
-
-        // Optional: Send audio if available
-        const audioPath = path.join(__dirname, '../assets/menu.m4a')
-        if (fs.existsSync(audioPath)) {
-            await conn.sendMessage(from, {
-                audio: { url: audioPath },
-                mimetype: 'audio/mp4'
-            }, { quoted: mek })
-        }
 
     } catch (e) {
         console.error("Menu Error:", e)

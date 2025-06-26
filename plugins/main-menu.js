@@ -75,7 +75,7 @@ cmd({
 
         // Optional: Send menu image
         await conn.sendMessage(from, {
-            image: { url: config.MENU_IMAGE_URL || '' },
+            image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/71l0oz.jpg' },
             caption: "✨ *Bot Menu* ✨"
         }, { quoted: mek })
 

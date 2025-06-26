@@ -5,26 +5,42 @@ const path = require('path')
 const { runtime } = require('../lib/functions')
 
 cmd({
-    pattern: "menu2",
+    pattern: "menu",
     alias: ["allmenu", "fullmenu"],
-    desc: "Show all bot commands with buttons",
+    desc: "Show all bot commands",
     category: "menu",
     react: "📜",
     filename: __filename
 }, async (conn, mek, m, { from, sender, reply }) => {
     try {
-        // Header with bot info
+        // System information
+        const memoryUsage = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)
+        const totalMemory = (os.totalmem() / 1024 / 1024).toFixed(2)
+        const uptime = runtime(process.uptime())
+
+        // Create the header with bot info
         const header = `
-╭───「 ✨ *${config.BOT_NAME || "YourBot"}* ✨ 」───
+╭───「 ✨ *${config.BOT_NAME || "DARKZONE-MD"}* ✨ 」───
 │
-│ 👑 *Owner:* ${config.OWNER_NAME || "Erfan Ahmad"}
-│ ⚡ *Prefix:* [${config.PREFIX || "."}]
-│ 🕒 *Runtime:* ${runtime(process.uptime())}
+│ ⏱️ *Runtime:* ${uptime}
+│ 👑 *Owner:* @${config.OWNER_NAME || "MR MANUL"}
+│ 💾 *Memory:* ${memoryUsage}MB / ${totalMemory}MB
 │
 ╰─────────────────────`
 
-        // Create button sections
-        const buttonSections = [
+        // Create all button sections
+        const sections = [
+            // MAIN MENU
+            {
+                title: "⚡ MAIN MENU",
+                rows: [
+                    { title: "🏓 Ping", rowId: `${config.PREFIX}ping` },
+                    { title: "💚 Alive", rowId: `${config.PREFIX}alive` },
+                    { title: "📊 Speed", rowId: `${config.PREFIX}speed` },
+                    { title: "📡 Live", rowId: `${config.PREFIX}live` }
+                ]
+            },
+            // DOWNLOAD MENU
             {
                 title: "📥 DOWNLOAD MENU",
                 rows: [
@@ -34,6 +50,7 @@ cmd({
                     { title: "🐦 Twitter", rowId: `${config.PREFIX}twitter` }
                 ]
             },
+            // GROUP MENU
             {
                 title: "👥 GROUP MENU",
                 rows: [
@@ -43,40 +60,32 @@ cmd({
                     { title: "🎉 Welcome", rowId: `${config.PREFIX}setwelcome` }
                 ]
             },
+            // OWNER MENU
             {
-                title: "🎨 CREATIVE MENU",
+                title: "👑 OWNER MENU",
                 rows: [
-                    { title: "💡 Neon Logo", rowId: `${config.PREFIX}neonlight` },
-                    { title: "🏷️ Sticker", rowId: `${config.PREFIX}sticker` },
-                    { title: "🌌 Galaxy", rowId: `${config.PREFIX}galaxy` },
-                    { title: "🎭 Comic", rowId: `${config.PREFIX}3dcomic` }
-                ]
-            },
-            {
-                title: "⚡ UTILITIES",
-                rows: [
-                    { title: "🏓 Ping", rowId: `${config.PREFIX}ping` },
-                    { title: "💚 Alive", rowId: `${config.PREFIX}alive` },
-                    { title: "🔍 AI", rowId: `${config.PREFIX}ai` },
-                    { title: "📜 Full Menu", rowId: `${config.PREFIX}allmenu` }
+                    { title: "👑 Owner", rowId: `${config.PREFIX}owner` },
+                    { title: "🔄 Restart", rowId: `${config.PREFIX}restart` },
+                    { title: "🚫 Block", rowId: `${config.PREFIX}block` },
+                    { title: "✅ Unblock", rowId: `${config.PREFIX}unblock` }
                 ]
             }
         ]
 
-        // Send the button menu
+        // Send the interactive button menu
         await conn.sendMessage(from, {
             text: header,
-            footer: config.DESCRIPTION || "Powered by Erfan Ahmad",
-            title: "BOT COMMAND MENU",
+            footer: "Powered By - @MR MANUL | OFC",
+            title: "COMMANDS PANEL",
             buttonText: "CLICK FOR COMMANDS ▼",
-            sections: buttonSections,
+            sections: sections,
             mentions: [sender]
         }, { quoted: mek })
 
         // Optional: Send menu image
         await conn.sendMessage(from, {
             image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/71l0oz.jpg' },
-            caption: "✨ *Bot Menu* ✨"
+            caption: "✨ *DARKZONE-MD Bot Menu* ✨"
         }, { quoted: mek })
 
     } catch (e) {

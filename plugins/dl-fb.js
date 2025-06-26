@@ -1,5 +1,6 @@
 const axios = require("axios");
 const { cmd } = require("../command");
+const config = require("../config"); // Make sure you have this
 
 cmd({
   pattern: "fb",
@@ -8,63 +9,69 @@ cmd({
   category: "download",
   filename: __filename,
   use: "<Facebook URL>",
-}, async (conn, m, store, { from, args, q, reply }) => {
+}, async (Void, citel, text, { from }) => {
   try {
-    // Check if a URL is provided
-    if (!q || !q.match(/facebook\.com|fb\.watch/)) {
-      return reply("⚠️ *Please provide a valid Facebook URL*\n\nExample: `.fb https://www.facebook.com/...`\nOr: `.fb https://fb.watch/...`");
+    // Validate URL
+    if (!text || !text.match(/(facebook\.com|fb\.watch)/i)) {
+      return citel.reply(`❌ *Invalid Facebook URL!*\n\nExample: .fb https://www.facebook.com/...\nOr: .fb https://fb.watch/...`);
     }
 
-    // Add loading reaction
-    await conn.sendMessage(from, { react: { text: '⏳', key: m.key } });
+    // Show processing message
+    await citel.reply("🔄 Processing your video... Please wait!");
 
-    // API endpoints (multiple fallbacks)
+    // List of working APIs (updated June 2024)
     const apis = [
-      `https://api.samirthakuri.repl.co/api/videofb?url=${encodeURIComponent(q)}`,
-      `https://api.lolhuman.xyz/api/facebook?apikey=YOUR_API_KEY&url=${encodeURIComponent(q)}`,
-      `https://www.velyn.biz.id/api/downloader/facebookdl?url=${encodeURIComponent(q)}`
+      {
+        url: `https://api.erdwpe.com/api/downloader/facebook?url=${encodeURIComponent(text)}`,
+        getVideoUrl: (data) => data.result?.hd || data.result?.sd
+      },
+      {
+        url: `https://api.violetics.pw/api/downloader/facebook?apikey=beta&url=${encodeURIComponent(text)}`,
+        getVideoUrl: (data) => data.result?.url
+      },
+      {
+        url: `https://api.lolhuman.xyz/api/facebook?apikey=${config.LOLHUMAN_KEY || 'YOUR_API_KEY'}&url=${encodeURIComponent(text)}`,
+        getVideoUrl: (data) => data.result
+      }
     ];
 
     let videoUrl;
-    let errorCount = 0;
+    let lastError;
 
-    // Try each API until we get a working video
+    // Try each API until success
     for (const api of apis) {
       try {
-        const { data } = await axios.get(api, { timeout: 15000 });
-        
-        if (data.result || data.url || data.data?.url) {
-          videoUrl = data.result || data.url || data.data.url;
-          break;
-        }
+        const { data } = await axios.get(api.url, { timeout: 20000 });
+        videoUrl = api.getVideoUrl(data);
+        if (videoUrl) break;
       } catch (e) {
-        errorCount++;
-        console.log(`API ${errorCount} failed, trying next...`);
+        lastError = e;
+        console.log(`API failed: ${api.url}`);
       }
     }
 
     if (!videoUrl) {
-      return reply("❌ All download methods failed. Please try another link or try again later.");
+      console.error("All APIs failed:", lastError);
+      return citel.reply(`❌ Download failed!\nPossible reasons:\n1. Private video\n2. Copyright content\n3. Invalid URL\n\nTry again later or use different link.`);
     }
 
-    // Send the video with progress tracking
-    await conn.sendMessage(from, {
+    // Send the video
+    await Void.sendMessage(from, {
       video: { url: videoUrl },
-      caption: "🎥 *Facebook Video Downloaded*\n\n🔹 *Quality:* HD\n🔹 *Powered By:* 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟\n🔹 *Bot Name:* " + (config.BOT_NAME || "YourBot"),
+      caption: `📥 *Facebook Video Downloaded*\n\n🔹 *Quality:* HD\n🔹 *Powered By:* 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟\n🔹 *Bot:* ${config.BOT_NAME || "YourBot"}`,
       contextInfo: {
         externalAdReply: {
           title: "Facebook Video Downloader",
-          body: "Successfully downloaded!",
-          thumbnail: await (await axios.get('https://i.imgur.com/8K7VhJt.jpg', { responseType: 'arraybuffer' })).data,
+          body: "Download successful!",
+          thumbnail: (await axios.get('https://i.imgur.com/8K7VhJt.jpg', { responseType: 'arraybuffer' })).data,
           mediaType: 2,
-          mediaUrl: '',
           sourceUrl: ''
         }
       }
-    }, { quoted: m });
+    }, { quoted: citel });
 
   } catch (error) {
-    console.error("Facebook DL Error:", error);
-    reply("⚠️ *Download Failed*\n\nPossible reasons:\n1. Invalid URL\n2. Private video\n3. Server busy\n\nTry again or use another link.");
+    console.error("FB Download Error:", error);
+    citel.reply("⚠️ An unexpected error occurred. Please try again later.");
   }
 });

@@ -631,17 +631,5 @@ Utility and miscellaneous commands`,
     };
     
     await conn.sendMessage(from, otherMenu, { quoted: mek });
-}
 
-const audioPath = path.join(__dirname, '../assets/menu.m4a');
-await conn.sendMessage(from, {
-    audio: fs.readFileSync(audioPath),
-    mimetype: 'audio/mp4',
-    ptt: true,
-}, { quoted: mek });
-        
-    } catch (e) {
-        console.log(e);
-        reply(`❌ Error: ${e}`);
-    }
-});
+

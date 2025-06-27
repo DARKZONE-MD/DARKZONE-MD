@@ -188,8 +188,7 @@ let up = `┏━━━━━━━━━━━━━━━━━━━┓
     if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN === "true"){
       await conn.readMessages([mek.key])
     }
-  
-I am give you now code the status react is not working so make working and please 💯 working code ; if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
+  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
     const jawadlike = await conn.decodeJid(conn.user.id);
     const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
     const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
@@ -197,90 +196,7 @@ I am give you now code the status react is not working so make working and pleas
       react: {
         text: randomEmoji,
         key: mek.key,
-      }
-
-Edit
-Looking at your code, I can see a few potential issues that might be preventing the status reaction from working properly. Here's a corrected and more robust version:
-
-
-Fixed WhatsApp Status Auto React Code
-Code 
-Key improvements made:
-
-Added try-catch error handling - This will catch and log any errors that occur during the reaction process
-Added a small delay - 1 second delay before sending reaction to avoid potential rate limiting issues
-Removed duplicate emoji - Fixed the duplicate '🖤' in your emoji array
-Added console logging - So you can see if the reaction is being sent successfully
-Added fallback method - If the primary reaction method fails, it tries an alternative approach using relayMessage
-Better code formatting - Made the code more readable and maintainable
-Common issues that might have been causing problems:
-
-Rate limiting: WhatsApp may block rapid reactions
-Missing error handling: Errors were being thrown silently
-Timing issues: Reacting too quickly after receiving the status
-Authentication issues: Make sure your bot is properly connected
-Additional troubleshooting tips:
-
-Make sure config.AUTO_STATUS_REACT is exactly "true" (string, not boolean)
-Verify that conn.user.id exists and is properly set
-Check that the bot has permission to view and react to statuses
-Monitor the console logs to see what's happening
-This improved version should work much more reliably! 💯
-
-
-
-
-
-
-
-// Fixed WhatsApp Status Auto React Code
-if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true") {
-    try {
-        // Decode the bot's JID
-        const jawadlike = await conn.decodeJid(conn.user.id);
-        
-        // Array of emojis to randomly select from
-        const emojis = [
-            '❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', 
-            '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', 
-            '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', 
-            '🗿', '🇵🇰', '💜', '💙', '🌝', '💚'
-        ];
-        
-        // Select random emoji
-        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-        
-        // Add small delay to avoid rate limiting
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Send reaction to the status
-        await conn.sendMessage(mek.key.remoteJid, {
-            react: {
-                text: randomEmoji,
-                key: mek.key
-            }
-        });
-        
-        console.log(`✅ Reacted to status with: ${randomEmoji}`);
-        
-    } catch (error) {
-        console.error('❌ Error reacting to status:', error);
-        
-        // Alternative method if first method fails
-        try {
-            await conn.relayMessage(mek.key.remoteJid, {
-                reactionMessage: {
-                    key: mek.key,
-                    text: emojis[Math.floor(Math.random() * emojis.length)]
-                }
-            }, {});
-            console.log('✅ Status reaction sent using alternative method');
-        } catch (altError) {
-            console.error('❌ Alternative reaction method also failed:', altError);
-        }
-    }
-}
-
+      } 
     }, { statusJidList: [mek.key.participant, erfanlike] });
   }                       
   if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){

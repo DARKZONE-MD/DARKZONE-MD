@@ -1,4 +1,4 @@
-const { cmd, commands } = require('../command');
+const { cmd } = require('../command');
 const axios = require('axios');
 
 cmd({
@@ -11,35 +11,43 @@ cmd({
     filename: __filename
 }, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, senderNumber, reply }) => {
     try {
-        // Extract phone number from command
-        const phoneNumber = q ? q.trim().replace(/[^0-9]/g, '') : senderNumber.replace(/[^0-9]/g, '');
-
-        // Validate phone number format
-        if (!phoneNumber || phoneNumber.length < 10 || phoneNumber.length > 15) {
-            return await reply("❌ Please provide a valid phone number without `+`\nExample: `.pair 923306137XXX`");
+        // Extract and validate phone number
+        let phoneNumber = q ? q.trim().replace(/[^0-9]/g, '') : senderNumber.replace(/[^0-9]/g, '');
+        
+        // Add country code if missing
+        if (!phoneNumber.startsWith('92') && phoneNumber.length === 10) {
+            phoneNumber = '92' + phoneNumber;
         }
 
-        // Make API request to get pairing code
-        const response = await axios.get(`https://irfan-7hee.onrender.com//code?number=${encodeURIComponent(phoneNumber)}`);
-
-        if (!response.data || !response.data.code) {
-            return await reply("❌ Failed to retrieve pairing code. Please try again later.");
+        // Validate phone number
+        if (!phoneNumber.match(/^92\d{9,12}$/)) {
+            return await reply("❌ Invalid Pakistan number!\nUse: `.pair 92306123XXXX`");
         }
 
-        const pairingCode = response.data.code;
-        const doneMessage = "> *DARKZONE-MD PAIRING COMPLETED*";
+        // API Request with timeout
+        const { data } = await axios.get(`https://irfan-7hee.onrender.com/code?number=${phoneNumber}`, {
+            timeout: 10000 // 10 seconds timeout
+        });
 
-        // Send initial message with formatting
-        await reply(`${doneMessage}\n\n*Your pairing code is:* ${pairingCode}`);
+        if (!data?.code) {
+            return await reply("⚠️ Pairing server busy. Try again later!");
+        }
 
-        // Optional 2-second delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Send formatted response
+        await reply(`*DARKZONE-MD PAIRING CODE* 🚀\n\n` +
+                   `▢ *Number:* ${phoneNumber}\n` +
+                   `▢ *Code:* ${data.code}\n\n` +
+                   `_Expires in 5 minutes_`);
 
-        // Send clean code again
-        await reply(`${pairingCode}`);
+        // Send raw code separately
+        await reply(data.code.toString());
 
     } catch (error) {
-        console.error("Pair command error:", error);
-        await reply("❌ An error occurred while getting pairing code. Please try again later.");
+        console.error("Pair Error:", error);
+        if (error.code === 'ECONNABORTED') {
+            await reply("❌ Server timeout! Try again in 1 minute.");
+        } else {
+            await reply("⚠️ Pairing service unavailable. Contact @Owner");
+        }
     }
 });

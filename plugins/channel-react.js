@@ -1,6 +1,7 @@
 const config = require('../config');
 const { cmd } = require('../command');
 
+// Stylized Characters
 const stylizedChars = {
   a: '🅐', b: '🅑', c: '🅒', d: '🅓', e: '🅔', f: '🅕', g: '🅖',
   h: '🅗', i: '🅘', j: '🅙', k: '🅚', l: '🅛', m: '🅜', n: '🅝',
@@ -10,77 +11,69 @@ const stylizedChars = {
   '5': '➎', '6': '➏', '7': '➐', '8': '➑', '9': '➒'
 };
 
-const newsletterJids = [
-  "120363416743041101@newsletter"
-];
+// Your Channel ID
+const yourChannelId = "120363416743041101@newsletter"; 
 
-const emojis = [
-  "❤️", "💀", "🌚", "🌟", "🔥", "❤️‍🩹", "🌸", "🍁", "🍂", "🦋",
-  "🍥", "🍧", "🍨", "🍫", "🍭", "🎀", "🎐", "🎗️", "👑", "🚩",
-  "🇵🇰", "🍓", "🍇", "🧃", "🗿", "🎋", "💸", "🧸"
-];
+// Random Emoji List
+const emojis = ["❤️", "🌟", "🔥", "🌸", "🍁", "🦋", "🍥", "🎀", "👑", "🚩"];
 
 cmd({
   pattern: "chr",
-  alias: ["creact"],
+  alias: ["channelreact"],
   react: "🔤",
-  desc: "React to channel messages with stylized text",
+  desc: "React to channel posts with stylized text",
   category: "owner",
-  use: '.chr <channel-link> <text>',
   filename: __filename
-},
-async (conn, mek, m, {
-  from, quoted, body, isCmd, command, args, q,
-  isGroup, sender, senderNumber, botNumber2, botNumber,
-  pushname, isMe, isCreator, groupMetadata, groupName,
-  participants, groupAdmins, isBotAdmins, isAdmins, reply
-}) => {
+}, async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, reply }) => {
   try {
-    // ✅ Auto-react to messages in the newsletter
-    if (
-      mek &&
-      mek.key &&
-      mek.key.remoteJid &&
-      newsletterJids.includes(mek.key.remoteJid)
-    ) {
-      const serverId = mek.newsletterMessage?.message?.id || mek.newsletterServerId;
-      if (serverId) {
-        const emoji = emojis[Math.floor(Math.random() * emojis.length)];
-        await conn.newsletterReactMessage(mek.key.remoteJid, serverId.toString(), emoji);
-      }
+    // ==============================================
+    // 🔥 AUTO-REACT TO YOUR CHANNEL POSTS (HEART EMOJI)
+    // ==============================================
+    if (mek.key?.remoteJid === yourChannelId) {
+      const messageId = mek.key.id;
+      const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+      await conn.sendMessage(yourChannelId, {
+        react: {
+          text: randomEmoji,
+          key: mek.key
+        }
+      });
+      return;
     }
 
-    // ✅ Command: .chr <link> <text>
-    if (!isCreator) return reply("❌ Owner only command");
-    if (!q) return reply(`Usage:\n${command} https://whatsapp.com/channel/1234567890/987654321 hello`);
+    // ==============================================
+    // ✨ MANUAL REACT COMMAND (.chr <link> <text>)
+    // ==============================================
+    if (!q) return reply(`❌ Usage: .chr <channel-link> <text>\nExample: .chr https://whatsapp.com/channel/123456 hello`);
 
     const [link, ...textParts] = q.split(' ');
     if (!link.includes("whatsapp.com/channel/")) return reply("❌ Invalid channel link format");
 
-    const inputText = textParts.join(' ').toLowerCase();
-    if (!inputText) return reply("❌ Please provide text to convert");
+    const text = textParts.join(' ').toLowerCase();
+    if (!text) return reply("❌ Please provide text to convert");
 
-    const emojiText = inputText.split('').map(char => {
-      if (char === ' ') return '―';
-      return stylizedChars[char] || char;
-    }).join('');
+    // Convert text to stylized characters
+    const styledText = text.split('').map(char => stylizedChars[char] || char).join('');
 
-    const channelId = link.split('/')[4];
-    const messageId = link.split('/')[5];
+    // Extract channel ID and message ID from link
+    const parts = link.split('/');
+    const channelId = parts[4];
+    const messageId = parts[5];
+
     if (!channelId || !messageId) return reply("❌ Invalid link - missing IDs");
 
-    const channelMeta = await conn.newsletterMetadata("invite", channelId);
-    await conn.newsletterReactMessage(channelMeta.id, messageId, emojiText);
+    // Send reaction
+    await conn.sendMessage(channelId+'@newsletter', {
+      react: {
+        text: styledText,
+        key: { id: messageId, remoteJid: channelId+'@newsletter' }
+      }
+    });
 
-    return reply(`╭━━━〔 *DARKZONE-MD* 〕━━━┈⊷
-┃▸ *Success!* Reaction sent
-┃▸ *Channel:* ${channelMeta.name}
-┃▸ *Reaction:* ${emojiText}
-╰────────────────┈⊷
-> *𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝐷*`);
+    reply(`✅ Success! Reacted with:\n${styledText}`);
+
   } catch (e) {
-    console.error("❌ Error:", e);
-    reply(`❎ Error: ${e.message || "Failed to send reaction"}`);
+    console.error("CHR Error:", e);
+    reply(`❌ Error: ${e.message || "Failed to react"}`);
   }
 });
-    

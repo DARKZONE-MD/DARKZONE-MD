@@ -6,9 +6,9 @@ const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "menu2",
-    alias: ["menu"],
-    desc: "Download menu with button",
-    category: "menu",
+    alias: ["menu2"],
+    desc: "Download menu2 with button",
+    category: "menu2",
     react: "📥",
     filename: __filename
 }, async (conn, mek, m, { from, reply }) => {

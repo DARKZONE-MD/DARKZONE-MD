@@ -6,69 +6,35 @@ const { runtime } = require('../lib/functions');
 
 cmd({
     pattern: "menu2",
-    alias: ["menu2"],
-    desc: "Download menu2 with button",
-    category: "menu2",
+    alias: ["menu"],
+    desc: "Show download menu",
+    category: "menu",
     react: "📥",
     filename: __filename
 }, async (conn, mek, m, { from, reply }) => {
     try {
-        // Menu Text
-        let menuText = `
+        // Menu Header
+        let menuHeader = `
 ╭━━〔 🚀 ${config.BOT_NAME} 〕━━┈⊷
 ┃◈ Owner: ${config.OWNER_NAME}
 ┃◈ Prefix: [${config.PREFIX}]
 ┃◈ Runtime: ${runtime(process.uptime())}
-╰━━━━━━━━━━━━━━━━━━━┈⊷
+╰━━━━━━━━━━━━━━━━━━━┈⊷`;
 
-📌 Click the button below for download options!`;
+        // Create Download Button
+        const buttonMessage = {
+            text: menuHeader,
+            footer: "Tap the button below for download options!",
+            buttons: [
+                { buttonId: `${config.PREFIX}download`, buttonText: { displayText: '📥 DOWNLOAD' }, type: 1 }
+            ],
+            headerType: 1
+        };
 
-        // Download Button
-        const buttons = [
-            {
-                buttonId: `${config.PREFIX}download`,
-                buttonText: { displayText: '📥 DOWNLOAD MENU' },
-                type: 1
-            }
-        ];
+        // Send the message
+        await conn.sendMessage(from, buttonMessage, { quoted: mek });
 
-        // Download Commands (shown when button is clicked)
-        let downloadCommands = `
-╭━━〔 📥 DOWNLOAD COMMANDS 〕━━┈⊷
-┃◈ facebook [url]
-┃◈ tiktok [url] 
-┃◈ insta [url]
-┃◈ youtube [url]
-┃◈ spotify [url]
-┃◈ song [name]
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-Type ${config.PREFIX}command for usage`;
-
-        // Send Interactive Message
-        await conn.sendMessage(
-            from,
-            {
-                image: { url: config.MENU_IMAGE_URL || 'https://i.imgur.com/abc123.jpg' },
-                caption: menuText,
-                footer: "Tap the button below",
-                buttons: buttons,
-                headerType: 4
-            },
-            { quoted: mek }
-        );
-
-        // Optional: Send audio
-        const audioPath = path.join(__dirname, '../assets/menu.m4a');
-        if (fs.existsSync(audioPath)) {
-            await conn.sendMessage(
-                from,
-                { 
-                    audio: fs.readFileSync(audioPath),
-                    mimetype: 'audio/mp4'
-                },
-                { quoted: mek }
-            );
-        }
+        console.log("Menu sent successfully!"); // Debug log
 
     } catch (e) {
         console.error("Menu Error:", e);

@@ -1,4 +1,4 @@
-const config = require('../config')
+const config = require('../config');
 const { cmd } = require('../command');
 const path = require('path');
 const fs = require('fs');
@@ -7,70 +7,63 @@ const { runtime } = require('../lib/functions');
 cmd({
     pattern: "menu2",
     alias: ["menu"],
-    desc: "Interactive menu with buttons",
+    desc: "Download menu with button",
     category: "menu",
-    react: "📜",
+    react: "📥",
     filename: __filename
 }, async (conn, mek, m, { from, reply }) => {
     try {
-        // Main Menu Text
+        // Menu Text
         let menuText = `
-╭━━〔 🚀 *${config.BOT_NAME}* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 👑 Owner : *${config.OWNER_NAME}*
-┃◈┃• ⚙️ Prefix : *[${config.PREFIX}]*
-┃◈┃• ⏱️ Runtime : *${runtime(process.uptime())}*
-┃◈╰─────────────────┈⊷
+╭━━〔 🚀 ${config.BOT_NAME} 〕━━┈⊷
+┃◈ Owner: ${config.OWNER_NAME}
+┃◈ Prefix: [${config.PREFIX}]
+┃◈ Runtime: ${runtime(process.uptime())}
 ╰━━━━━━━━━━━━━━━━━━━┈⊷
 
-📌 *Click buttons below for quick access!*`;
+📌 Click the button below for download options!`;
 
-        // Interactive Buttons (MAIN COMMANDS)
+        // Download Button
         const buttons = [
-            { buttonId: `${config.PREFIX}owner`, buttonText: { displayText: "👑 Owner" }, type: 1 },
-            { buttonId: `${config.PREFIX}download`, buttonText: { displayText: "📥 Download" }, type: 1 },
-            { buttonId: `${config.PREFIX}vote`, buttonText: { displayText: "⭐ Vote" }, type: 1 },
-            { buttonId: `${config.PREFIX}group`, buttonText: { displayText: "👥 Group" }, type: 1 },
-            { buttonId: `${config.PREFIX}ai`, buttonText: { displayText: "🤖 AI" }, type: 1 },
-            { buttonId: `${config.PREFIX}fun`, buttonText: { displayText: "🎉 Fun" }, type: 1 }
+            {
+                buttonId: `${config.PREFIX}download`,
+                buttonText: { displayText: '📥 DOWNLOAD MENU' },
+                type: 1
+            }
         ];
 
-        // All Other Commands (as text)
-        let commandsText = `
-╭━━〔 📜 *ALL COMMANDS* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 🎵 tiktok
-┃◈┃• 🐦 twitter
-┃◈┃• 📷 insta
-┃◈┃• 🖼️ sticker
-┃◈┃• 🎭 anime
-┃◈┃• 🎨 logo
-┃◈┃• 🧠 gpt
-┃◈┃• 🎲 joke
-┃◈┃• ℹ️ fact
-┃◈╰─────────────────┈⊷
-> ${config.DESCRIPTION}`;
+        // Download Commands (shown when button is clicked)
+        let downloadCommands = `
+╭━━〔 📥 DOWNLOAD COMMANDS 〕━━┈⊷
+┃◈ facebook [url]
+┃◈ tiktok [url] 
+┃◈ insta [url]
+┃◈ youtube [url]
+┃◈ spotify [url]
+┃◈ song [name]
+╰━━━━━━━━━━━━━━━━━━━┈⊷
+Type ${config.PREFIX}command for usage`;
 
         // Send Interactive Message
         await conn.sendMessage(
             from,
             {
-                image: { url: config.MENU_IMAGE_URL || 'https://i.imgur.com/3xZQZ9x.jpeg' },
-                caption: menuText + commandsText,
-                footer: "Tap buttons to execute commands!",
+                image: { url: config.MENU_IMAGE_URL || 'https://i.imgur.com/abc123.jpg' },
+                caption: menuText,
+                footer: "Tap the button below",
                 buttons: buttons,
                 headerType: 4
             },
             { quoted: mek }
         );
 
-        // Optional: Send Menu Audio
+        // Optional: Send audio
         const audioPath = path.join(__dirname, '../assets/menu.m4a');
         if (fs.existsSync(audioPath)) {
             await conn.sendMessage(
                 from,
                 { 
-                    audio: fs.readFileSync(audioPath), 
+                    audio: fs.readFileSync(audioPath),
                     mimetype: 'audio/mp4'
                 },
                 { quoted: mek }
@@ -79,6 +72,6 @@ cmd({
 
     } catch (e) {
         console.error("Menu Error:", e);
-        reply(`❌ Menu failed. Error: ${e.message}`);
+        reply(`❌ Error: ${e.message}`);
     }
 });

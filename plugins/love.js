@@ -9,35 +9,32 @@ const loveEmojis = [
 ];
 
 cmd({
-    pattern: "lov",
+    pattern: "love",
     alias: ["heart"],
-    desc: "Send changing love emojis in one message",
+    desc: "Send changing love emojis",
     category: "fun",
     react: "💖",
     filename: __filename
 }, async (conn, mek, m, { from, reply }) => {
     try {
-        // Send initial message
+        // Send initial emoji
         let msg = await conn.sendMessage(from, { 
-            text: "💖 *Love Bomb Incoming!* 💖\n\nCurrent emoji: 💖" 
+            text: loveEmojis[0] 
         }, { quoted: mek });
 
-        let counter = 0;
+        let counter = 1;
         const interval = setInterval(async () => {
             try {
                 if (counter >= 20) {
                     clearInterval(interval);
-                    await conn.sendMessage(from, { 
-                        text: "💝 *Love session ended!*" 
-                    }, { quoted: mek });
                     return;
                 }
 
                 const emoji = loveEmojis[counter % loveEmojis.length];
                 
-                // Edit the same message
+                // Edit the same message with new emoji
                 await conn.sendMessage(from, {
-                    text: `💖 *Love Bomb Incoming!* 💖\n\nCurrent emoji: ${emoji}`,
+                    text: emoji,
                     edit: msg.key
                 });
                 
@@ -47,12 +44,12 @@ cmd({
                 clearInterval(interval);
                 console.error("Error updating emoji:", e);
             }
-        }, 1000);
+        }, 1000); // Change every 1 second
 
     } catch (e) {
         console.error("Initial Error:", e);
         await conn.sendMessage(from, { 
-            text: "❌ Failed to start love session!" 
+            text: "💔" 
         }, { quoted: mek });
     }
 });

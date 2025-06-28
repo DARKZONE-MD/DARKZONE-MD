@@ -8,49 +8,47 @@ const {
   proto,
   generateWAMessageContent,
   generateWAMessage,
+  AnyMessageContent,
   prepareWAMessageMedia,
   areJidsSameUser,
   downloadContentFromMessage,
+  MessageRetryMap,
   generateForwardMessageContent,
   generateWAMessageFromContent,
-  generateMessageID,
+  generateMessageID, 
   makeInMemoryStore,
   jidDecode,
   fetchLatestBaileysVersion,
   Browsers
 } = require('@whiskeysockets/baileys');
 
-const fs = require('fs').promises;
-const path = require('path');
-const os = require('os');
-const util = require('util');
-const Crypto = require('crypto');
-const P = require('pino');
-const axios = require('axios');
-const express = require("express");
-const qrcode = require('qrcode-terminal');
-const FileType = require('file-type');
-const { fromBuffer } = require('file-type');
-const ff = require('fluent-ffmpeg');
-const StickersTypes = require('wa-sticker-formatter');
-const { File } = require('megajs');
-
-// Config and helper imports
-const config = require('./config');
+const l = console.log;
 const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson } = require('./lib/functions');
 const { AntiDelDB, initializeAntiDeleteSettings, setAnti, getAnti, getAllAntiDeleteSettings, saveContact, loadMessage, getName, getChatSummary, saveGroupMetadata, getGroupMetadata, saveMessageCount, getInactiveGroupMembers, getGroupMembersMessageCount, saveMessage } = require('./data');
+const fs = require('fs').promises; // Changed to promises API
+const ff = require('fluent-ffmpeg');
+const P = require('pino');
+const config = require('./config');
 const GroupEvents = require('./lib/groupevents');
+const qrcode = require('qrcode-terminal');
+const StickersTypes = require('wa-sticker-formatter');
+const util = require('util');
 const { sms, downloadMediaMessage, AntiDelete } = require('./lib');
-
+const FileType = require('file-type');
+const axios = require('axios');
+const { File } = require('megajs');
+const { fromBuffer } = require('file-type');
+const bodyparser = require('body-parser');
+const os = require('os');
+const Crypto = require('crypto');
+const path = require('path');
 const prefix = config.PREFIX;
-const ownerNumber = ['923306137477'];
-const app = express();
-const port = process.env.PORT || 9090;
 
-// Improved temp directory handling
+const ownerNumber = ['923306137477'];
 const tempDir = path.join(os.tmpdir(), 'cache-temp');
 
-async function ensureTempDir() {
+// Improved temp directory handling
+async function setupTempDir() {
   try {
     await fs.mkdir(tempDir, { recursive: true });
   } catch (err) {
@@ -69,18 +67,18 @@ async function clearTempDir() {
   }
 }
 
-// Initialize temp directory management
-ensureTempDir().then(() => {
+// Initialize temp directory
+setupTempDir().then(() => {
   setInterval(clearTempDir, 5 * 60 * 1000);
 });
 
-// Session handling with better error management
+// Improved session handling
 async function setupSession() {
   const sessionPath = path.join(__dirname, 'sessions', 'creds.json');
   
   try {
     await fs.access(sessionPath);
-    return true; // Session exists
+    return true;
   } catch {
     if (!config.SESSION_ID) {
       console.log('Please add your session to SESSION_ID env !!');
@@ -111,7 +109,10 @@ async function setupSession() {
   }
 }
 
-// Optimized WA connection handler
+const express = require("express");
+const app = express();
+const port = process.env.PORT || 9090;
+
 async function connectToWA() {
   if (!await setupSession()) {
     console.log('Failed to setup session, retrying in 30 seconds...');
@@ -217,7 +218,6 @@ async function connectToWA() {
   }
 }
 
-// Helper function to send connection notification
 async function sendConnectionNotification(conn) {
   const greetings = [
     "🤖 DARKZONE-MD BOT",
@@ -267,7 +267,6 @@ async function sendConnectionNotification(conn) {
   }
 }
 
-// Optimized message processing
 async function processMessages(conn, messages) {
   for (const mek of messages) {
     if (!mek.message) continue;
@@ -320,7 +319,7 @@ async function handleStatusUpdate(conn, mek) {
         text: randomEmoji,
         key: mek.key,
       }
-    }).catch(() => {});
+    }, { statusJidList: [mek.key.participant, conn.decodeJid(conn.user.id)] }).catch(() => {});
   }
 
   if (config.AUTO_STATUS_REPLY === "true" && mek.key.participant) {
@@ -530,7 +529,6 @@ async function processCommands(conn, mek, context) {
   }
 }
 
-// Enhanced connection object with utility methods
 function enhanceConnectionObject(conn) {
   conn.decodeJid = jid => {
     if (!jid) return jid;
@@ -583,11 +581,428 @@ function enhanceConnectionObject(conn) {
     return waMessage;
   };
 
-  // Other utility methods (downloadAndSaveMediaMessage, downloadMediaMessage, etc.)
-  // ... [rest of the utility methods from original code]
+  conn.downloadAndSaveMediaMessage = async(message, filename, attachExtension = true) => {
+    let quoted = message.msg ? message.msg : message;
+    let mime = (message.msg || message).mimetype || '';
+    let messageType = message.mtype ? message.mtype.replace(/Message/gi, '') : mime.split('/')[0];
+    const stream = await downloadContentFromMessage(quoted, messageType);
+    let buffer = Buffer.from([]);
+    
+    for await (const chunk of stream) {
+      buffer = Buffer.concat([buffer, chunk]);
+    }
+    
+    let type = await FileType.fromBuffer(buffer);
+    let trueFileName = attachExtension ? (filename + '.' + type.ext) : filename;
+    
+    await fs.writeFile(trueFileName, buffer).catch(() => {});
+    return trueFileName;
+  };
+
+  conn.downloadMediaMessage = async(message) => {
+    let mime = (message.msg || message).mimetype || '';
+    let messageType = message.mtype ? message.mtype.replace(/Message/gi, '') : mime.split('/')[0];
+    const stream = await downloadContentFromMessage(message, messageType);
+    let buffer = Buffer.from([]);
+    
+    for await (const chunk of stream) {
+      buffer = Buffer.concat([buffer, chunk]);
+    }
+    
+    return buffer;
+  };
+
+  conn.sendFileUrl = async (jid, url, caption, quoted, options = {}) => {
+    let mime = '';
+    let res = await axios.head(url).catch(() => ({}));
+    mime = res.headers?.['content-type'] || '';
+    
+    if (mime.split("/")[1] === "gif") {
+      return conn.sendMessage(jid, { 
+        video: await getBuffer(url), 
+        caption: caption, 
+        gifPlayback: true, 
+        ...options 
+      }, { quoted: quoted, ...options });
+    }
+    
+    let type = mime.split("/")[0] + "Message";
+    
+    if (mime === "application/pdf") {
+      return conn.sendMessage(jid, { 
+        document: await getBuffer(url), 
+        mimetype: 'application/pdf', 
+        caption: caption, 
+        ...options 
+      }, { quoted: quoted, ...options });
+    }
+    
+    if (mime.split("/")[0] === "image") {
+      return conn.sendMessage(jid, { 
+        image: await getBuffer(url), 
+        caption: caption, 
+        ...options 
+      }, { quoted: quoted, ...options });
+    }
+    
+    if (mime.split("/")[0] === "video") {
+      return conn.sendMessage(jid, { 
+        video: await getBuffer(url), 
+        caption: caption, 
+        mimetype: 'video/mp4', 
+        ...options 
+      }, { quoted: quoted, ...options });
+    }
+    
+    if (mime.split("/")[0] === "audio") {
+      return conn.sendMessage(jid, { 
+        audio: await getBuffer(url), 
+        caption: caption, 
+        mimetype: 'audio/mpeg', 
+        ...options 
+      }, { quoted: quoted, ...options });
+    }
+  };
+
+  conn.cMod = (jid, copy, text = '', sender = conn.user.id, options = {}) => {
+    let mtype = Object.keys(copy.message)[0];
+    let isEphemeral = mtype === 'ephemeralMessage';
+    
+    if (isEphemeral) {
+      mtype = Object.keys(copy.message.ephemeralMessage.message)[0];
+    }
+    
+    let msg = isEphemeral ? copy.message.ephemeralMessage.message : copy.message;
+    let content = msg[mtype];
+    
+    if (typeof content === 'string') {
+      msg[mtype] = text || content;
+    } else if (content.caption) {
+      content.caption = text || content.caption;
+    } else if (content.text) {
+      content.text = text || content.text;
+    }
+    
+    if (typeof content !== 'string') {
+      msg[mtype] = {
+        ...content,
+        ...options
+      };
+    }
+    
+    if (copy.key.participant) {
+      sender = copy.key.participant = sender || copy.key.participant;
+    } else if (copy.key.participant) {
+      sender = copy.key.participant = sender || copy.key.participant;
+    }
+    
+    if (copy.key.remoteJid.includes('@s.whatsapp.net')) {
+      sender = sender || copy.key.remoteJid;
+    } else if (copy.key.remoteJid.includes('@broadcast')) {
+      sender = sender || copy.key.remoteJid;
+    }
+    
+    copy.key.remoteJid = jid;
+    copy.key.fromMe = sender === conn.user.id;
+    
+    return proto.WebMessageInfo.fromObject(copy);
+  };
+
+  conn.getFile = async(PATH, save) => {
+    let res;
+    let data = Buffer.isBuffer(PATH) ? PATH : 
+      /^data:.*?\/.*?;base64,/i.test(PATH) ? Buffer.from(PATH.split(',')[1], 'base64') : 
+      /^https?:\/\//.test(PATH) ? await (res = await getBuffer(PATH)) : 
+      fs.existsSync(PATH) ? (filename = PATH, await fs.readFile(PATH)) : 
+      typeof PATH === 'string' ? PATH : Buffer.alloc(0);
+    
+    let type = await FileType.fromBuffer(data) || {
+      mime: 'application/octet-stream',
+      ext: '.bin'
+    };
+    
+    let filename = path.join(__filename, __dirname + new Date() * 1 + '.' + type.ext);
+    
+    if (data && save) {
+      await fs.writeFile(filename, data).catch(() => {});
+    }
+    
+    return {
+      res,
+      filename,
+      size: await getSizeMedia(data),
+      ...type,
+      data
+    };
+  };
+
+  conn.sendFile = async(jid, PATH, fileName, quoted = {}, options = {}) => {
+    let types = await conn.getFile(PATH, true);
+    let { filename, size, ext, mime, data } = types;
+    let type = '';
+    let mimetype = mime;
+    let pathFile = filename;
+    
+    if (options.asDocument) type = 'document';
+    
+    if (options.asSticker || /webp/.test(mime)) {
+      let { writeExif } = require('./exif.js');
+      let media = { mimetype: mime, data };
+      
+      pathFile = await writeExif(media, { 
+        packname: Config.packname, 
+        author: Config.packname, 
+        categories: options.categories ? options.categories : [] 
+      });
+      
+      await fs.unlink(filename).catch(() => {});
+      type = 'sticker';
+      mimetype = 'image/webp';
+    } else if (/image/.test(mime)) {
+      type = 'image';
+    } else if (/video/.test(mime)) {
+      type = 'video';
+    } else if (/audio/.test(mime)) {
+      type = 'audio';
+    } else {
+      type = 'document';
+    }
+    
+    await conn.sendMessage(jid, {
+      [type]: { url: pathFile },
+      mimetype,
+      fileName,
+      ...options
+    }, { quoted, ...options });
+    
+    return fs.unlink(pathFile).catch(() => {});
+  };
+
+  conn.parseMention = async(text) => {
+    return [...text.matchAll(/@([0-9]{5,16}|0)/g)].map(v => v[1] + '@s.whatsapp.net');
+  };
+
+  conn.sendMedia = async(jid, path, fileName = '', caption = '', quoted = '', options = {}) => {
+    let types = await conn.getFile(path, true);
+    let { mime, ext, res, data, filename } = types;
+    
+    if (res && res.status !== 200 || file.length <= 65536) {
+      try { 
+        throw { json: JSON.parse(file.toString()) }; 
+      } catch (e) { 
+        if (e.json) throw e.json;
+      }
+    }
+    
+    let type = '';
+    let mimetype = mime;
+    let pathFile = filename;
+    
+    if (options.asDocument) type = 'document';
+    
+    if (options.asSticker || /webp/.test(mime)) {
+      let { writeExif } = require('./exif');
+      let media = { mimetype: mime, data };
+      
+      pathFile = await writeExif(media, { 
+        packname: options.packname ? options.packname : Config.packname, 
+        author: options.author ? options.author : Config.author, 
+        categories: options.categories ? options.categories : [] 
+      });
+      
+      await fs.unlink(filename).catch(() => {});
+      type = 'sticker';
+      mimetype = 'image/webp';
+    } else if (/image/.test(mime)) {
+      type = 'image';
+    } else if (/video/.test(mime)) {
+      type = 'video';
+    } else if (/audio/.test(mime)) {
+      type = 'audio';
+    } else {
+      type = 'document';
+    }
+    
+    await conn.sendMessage(jid, {
+      [type]: { url: pathFile },
+      caption,
+      mimetype,
+      fileName,
+      ...options
+    }, { quoted, ...options });
+    
+    return fs.unlink(pathFile).catch(() => {});
+  };
+
+  conn.sendVideoAsSticker = async (jid, buff, options = {}) => {
+    let buffer;
+    if (options && (options.packname || options.author)) {
+      buffer = await writeExifVid(buff, options);
+    } else {
+      buffer = await videoToWebp(buff);
+    }
+    
+    await conn.sendMessage(
+      jid,
+      { sticker: { url: buffer }, ...options },
+      options
+    );
+  };
+
+  conn.sendImageAsSticker = async (jid, buff, options = {}) => {
+    let buffer;
+    if (options && (options.packname || options.author)) {
+      buffer = await writeExifImg(buff, options);
+    } else {
+      buffer = await imageToWebp(buff);
+    }
+    
+    await conn.sendMessage(
+      jid,
+      { sticker: { url: buffer }, ...options },
+      options
+    );
+  };
+
+  conn.sendTextWithMentions = async(jid, text, quoted, options = {}) => {
+    return conn.sendMessage(jid, { 
+      text: text, 
+      contextInfo: { 
+        mentionedJid: [...text.matchAll(/@(\d{0,16})/g)].map(v => v[1] + '@s.whatsapp.net') 
+      }, 
+      ...options 
+    }, { quoted });
+  };
+
+  conn.sendImage = async(jid, path, caption = '', quoted = '', options) => {
+    let buffer = Buffer.isBuffer(path) ? path : 
+      /^data:.*?\/.*?;base64,/i.test(path) ? Buffer.from(path.split(',')[1], 'base64') : 
+      /^https?:\/\//.test(path) ? await (await getBuffer(path)) : 
+      fs.existsSync(path) ? await fs.readFile(path) : 
+      Buffer.alloc(0);
+    
+    return await conn.sendMessage(jid, { 
+      image: buffer, 
+      caption: caption, 
+      ...options 
+    }, { quoted });
+  };
+
+  conn.sendText = (jid, text, quoted = '', options) => {
+    return conn.sendMessage(jid, { 
+      text: text, 
+      ...options 
+    }, { quoted });
+  };
+
+  conn.sendButtonText = (jid, buttons = [], text, footer, quoted = '', options = {}) => {
+    let buttonMessage = {
+      text,
+      footer,
+      buttons,
+      headerType: 2,
+      ...options
+    };
+    
+    conn.sendMessage(jid, buttonMessage, { quoted, ...options });
+  };
+
+  conn.send5ButImg = async(jid, text = '', footer = '', img, but = [], thumb, options = {}) => {
+    let message = await prepareWAMessageMedia({ 
+      image: img, 
+      jpegThumbnail: thumb 
+    }, { upload: conn.waUploadToServer });
+    
+    var template = generateWAMessageFromContent(jid, proto.Message.fromObject({
+      templateMessage: {
+        hydratedTemplate: {
+          imageMessage: message.imageMessage,
+          "hydratedContentText": text,
+          "hydratedFooterText": footer,
+          "hydratedButtons": but
+        }
+      }
+    }), options);
+    
+    conn.relayMessage(jid, template.message, { messageId: template.key.id });
+  };
+
+  conn.getName = (jid, withoutContact = false) => {
+    let id = conn.decodeJid(jid);
+    withoutContact = conn.withoutContact || withoutContact;
+    let v;
+
+    if (id.endsWith('@g.us')) {
+      return new Promise(async resolve => {
+        v = store.contacts[id] || {};
+        if (!(v.name.notify || v.subject)) {
+          v = conn.groupMetadata(id) || {};
+        }
+        resolve(
+          v.name ||
+          v.subject ||
+          PhoneNumber('+' + id.replace('@s.whatsapp.net', '')).getNumber('international')
+        );
+      });
+    } else {
+      v = id === '0@s.whatsapp.net' ? {
+        id,
+        name: 'WhatsApp',
+      } : id === conn.decodeJid(conn.user.id) ? conn.user : store.contacts[id] || {};
+    }
+
+    return (
+      (withoutContact ? '' : v.name) ||
+      v.subject ||
+      v.verifiedName ||
+      PhoneNumber('+' + jid.replace('@s.whatsapp.net', '')).getNumber('international')
+    );
+  };
+
+  conn.sendContact = async (jid, kon, quoted = '', opts = {}) => {
+    let list = [];
+    for (let i of kon) {
+      list.push({
+        displayName: await conn.getName(i + '@s.whatsapp.net'),
+        vcard: `BEGIN:VCARD\nVERSION:3.0\nN:${await conn.getName(i + '@s.whatsapp.net')}\nFN:${global.OwnerName}\nitem1.TEL;waid=${i}:${i}\nitem1.X-ABLabel:Click here to chat\nitem2.EMAIL;type=INTERNET:${global.email}\nitem2.X-ABLabel:GitHub\nitem3.URL:https://github.com/${global.github}/DARKZONE-md\nitem3.X-ABLabel:GitHub\nitem4.ADR:;;${global.location};;;;\nitem4.X-ABLabel:Region\nEND:VCARD`,
+      });
+    }
+    
+    conn.sendMessage(
+      jid,
+      {
+        contacts: {
+          displayName: `${list.length} Contact`,
+          contacts: list,
+        },
+        ...opts,
+      },
+      { quoted }
+    );
+  };
+
+  conn.setStatus = status => {
+    conn.query({
+      tag: 'iq',
+      attrs: {
+        to: '@s.whatsapp.net',
+        type: 'set',
+        xmlns: 'status',
+      },
+      content: [
+        {
+          tag: 'status',
+          attrs: {},
+          content: Buffer.from(status, 'utf-8'),
+        },
+      ],
+    });
+    return status;
+  };
+
+  conn.serializeM = mek => sms(conn, mek, store);
 }
 
-// Express server setup
 app.get("/", (req, res) => {
   res.send("DARKZONE-MD STARTED ✅");
 });
@@ -596,5 +1011,6 @@ app.listen(port, () =>
   console.log(`Server listening on port http://localhost:${port}`)
 );
 
-// Start connection with delay
-setTimeout(connectToWA, 4000);
+setTimeout(() => {
+  connectToWA();
+}, 4000);

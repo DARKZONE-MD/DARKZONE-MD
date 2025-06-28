@@ -2,8 +2,8 @@ const { cmd } = require('../command');
 const config = require('../config');
 
 cmd({
-    pattern: "creater",
-    alias: ["creator", "owner", "dev"],
+    pattern: "creator",
+    alias: ["creator", "coder", "dev"],
     desc: "Show bot creator information",
     category: "info",
     react: "👑",

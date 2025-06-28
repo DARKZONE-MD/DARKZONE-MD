@@ -185,25 +185,34 @@ let up = `┏━━━━━━━━━━━━━━━━━━━┓
   }
     if(mek.message.viewOnceMessageV2)
     mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
-    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN === "true"){
-      await conn.readMessages([mek.key])
+   // In the messages.upsert event handler, replace the status-related code with this:
+
+if (mek.key && mek.key.remoteJid === 'status@broadcast') {
+    // Auto status seen
+    if (config.AUTO_STATUS_SEEN === "true") {
+        await conn.readMessages([mek.key]);
     }
-  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
-    const jawadlike = await conn.decodeJid(conn.user.id);
-    const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
-    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    await conn.sendMessage(mek.key.remoteJid, {
-      react: {
-        text: randomEmoji,
-        key: mek.key,
-      } 
-    }, { statusJidList: [mek.key.participant, erfanlike] });
-  }                       
-  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){
-  const user = mek.key.participant
-  const text = `${config.AUTO_STATUS_MSG}`
-  await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
+    
+    // Auto status react
+    if (config.AUTO_STATUS_REACT === "true") {
+        const erfanlike = await conn.decodeJid(conn.user.id);
+        const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
+        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+        await conn.sendMessage(mek.key.remoteJid, {
+            react: {
+                text: randomEmoji,
+                key: mek.key,
             }
+        }, { statusJidList: [mek.key.participant, erfanlike] });
+    }
+    
+    // Auto status reply
+    if (config.AUTO_STATUS_REPLY === "true" && mek.key.participant) {
+        const user = mek.key.participant;
+        const text = `${config.AUTO_STATUS_MSG}`;
+        await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek });
+    }
+
             await Promise.all([
               saveMessage(mek),
             ]);

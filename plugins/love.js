@@ -1,7 +1,6 @@
 const { cmd } = require('../command');
 const config = require('../config');
 
-// Array of love emojis to cycle through
 const loveEmojis = [
     '💖', '❤️', '🧡', '💛', '💚', 
     '💙', '💜', '🤎', '🤍', '🖤',
@@ -11,47 +10,49 @@ const loveEmojis = [
 
 cmd({
     pattern: "lov",
-    alias: ["heart", "emoji"],
-    desc: "Send continuous love emoji reactions",
+    alias: ["heart"],
+    desc: "Send changing love emojis in one message",
     category: "fun",
     react: "💖",
     filename: __filename
 }, async (conn, mek, m, { from, reply }) => {
     try {
         // Send initial message
-        const sentMsg = await conn.sendMessage(from, { 
-            text: "💖 *Love Bomb Incoming!* 💖\n\nI'll keep sending love emojis..." 
+        let msg = await conn.sendMessage(from, { 
+            text: "💖 *Love Bomb Incoming!* 💖\n\nCurrent emoji: 💖" 
         }, { quoted: mek });
 
-        // Start emoji rotation
         let counter = 0;
         const interval = setInterval(async () => {
             try {
                 if (counter >= 20) {
                     clearInterval(interval);
-                    await conn.sendMessage(from, { text: "💝 *Love session ended!*" }, { quoted: mek });
+                    await conn.sendMessage(from, { 
+                        text: "💝 *Love session ended!*" 
+                    }, { quoted: mek });
                     return;
                 }
 
                 const emoji = loveEmojis[counter % loveEmojis.length];
                 
-                // Send as new message instead of react
-                await conn.sendMessage(from, { 
-                    text: emoji 
-                }, { quoted: mek });
+                // Edit the same message
+                await conn.sendMessage(from, {
+                    text: `💖 *Love Bomb Incoming!* 💖\n\nCurrent emoji: ${emoji}`,
+                    edit: msg.key
+                });
                 
                 counter++;
                 
             } catch (e) {
                 clearInterval(interval);
-                console.error("Love Error:", e);
+                console.error("Error updating emoji:", e);
             }
-        }, 1000); // Change emoji every 1 second
+        }, 1000);
 
     } catch (e) {
-        console.error("Initial Love Error:", e);
+        console.error("Initial Error:", e);
         await conn.sendMessage(from, { 
-            text: "❌ Failed to spread love! Maybe try again later." 
+            text: "❌ Failed to start love session!" 
         }, { quoted: mek });
     }
 });

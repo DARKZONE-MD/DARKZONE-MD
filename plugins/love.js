@@ -9,11 +9,11 @@ const loveEmojis = [
 ];
 
 cmd({
-    pattern: "love",
+    pattern: "lov",
     alias: ["heart"],
     desc: "Send changing love emojis",
     category: "fun",
-    react: "💖",
+    react: "🥺",
     filename: __filename
 }, async (conn, mek, m, { from, reply }) => {
     try {

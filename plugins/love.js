@@ -10,7 +10,7 @@ const loveEmojis = [
 ];
 
 cmd({
-    pattern: "love",
+    pattern: "lov",
     alias: ["heart", "emoji"],
     desc: "Send continuous love emoji reactions",
     category: "fun",
@@ -19,33 +19,29 @@ cmd({
 }, async (conn, mek, m, { from, reply }) => {
     try {
         // Send initial message
-        const message = await reply("💖 *Love Bomb Incoming!* 💖\n\nI'll keep sending love emojis...");
+        const sentMsg = await conn.sendMessage(from, { 
+            text: "💖 *Love Bomb Incoming!* 💖\n\nI'll keep sending love emojis..." 
+        }, { quoted: mek });
 
-        // Get message ID to react to
-        const messageId = message.key.id;
-        
         // Start emoji rotation
         let counter = 0;
         const interval = setInterval(async () => {
             try {
-                // Cycle through emojis
+                if (counter >= 20) {
+                    clearInterval(interval);
+                    await conn.sendMessage(from, { text: "💝 *Love session ended!*" }, { quoted: mek });
+                    return;
+                }
+
                 const emoji = loveEmojis[counter % loveEmojis.length];
                 
-                // Add reaction to the original message
-                await conn.sendMessage(from, {
-                    react: {
-                        text: emoji,
-                        key: message.key
-                    }
-                });
+                // Send as new message instead of react
+                await conn.sendMessage(from, { 
+                    text: emoji 
+                }, { quoted: mek });
                 
                 counter++;
                 
-                // Stop after 20 rotations (or adjust as needed)
-                if (counter >= 20) {
-                    clearInterval(interval);
-                    await reply("💝 *Love session ended!*");
-                }
             } catch (e) {
                 clearInterval(interval);
                 console.error("Love Error:", e);
@@ -54,6 +50,8 @@ cmd({
 
     } catch (e) {
         console.error("Initial Love Error:", e);
-        reply("❌ Failed to spread love!");
+        await conn.sendMessage(from, { 
+            text: "❌ Failed to spread love! Maybe try again later." 
+        }, { quoted: mek });
     }
 });

@@ -11,11 +11,11 @@ const loveEmojis = [
 cmd({
     pattern: "lov",
     alias: ["heart"],
-    desc: "Send changing love emojis",
+    desc: "Send beautiful changing love emojis",
     category: "fun",
-    react: "🥺",
+    react: "💖",
     filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
+}, async (conn, mek, m, { from, sender, reply }) => {
     try {
         // Send initial emoji
         let msg = await conn.sendMessage(from, { 
@@ -32,7 +32,7 @@ cmd({
 
                 const emoji = loveEmojis[counter % loveEmojis.length];
                 
-                // Edit the same message with new emoji
+                // Edit the same message
                 await conn.sendMessage(from, {
                     text: emoji,
                     edit: msg.key
@@ -42,14 +42,18 @@ cmd({
                 
             } catch (e) {
                 clearInterval(interval);
-                console.error("Error updating emoji:", e);
+                console.error("Emoji update error:", e);
             }
         }, 1000); // Change every 1 second
 
     } catch (e) {
-        console.error("Initial Error:", e);
-        await conn.sendMessage(from, { 
-            text: "💔" 
-        }, { quoted: mek });
+        console.error("Love command error:", e);
+        try {
+            await conn.sendMessage(from, { 
+                text: "💔 Couldn't send love right now" 
+            }, { quoted: mek });
+        } catch (err) {
+            console.error("Failed to send error message:", err);
+        }
     }
 });

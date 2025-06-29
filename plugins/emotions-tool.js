@@ -13,8 +13,19 @@ const emotionEmojis = {
     beautiful: ['✨', '🌟', '💫', '🌠', '🌌', '🌹', '🏵️', '🌸', '💮', '🏆']
 };
 
-// Function to handle emotion display
+// Track active animations to prevent duplicates
+const activeAnimations = new Map();
+
+// Optimized function to handle emotion display
 async function showEmotion(conn, from, mek, emotion) {
+    const chatKey = `${from}_${emotion}`;
+    
+    // Clear any existing animation for this chat+emotion
+    if (activeAnimations.has(chatKey)) {
+        clearInterval(activeAnimations.get(chatKey));
+        activeAnimations.delete(chatKey);
+    }
+
     try {
         // Send initial emoji
         let msg = await conn.sendMessage(from, { 
@@ -36,9 +47,21 @@ async function showEmotion(conn, from, mek, emotion) {
                 
             } catch (e) {
                 clearInterval(interval);
+                activeAnimations.delete(chatKey);
                 console.error(`Error updating ${emotion} emoji:`, e);
             }
-        }, 800); // Change every 0.8 seconds
+        }, 1000); // Changed to 1 second interval for better performance
+
+        // Store the interval reference
+        activeAnimations.set(chatKey, interval);
+        
+        // Auto-stop after 30 seconds to prevent memory leaks
+        setTimeout(() => {
+            if (activeAnimations.has(chatKey)) {
+                clearInterval(activeAnimations.get(chatKey));
+                activeAnimations.delete(chatKey);
+            }
+        }, 30000);
 
     } catch (e) {
         console.error(`Initial ${emotion} error:`, e);
@@ -48,92 +71,26 @@ async function showEmotion(conn, from, mek, emotion) {
     }
 }
 
-// Love command
-cmd({
-    pattern: "love",
-    alias: ["heart"],
-    desc: "Show continuous love emojis",
-    category: "fun",
-    react: "❤️",
-    filename: __filename
-}, async (conn, mek, m, { from, sender, reply }) => {
-    await showEmotion(conn, from, mek, 'love');
-});
+// Command handler factory to reduce repetitive code
+function createEmotionCommand(pattern, emotion, alias = [], react = "❤️") {
+    cmd({
+        pattern,
+        alias,
+        desc: `Show continuous ${emotion} emojis`,
+        category: "fun",
+        react,
+        filename: __filename
+    }, async (conn, mek, m, { from }) => {
+        await showEmotion(conn, from, mek, emotion);
+    });
+}
 
-// Shy command
-cmd({
-    pattern: "shy",
-    desc: "Show shy emojis",
-    category: "fun",
-    react: "😊",
-    filename: __filename
-}, async (conn, mek, m, { from, sender, reply }) => {
-    await showEmotion(conn, from, mek, 'shy');
-});
-
-// Sad command
-cmd({
-    pattern: "sad",
-    desc: "Show sad emojis",
-    category: "fun",
-    react: "😢",
-    filename: __filename
-}, async (conn, mek, m, { from, sender, reply }) => {
-    await showEmotion(conn, from, mek, 'sad');
-});
-
-// Happy command
-cmd({
-    pattern: "happy",
-    desc: "Show happy emojis",
-    category: "fun",
-    react: "😄",
-    filename: __filename
-}, async (conn, mek, m, { from, sender, reply }) => {
-    await showEmotion(conn, from, mek, 'happy');
-});
-
-// Hurt command
-cmd({
-    pattern: "hurt",
-    desc: "Show hurt emojis",
-    category: "fun",
-    react: "🤕",
-    filename: __filename
-}, async (conn, mek, m, { from, sender, reply }) => {
-    await showEmotion(conn, from, mek, 'hurt');
-});
-
-// Broken command
-cmd({
-    pattern: "broken",
-    desc: "Show broken heart/moon emojis",
-    category: "fun",
-    react: "💔",
-    filename: __filename
-}, async (conn, mek, m, { from, sender, reply }) => {
-    await showEmotion(conn, from, mek, 'broken');
-});
-
-// Hot command
-cmd({
-    pattern: "hot",
-    desc: "Show hot emojis",
-    category: "fun",
-    react: "🥵",
-    filename: __filename
-}, async (conn, mek, m, { from, sender, reply }) => {
-    await showEmotion(conn, from, mek, 'hot');
-});
-
-// Beautiful command
-cmd({
-    pattern: "beautiful",
-    alias: ["beauty"],
-    desc: "Show beautiful emojis",
-    category: "fun",
-    react: "✨",
-    filename: __filename
-}, async (conn, mek, m, { from, sender, reply }) => {
-    await showEmotion(conn, from, mek, 'beautiful');
-});
+// Create all emotion commands
+createEmotionCommand("love", "love", ["heart"], "❤️");
+createEmotionCommand("shy", "shy", [], "😊");
+createEmotionCommand("sad", "sad", [], "😢");
+createEmotionCommand("happy", "happy", [], "😄");
+createEmotionCommand("hurt", "hurt", [], "🤕");
+createEmotionCommand("broken", "broken", [], "💔");
+createEmotionCommand("hot", "hot", [], "🥵");
+createEmotionCommand("beautiful", "beautiful", ["beauty"], "✨");

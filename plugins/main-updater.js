@@ -1,225 +1,261 @@
 const { cmd } = require("../command");
 const axios = require('axios');
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require("path");
 const AdmZip = require("adm-zip");
 const { setCommitHash, getCommitHash } = require('../data/updateDB');
-const child_process = require('child_process');
+const { execSync } = require('child_process');
 
-// Update management variables
-let isUpdating = false;
-const protectedFiles = ['config.js', 'app.json', 'sessions', 'data', 'lib'];
+// Configuration
+const REPO_URL = "https://github.com/DARKZONE-MD/DARKZONE-MD";
+const PROTECTED_FILES = [
+    'config.js',
+    'app.json',
+    'sessions/',
+    'data/',
+    'lib/',
+    'node_modules/'
+];
+
+// Update state
+let updateInProgress = false;
+const updateQueue = [];
 
 cmd({
     pattern: "update",
-    alias: ["upgrade", "sync", "gitpull"],
+    alias: ["upgrade", "gitpull"],
     react: '🆕',
-    desc: "Update the bot to the latest version",
-    category: "misc",
+    desc: "Update bot to latest version",
+    category: "owner",
     filename: __filename
 }, async (client, message, args, { reply, isOwner }) => {
-    if (!isOwner) return reply("❌ This command is only for the bot owner.");
-    if (isUpdating) return reply("🔄 Update already in progress. Please wait...");
+    if (!isOwner) return reply("❌ Owner only command");
+    if (updateInProgress) {
+        updateQueue.push(message);
+        return reply("🔄 Update in progress. Queued your request.");
+    }
 
     try {
-        isUpdating = true;
+        updateInProgress = true;
         await reply("🔍 Checking for updates...");
 
-        // Get current and latest commit hashes
+        // Get current and latest commit
         const currentHash = await getCommitHash();
-        const { data: [latestCommit] } = await axios.get(
-            "https://api.github.com/repos/DARKZONE-MD/DARKZONE-MD/commits?per_page=1",
-            { timeout: 10000 }
-        );
+        const latestCommit = await getLatestCommit();
         
         if (latestCommit.sha === currentHash) {
-            isUpdating = false;
-            return reply("✅ Your bot is already up-to-date!");
+            updateInProgress = false;
+            return reply("✅ Bot is already up-to-date!");
         }
 
-        await reply("🚀 New version found! Starting update...");
-
+        // Start update process
+        await reply("🚀 New version available! Starting update...");
+        
         // Step 1: Create backup
         await reply("📂 Creating backup...");
-        const backupDir = path.join(__dirname, '../backup_' + Date.now());
-        fs.mkdirSync(backupDir);
-        await copyDirectory(path.join(__dirname, '..'), backupDir);
-
-        // Step 2: Download update
-        await reply("⬇️ Downloading update package...");
-        const zipPath = path.join(__dirname, '../update_temp.zip');
-        const writer = fs.createWriteStream(zipPath);
+        const backupDir = await createBackup();
         
-        const response = await axios({
-            url: "https://github.com/DARKZONE-MD/DARKZONE-MD/archive/main.zip",
-            method: 'GET',
-            responseType: 'stream',
-            timeout: 30000
-        });
-
-        await new Promise((resolve, reject) => {
-            response.data.pipe(writer);
-            writer.on('finish', resolve);
-            writer.on('error', reject);
-        });
-
-        // Step 3: Extract update
-        await reply("📦 Extracting update...");
-        const extractDir = path.join(__dirname, '../update_temp');
-        const zip = new AdmZip(zipPath);
-        zip.extractAllTo(extractDir, true);
-
-        // Step 4: Apply update
-        await reply("🔄 Applying update...");
-        const updateSource = path.join(extractDir, "DARKZONE-MD-main");
-        await applyUpdate(updateSource, path.join(__dirname, '..'));
-
-        // Step 5: Update dependencies if needed
-        if (await checkDependenciesChanged(updateSource)) {
-            await reply("🛠️ Updating dependencies...");
-            child_process.execSync('npm install --production', { 
-                cwd: path.join(__dirname, '..'),
-                stdio: 'inherit'
-            });
+        try {
+            // Step 2: Download update
+            await reply("⬇️ Downloading update...");
+            const zipPath = await downloadUpdate();
+            
+            // Step 3: Extract update
+            await reply("📦 Extracting files...");
+            const updateDir = await extractUpdate(zipPath);
+            
+            // Step 4: Apply update
+            await reply("🔄 Applying changes...");
+            await applyUpdate(updateDir);
+            
+            // Step 5: Update dependencies if needed
+            if (await dependenciesChanged(updateDir)) {
+                await reply("🛠️ Updating packages...");
+                updateDependencies();
+            }
+            
+            // Finalize update
+            await setCommitHash(latestCommit.sha);
+            await cleanup(updateDir, zipPath);
+            
+            await reply("✅ Update successful! Changes applied.");
+            
+            // Notify queued requests
+            notifyQueue("✅ Update completed successfully!");
+            
+        } catch (updateError) {
+            console.error("Update failed:", updateError);
+            await handleFailure(backupDir, reply);
         }
-
-        // Step 6: Finalize update
-        await setCommitHash(latestCommit.sha);
-        fs.unlinkSync(zipPath);
-        fs.rmSync(extractDir, { recursive: true, force: true });
-
-        await reply("✅ Update successful! Changes will take effect immediately.");
-        isUpdating = false;
-
+        
     } catch (error) {
-        console.error("Update failed:", error);
-        await handleUpdateError(error, reply);
-        isUpdating = false;
+        console.error("Update process error:", error);
+        await reply(`❌ Update failed: ${error.message}`);
+    } finally {
+        updateInProgress = false;
     }
 });
 
-// Enhanced update application with proper file handling
-async function applyUpdate(source, destination) {
-    const filesToUpdate = getUpdateableFiles(source, destination);
+// ==================== Core Functions ====================
+
+async function getLatestCommit() {
+    const { data } = await axios.get(`${REPO_URL}/commits/main`, {
+        timeout: 10000,
+        headers: { 'Accept': 'application/vnd.github.v3+json' }
+    });
+    return data;
+}
+
+async function createBackup() {
+    const backupDir = path.join(__dirname, '../../backup_' + Date.now());
+    await fs.ensureDir(backupDir);
+    await fs.copy(path.join(__dirname, '../..'), backupDir, {
+        filter: src => !PROTECTED_FILES.some(pf => src.includes(pf))
+    });
+    return backupDir;
+}
+
+async function downloadUpdate() {
+    const zipPath = path.join(__dirname, '../../update_temp.zip');
+    const writer = fs.createWriteStream(zipPath);
     
-    for (const file of filesToUpdate) {
-        const srcPath = path.join(source, file);
-        const destPath = path.join(destination, file);
-        
-        // Ensure destination directory exists
-        fs.mkdirSync(path.dirname(destPath), { recursive: true });
-        
-        // Copy the file
-        fs.copyFileSync(srcPath, destPath);
-        console.log(`Updated: ${file}`);
+    const response = await axios({
+        url: `${REPO_URL}/archive/main.zip`,
+        method: 'GET',
+        responseType: 'stream',
+        timeout: 60000
+    });
+
+    await new Promise((resolve, reject) => {
+        response.data.pipe(writer);
+        writer.on('finish', resolve);
+        writer.on('error', reject);
+    });
+
+    return zipPath;
+}
+
+async function extractUpdate(zipPath) {
+    const extractDir = path.join(__dirname, '../../update_temp');
+    await fs.ensureDir(extractDir);
+    
+    const zip = new AdmZip(zipPath);
+    zip.extractAllTo(extractDir, true);
+    
+    return path.join(extractDir, "DARKZONE-MD-main");
+}
+
+async function applyUpdate(updateDir) {
+    const botDir = path.join(__dirname, '../..');
+    const files = await getUpdateableFiles(updateDir, botDir);
+    
+    for (const file of files) {
+        const src = path.join(updateDir, file);
+        const dest = path.join(botDir, file);
+        await fs.ensureDir(path.dirname(dest));
+        await fs.copy(src, dest);
     }
 }
 
-// Get list of files that need updating (excluding protected files)
-function getUpdateableFiles(source, destination) {
+async function getUpdateableFiles(source, destination) {
     const files = [];
     
-    function scanDirectory(dir, relativePath = '') {
-        const items = fs.readdirSync(path.join(source, relativePath));
+    async function scanDir(currentPath, relativePath = '') {
+        const items = await fs.readdir(path.join(source, relativePath));
         
         for (const item of items) {
             const fullPath = path.join(source, relativePath, item);
             const relPath = path.join(relativePath, item);
             const destPath = path.join(destination, relPath);
-            const stat = fs.statSync(fullPath);
+            const stat = await fs.stat(fullPath);
 
-            // Skip protected files/directories
-            if (protectedFiles.some(pf => relPath.startsWith(pf))) {
-                console.log(`Skipping protected: ${relPath}`);
+            // Skip protected files
+            if (PROTECTED_FILES.some(pf => relPath.startsWith(pf))) {
                 continue;
             }
 
             if (stat.isDirectory()) {
-                scanDirectory(dir, relPath);
+                await scanDir(currentPath, relPath);
             } else {
-                // Only update if file is different
-                if (!fs.existsSync(destPath) || 
-                    stat.mtimeMs > fs.statSync(destPath).mtimeMs) {
+                // Only update changed files
+                if (!(await fs.pathExists(destPath)) {
                     files.push(relPath);
+                } else {
+                    const destStat = await fs.stat(destPath);
+                    if (stat.mtimeMs > destStat.mtimeMs) {
+                        files.push(relPath);
+                    }
                 }
             }
         }
     }
     
-    scanDirectory(source);
+    await scanDir(source);
     return files;
 }
 
-// Check if dependencies have changed
-async function checkDependenciesChanged(updateSource) {
+async function dependenciesChanged(updateDir) {
     try {
-        const currentPackage = require(path.join(__dirname, '../package.json'));
-        const newPackage = require(path.join(updateSource, 'package.json'));
+        const currentPkg = require(path.join(__dirname, '../../package.json'));
+        const newPkg = require(path.join(updateDir, 'package.json'));
         
-        return JSON.stringify(currentPackage.dependencies) !== JSON.stringify(newPackage.dependencies) ||
-               JSON.stringify(currentPackage.devDependencies) !== JSON.stringify(newPackage.devDependencies);
+        return JSON.stringify(currentPkg.dependencies) !== JSON.stringify(newPkg.dependencies) ||
+               JSON.stringify(currentPkg.devDependencies) !== JSON.stringify(newPkg.devDependencies);
     } catch (e) {
-        console.error("Dependency check failed:", e);
+        console.error("Dependency check error:", e);
         return false;
     }
 }
 
-// Handle update errors and attempt recovery
-async function handleUpdateError(error, reply) {
+function updateDependencies() {
+    execSync('npm install --production', {
+        cwd: path.join(__dirname, '../..'),
+        stdio: 'inherit'
+    });
+}
+
+async function cleanup(updateDir, zipPath) {
+    await fs.remove(updateDir);
+    await fs.remove(zipPath);
+}
+
+async function handleFailure(backupDir, reply) {
     try {
-        // Find the most recent backup
-        const backupDirs = fs.readdirSync(path.join(__dirname, '..'))
-            .filter(dir => dir.startsWith('backup_'))
-            .sort()
-            .reverse();
+        await reply("⚠️ Update failed! Attempting recovery...");
         
-        if (backupDirs.length > 0) {
-            await reply("⚠️ Update failed. Attempting recovery...");
-            const latestBackup = path.join(__dirname, '..', backupDirs[0]);
-            await copyDirectory(latestBackup, path.join(__dirname, '..'));
-            fs.rmSync(latestBackup, { recursive: true, force: true });
+        if (await fs.pathExists(backupDir)) {
+            await fs.copy(backupDir, path.join(__dirname, '../..'), {
+                overwrite: true
+            });
+            await fs.remove(backupDir);
             await reply("✅ Recovery successful! Running previous version.");
         } else {
-            await reply("❌ Update failed with no backup available. Manual repair needed.");
+            await reply("❌ Backup not found! Manual recovery needed.");
         }
     } catch (recoveryError) {
         console.error("Recovery failed:", recoveryError);
-        await reply("❌ Critical error! Both update and recovery failed. Please reinstall manually.");
+        await reply("❌ Critical error! Both update and recovery failed.");
     }
 }
 
-// Reliable directory copy function
-async function copyDirectory(source, target) {
-    if (!fs.existsSync(target)) fs.mkdirSync(target, { recursive: true });
-    
-    const items = fs.readdirSync(source);
-    for (const item of items) {
-        const srcPath = path.join(source, item);
-        const destPath = path.join(target, item);
-        const stat = fs.lstatSync(srcPath);
-        
-        if (stat.isDirectory()) {
-            await copyDirectory(srcPath, destPath);
-        } else {
-            fs.copyFileSync(srcPath, destPath);
-        }
-    }
+function notifyQueue(message) {
+    updateQueue.forEach(msg => {
+        client.sendMessage(msg.key.remoteJid, { text: message }, { quoted: msg });
+    });
+    updateQueue.length = 0;
 }
 
-// Auto-update checker (runs every 6 hours)
+// Auto-update checker
 setInterval(async () => {
     try {
         const currentHash = await getCommitHash();
-        const { data: [latestCommit] } = await axios.get(
-            "https://api.github.com/repos/DARKZONE-MD/DARKZONE-MD/commits?per_page=1",
-            { timeout: 5000 }
-        );
+        const latestCommit = await getLatestCommit();
         
         if (latestCommit.sha !== currentHash) {
-            console.log('🔔 Update available! Commit:', latestCommit.sha.substring(0, 7));
-            // Could add notification to bot owner here
+            console.log(`🔔 Update available: ${latestCommit.sha.substring(0, 7)}`);
+            // Optional: Notify owner about available update
         }
     } catch (e) {
         console.log('Update check failed:', e.message);
     }
-}, 6 * 60 * 60 * 1000);
+}, 6 * 60 * 60 * 1000); // Check every 6 hours

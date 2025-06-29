@@ -167,7 +167,37 @@ let up = `┏━━━━━━━━━━━━━━━━━━━┓
     }
   });
   //============================== 
-
+// Add this to your index.js file
+conn.ev.on('group-participants.update', async (update) => {
+    try {
+        // Check if the bot was added to a group
+        if (update.action === 'add' && update.participants.includes(conn.user.id)) {
+            
+            // Get group information
+            const groupMetadata = await conn.groupMetadata(update.id);
+            const admins = groupMetadata.participants.filter(p => p.admin).map(p => p.id);
+            
+            // Send message to group
+            let message = "🤖 Thank you for adding me!\n";
+            message += "⚠️ *Please make me admin* to use all my features!\n";
+            message += `📌 Use command: *${prefix}admin*`;
+            
+            // Mention all admins if any exist
+            if (admins.length > 0) {
+                await conn.sendMessage(update.id, { 
+                    text: message,
+                    mentions: admins
+                });
+            } else {
+                await conn.sendMessage(update.id, { text: message });
+            }
+        }
+    } catch (error) {
+        console.log('Error in group notification:', error);
+    }
+});
+	  
+//================================
   conn.ev.on("group-participants.update", (update) => GroupEvents(conn, update));	  
 	  
   //=============readstatus=======

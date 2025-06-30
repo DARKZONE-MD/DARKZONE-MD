@@ -1,42 +1,28 @@
 const config = require('../config');
 const { cmd, commands } = require('../command');
 
-// Store to remember user's last used style
-const userStyles = new Map();
-
-// 10 Different Ping Designs
-const pingDesigns = [
-    (speed) => `╔═══════❖═══════╗\n║  ⚡ DARKZONE-MD ⚡  ║\n║  Speed: ${speed}ms  ║\n╚═══════❖═══════╝\n📢 Join our channel!\nhttps://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J`,
-    (speed) => `┏━━━━━━━━━━━━━\n┃ 🚀 *DARKZONE PING* 🚀\n┃ ➤ Speed: ${speed}ms\n┗━━━━━━━━━━━━━\n🌟 Channel: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J`,
-    (speed) => `▄▀▄▀▄ DARKZONE ▄▀▄▀▄\n⚡ Speed: ${speed}ms\n🔹 Channel: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J`,
-    (speed) => `✧･ﾟ: *✧ DARKZONE ✧* :･ﾟ✧\n❖ Speed: ${speed}ms\n❖ Stay updated: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J`,
-    (speed) => `╭─⊱❀⊰─╮\n│  💎 DARKZONE 💎  │\n│  ⏱️ ${speed}ms  │\n╰─⊱❀⊰─╯\n📡 Channel: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J`,
-    (speed) => `▰▰▰▰▰▰▰▰▰\n   DARKZONE-MD\n▰▰▰▰▰▰▰▰▰\n⚡ Speed: ${speed}ms\n🔔 Channel: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J`,
-    (speed) => `✧⋄⋆⋅⋆⋄✧⋄⋆⋅⋆⋄✧\n   DARKZONE PING\n✧⋄⋆⋅⋆⋄✧⋄⋆⋅⋆⋄✧\n⏱️ ${speed}ms\n📢 Join us: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J`,
-    (speed) => `◈◈◈◈◈◈◈◈◈\n   DARKZONE-MD\n◈◈◈◈◈◈◈◈◈\n🚀 ${speed}ms\n🔹 Channel: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J`,
-    (speed) => `✦✧✦✧✦✧✦✧✦\n  DARKZONE PING\n✦✧✦✧✦✧✦✧✦\n⚡ ${speed}ms\n📡 Updates: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J`,
-    (speed) => `▣▣▣▣▣▣▣▣▣\n   DARKZONE SPEED TEST\n▣▣▣▣▣▣▣▣▣\n⏱️ ${speed}ms\n💎 Channel: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J`
+// Array of different fancy text styles for DARKZONE-MD
+const botNameStyles = [
+    "𝘿𝘼𝙍𝙆𝙕𝙊𝙉𝙀-𝙈𝘿",
+    "𝔇𝔄𝔯𝔨𝔷𝔬𝔫𝔢-𝔐𝔇",
+    "🅳🅰🆁🅺🆉🅾🅽🅴-🅼🅳",
+    "𝐃𝐀𝐑𝐊𝐙𝐎𝐍𝐄-𝐌𝐃",
+    "𝓓𝓐𝓡𝓚𝓩𝓞𝓝𝓔-𝓜𝓓",
+    "𝒟𝒜𝑅𝒦𝒵𝒪𝒩𝐸-𝑀𝒟",
+    "𝖉𝖆𝖗𝖐𝖟𝖔𝖓𝖊-𝖒𝖉",
+    "ＤＡＲＫＺＯＮＥ-ＭＤ",
+    "𝕯𝕬𝕽𝕶𝖅𝕺𝕹𝕰-𝕸𝕯",
+    "𝙳𝙰𝚁𝙺𝚉𝙾𝙽𝙴-𝙼𝙳"
 ];
 
-// Fancy text styles
-const fancyStyles = [
-    (text) => text, // Normal
-    (text) => text.split('').map(c => c + '⃝').join(''), 
-    (text) => text.split('').map(c => c + '⃞').join(''),
-    (text) => text.split('').map(c => c + '⃟').join(''),
-    (text) => text.toUpperCase(),
-    (text) => text.split('').join(' '),
-    (text) => text.split('').map(c => c + '̲').join(''),
-    (text) => text.split('').map(c => c + '̶').join(''),
-    (text) => text.split('').map(c => c + '̷').join(''),
-    (text) => text.split('').map(c => c + '̸').join('')
-];
+// Track current style index
+let currentStyleIndex = 0;
 
 cmd({
     pattern: "ping",
     alias: ["speed","pong"],
     use: '.ping',
-    desc: "Check bot's response time with stylish responses",
+    desc: "Check bot's response time.",
     category: "main",
     react: "🌡️",
     filename: __filename
@@ -44,35 +30,34 @@ cmd({
 async (conn, mek, m, { from, quoted, sender, reply }) => {
     try {
         const start = new Date().getTime();
-        const user = sender.split('@')[0];
 
-        // Get or increment user's style index
-        let styleIndex = userStyles.get(user) || 0;
-        userStyles.set(user, (styleIndex + 1) % fancyStyles.length);
-
-        // Get random design
-        const designIndex = Math.floor(Math.random() * pingDesigns.length);
-        
-        // Send reaction
         const reactionEmojis = ['🔥', '⚡', '🚀', '💨', '🎯', '🎉', '🌟', '💥', '🕐', '🔹'];
+        const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '🌀', '🔱', '🛡️', '✨'];
+
         const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
-        
+        let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
+
+        // Ensure reaction and text emojis are different
+        while (textEmoji === reactionEmoji) {
+            textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
+        }
+
+        // Send reaction using conn.sendMessage()
         await conn.sendMessage(from, {
-            react: { text: reactionEmoji, key: mek.key }
+            react: { text: textEmoji, key: mek.key }
         });
 
         const end = new Date().getTime();
         const responseTime = (end - start) / 1000;
 
-        // Apply fancy style to the ping text
-        const pingText = `DARKZONE-MD SPEED: ${responseTime.toFixed(2)}ms`;
-        const styledText = fancyStyles[styleIndex](pingText);
+        // Get current fancy bot name and rotate for next time
+        const fancyBotName = botNameStyles[currentStyleIndex];
+        currentStyleIndex = (currentStyleIndex + 1) % botNameStyles.length;
 
-        // Create final message with design
-        const finalMessage = pingDesigns[designIndex](styledText);
+        const text = `> *${fancyBotName} SPEED: ${responseTime.toFixed(2)}ms ${reactionEmoji}*`;
 
         await conn.sendMessage(from, {
-            text: finalMessage,
+            text,
             contextInfo: {
                 mentionedJid: [sender],
                 forwardingScore: 999,
@@ -91,10 +76,10 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
     }
 });
 
-// Traditional ping2 command remains as backup
+// ping2 remains unchanged
 cmd({
     pattern: "ping2",
-    desc: "Check bot's response time (traditional method).",
+    desc: "Check bot's response time.",
     category: "main",
     react: "🍂",
     filename: __filename
@@ -105,11 +90,9 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         const message = await conn.sendMessage(from, { text: '*PINGING...*' })
         const endTime = Date.now()
         const ping = endTime - startTime
-        await conn.sendMessage(from, { 
-            text: `*🔥 DARKZONE-MD SPEED : ${ping}ms*\n📢 Join our channel: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J` 
-        }, { quoted: message })
+        await conn.sendMessage(from, { text: `*🔥 DARKZONE-MD SPEED : ${ping}ms*` }, { quoted: message })
     } catch (e) {
         console.log(e)
         reply(`${e}`)
     }
-});
+})

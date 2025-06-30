@@ -9,84 +9,62 @@ cmd({
     pattern: "update",
     alias: ["upgrade", "sync"],
     react: '🆕',
-    desc: "Update the bot to the latest version from the official repository.",
+    desc: "Update the bot to the latest version.",
     category: "misc",
     filename: __filename
 }, async (client, message, args, { reply, isOwner }) => {
-    if (!isOwner) {
-        return reply("🔒 This command is exclusively for the bot owner.");
-    }
+    if (!isOwner) return reply("This command is only for the bot owner.");
 
     try {
-        await reply("🔍 Checking for updates on GitHub...");
+        await reply("🔍 Checking for DARKZONE-MD updates...");
 
-        // 1. Added timeout to prevent hanging
-        const repoURL = "https://api.github.com/repos/DARKZONE-MD/DARKZONE-MD/commits/main";
-        const { data: commitData } = await axios.get(repoURL, { timeout: 10000 });
+        // Fetch the latest commit hash from GitHub
+        const { data: commitData } = await axios.get("https://api.github.com/repos/DARKZONE-MD/DARKZONE-MD/commits/main");
         const latestCommitHash = commitData.sha;
 
+        // Get the stored commit hash from the database
         const currentHash = await getCommitHash();
+
         if (latestCommitHash === currentHash) {
-            return reply("✅ You are already on the latest version of DARKZONE-MD!");
+            return reply("✅ Your DARKZONE-MD bot is already up-to-date!");
         }
 
-        await reply("🚀 An update is available! Starting the update process...");
+        await reply("🚀 Updating DARKZONE-MD Bot...");
 
-        // 2. Added error handling for download
-        const downloadURL = "https://github.com/DARKZONE-MD/DARKZONE-MD/archive/main.zip";
-        const zipPath = path.join(__dirname, "..", "latest_update.zip"); // Changed path to parent directory
-        const response = await axios.get(downloadURL, { 
-            responseType: "arraybuffer",
-            timeout: 30000 
-        });
-        fs.writeFileSync(zipPath, response.data);
-        await reply("📥 Download complete.");
+        // Download the latest code
+        const zipPath = path.join(__dirname, "latest.zip");
+        const { data: zipData } = await axios.get("https://github.com/DARKZONE-MD/DARKZONE-MD/archive/main.zip", { responseType: "arraybuffer" });
+        fs.writeFileSync(zipPath, zipData);
 
-        // 3. Improved extraction with better error handling
-        await reply("📦 Extracting files...");
-        const extractPath = path.join(__dirname, "..", 'temp_update');
-        try {
-            const zip = new AdmZip(zipPath);
-            zip.extractAllTo(extractPath, true);
-        } catch (extractError) {
-            console.error("Extraction failed:", extractError);
-            throw new Error("Failed to extract update package");
-        }
+        // Extract ZIP file
+        await reply("📦 Extracting the latest code...");
+        const extractPath = path.join(__dirname, 'latest');
+        const zip = new AdmZip(zipPath);
+        zip.extractAllTo(extractPath, true);
 
-        // 4. More robust file copying
-        await reply("🔄 Installing the update...");
+        // Copy updated files, preserving config.js and app.json
+        await reply("🔄 Replacing files...");
         const sourcePath = path.join(extractPath, "DARKZONE-MD-main");
-        const destinationPath = path.join(__dirname, ".."); // Bot root directory
-        
-        // 5. Added delay before copying
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        const destinationPath = path.join(__dirname, '..');
         copyFolderSync(sourcePath, destinationPath);
 
-        // 6. Update commit hash before cleanup
+        // Save the latest commit hash to the database
         await setCommitHash(latestCommitHash);
 
-        // 7. Safer cleanup with error handling
-        try {
-            fs.unlinkSync(zipPath);
-            fs.rmSync(extractPath, { recursive: true, force: true });
-        } catch (cleanupError) {
-            console.warn("Cleanup warning:", cleanupError);
-        }
+        // Cleanup
+        fs.unlinkSync(zipPath);
+        fs.rmSync(extractPath, { recursive: true, force: true });
 
-        // 8. Changed exit approach
-        await reply("✅ Update successful! The bot will now restart...");
-        setTimeout(() => process.exit(0), 2000);
-
+        await reply("✅ Update complete! Restarting the bot...");
+        process.exit(0);
     } catch (error) {
-        console.error("UPDATE ERROR:", error);
-        return reply(`❌ Update failed: ${error.message}\nPlease try manually or check logs.`);
+        console.error("Update error:", error);
+        return reply("❌ Update failed. Please try manually.");
     }
 });
 
-// Improved folder copy function
+// Helper function to copy directories while preserving config.js and app.json
 function copyFolderSync(source, target) {
-    const filesToSkip = ["config.js", "app.json", "data", "session", "database"]; // Added more critical directories
-    
     if (!fs.existsSync(target)) {
         fs.mkdirSync(target, { recursive: true });
     }
@@ -96,23 +74,16 @@ function copyFolderSync(source, target) {
         const srcPath = path.join(source, item);
         const destPath = path.join(target, item);
 
-        if (filesToSkip.includes(item)) {
-            console.log(`⚠️ Preserving: ${item}`);
+        // Skip config.js and app.json
+        if (item === "config.js" || item === "app.json") {
+            console.log(`Skipping ${item} to preserve custom settings.`);
             continue;
         }
 
-        try {
-            const stat = fs.lstatSync(srcPath);
-            if (stat.isDirectory()) {
-                if (!fs.existsSync(destPath)) {
-                    fs.mkdirSync(destPath, { recursive: true });
-                }
-                copyFolderSync(srcPath, destPath);
-            } else {
-                fs.copyFileSync(srcPath, destPath);
-            }
-        } catch (copyError) {
-            console.error(`Failed to copy ${item}:`, copyError);
+        if (fs.lstatSync(srcPath).isDirectory()) {
+            copyFolderSync(srcPath, destPath);
+        } else {
+            fs.copyFileSync(srcPath, destPath);
         }
     }
 }

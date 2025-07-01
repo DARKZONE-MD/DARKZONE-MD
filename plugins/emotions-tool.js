@@ -1,263 +1,144 @@
-////==========\
+// File: plugins/emoji-animations.js
 const { cmd } = require('../command');
+const fs = require('fs');
+const path = require('path');
 
-// Helper function for animated emoji messages
-async function sendEmojiAnimation(conn, from, initialEmoji, emojiSequence, speed = 800) {
+// Helper function to safely send animated messages
+async function animateEmojis(conn, from, initialEmoji, emojiSequence, delay = 800) {
     try {
-        const message = await conn.sendMessage(from, { text: initialEmoji });
+        const loadingMessage = await conn.sendMessage(from, { text: initialEmoji });
         
         for (const emoji of emojiSequence) {
-            await new Promise(resolve => setTimeout(resolve, speed));
-            await conn.relayMessage(from, {
-                protocolMessage: {
-                    key: message.key,
-                    type: 14, // Edited message type
-                    editedMessage: { conversation: emoji }
-                }
-            });
+            await new Promise(resolve => setTimeout(resolve, delay));
+            try {
+                await conn.relayMessage(
+                    from,
+                    {
+                        protocolMessage: {
+                            key: loadingMessage.key,
+                            type: 14, // Edited message type
+                            editedMessage: {
+                                conversation: emoji,
+                            },
+                        },
+                    },
+                    {}
+                );
+            } catch (editError) {
+                console.error('Edit error:', editError);
+                // If editing fails, send as new message
+                await conn.sendMessage(from, { text: emoji });
+            }
         }
-    } catch (error) {
-        console.error('Emoji animation error:', error);
-        throw error;
+    } catch (e) {
+        console.error('Animation error:', e);
+        throw e;
     }
 }
 
-// Love Command
-cmd({
-    pattern: "love",
-    alias: ["heart", "luv"],
-    desc: "Heart emoji animation",
-    category: "fun",
-    react: "❤️",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        await sendEmojiAnimation(conn, from, '❤️', [
-            "💘", "💝", "💖", "💗", "💓", "💞", 
-            "💕", "💟", "❣️", "💔", "❤️‍🔥", "❤️‍🩹",
-            "💌", "🧡", "💛", "💚", "💙", "💜",
-            "🤎", "🖤", "🤍", "❤️"
-        ], 600);
-    } catch (e) {
-        reply(`❌ Error: ${e.message}`);
+// Command configurations
+const emojiCommands = [
+    {
+        pattern: "happy",
+        desc: "Happy emoji animation",
+        react: "😊",
+        emojis: ["😀", "😃", "😄", "😁", "😆", "🥹", "😅", "😂", "🤣", "🥲", "☺️", "😊", "😇"]
+    },
+    {
+        pattern: "heart",
+        desc: "Heart emoji animation",
+        react: "❤️",
+        emojis: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❤️‍🔥", "❤️‍🩹", "💘", "💝", "💖", "💗", "💓", "💞", "💕", "💟"]
+    },
+    {
+        pattern: "sad",
+        desc: "Sad emoji animation",
+        react: "😢",
+        emojis: ["😔", "😟", "🙁", "☹️", "😕", "😞", "😢", "😥", "😪", "😭", "😿", "💔"]
+    },
+    {
+        pattern: "shy",
+        desc: "Shy emoji animation",
+        react: "😳",
+        emojis: ["🥺", "😳", "😊", "😚", "😙", "😗", "😘", "😍", "🤩", "🥰", "😇", "🙈", "🙊"]
+    },
+    {
+        pattern: "beautiful",
+        desc: "Beautiful emoji animation",
+        react: "✨",
+        emojis: ["✨", "🌟", "💫", "⭐️", "🌠", "🌞", "🌝", "🌹", "🥀", "🌺", "🌸", "🌼", "🌷"]
+    },
+    {
+        pattern: "confused",
+        desc: "Confused emoji animation",
+        react: "🤔",
+        emojis: ["🤔", "😕", "😟", "🙁", "😮", "😯", "😲", "😳", "🥴", "😵", "😵‍💫", "🧐"]
+    },
+    {
+        pattern: "moon",
+        desc: "Moon phase animation",
+        react: "🌚",
+        emojis: ["🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘", "🌑", "🌙", "🌚", "🌛", "🌜"]
+    },
+    {
+        pattern: "kiss",
+        desc: "Kiss emoji animation",
+        react: "💋",
+        emojis: ["💋", "😘", "😗", "😙", "😚", "🥰", "😍", "🤩", "❤️", "💝", "💘", "💖"]
+    },
+    {
+        pattern: "hurt",
+        desc: "Hurt emoji animation",
+        react: "💔",
+        emojis: ["💔", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😿", "🤕", "🥴", "😵"]
+    },
+    {
+        pattern: "broke",
+        desc: "Broken heart animation",
+        react: "💔",
+        emojis: ["💔", "🖤", "💔", "🖤", "💔", "🖤", "💔", "🖤", "💔", "🖤", "💔"]
+    },
+    {
+        pattern: "hot",
+        desc: "Hot emoji animation",
+        react: "🔥",
+        emojis: ["🔥", "🥵", "♨️", "🌶️", "🧨", "💥", "🤯", "👹", "💫", "✨", "🌟", "⭐️"]
+    },
+    {
+        pattern: "love",
+        desc: "Love emoji animation",
+        react: "🥰",
+        emojis: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🤎", "🖤", "🤍", "💖", "💗", "💓", "💞", "💕", "💘", "💝", "💟", "❣️", "💌", "🥰"]
     }
+];
+
+// Register all commands
+emojiCommands.forEach(cmdConfig => {
+    cmd({
+        pattern: cmdConfig.pattern,
+        desc: cmdConfig.desc,
+        category: "fun",
+        react: cmdConfig.react,
+        filename: __filename
+    }, async (conn, mek, m, { from, reply }) => {
+        try {
+            await animateEmojis(conn, from, cmdConfig.emojis[0], cmdConfig.emojis);
+        } catch (e) {
+            console.error(`Error in ${cmdConfig.pattern}:`, e);
+            reply(`❌ Failed to animate ${cmdConfig.pattern} emojis`);
+        }
+    });
 });
 
-// Happy Command
-cmd({
-    pattern: "happy",
-    alias: ["happiness", "joy"],
-    desc: "Happy emoji animation",
-    category: "fun",
-    react: "😊",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        await sendEmojiAnimation(conn, from, '😊', [
-            "😀", "😃", "😄", "😁", "😆", "😅",
-            "😂", "🤣", "🥲", "☺️", "😊", "😇",
-            "🙂", "🙃", "😉", "😌", "😍", "🥰",
-            "😘", "😗", "😙", "😚", "😋", "😛",
-            "😝", "😜", "🤪", "🤨", "🧐", "🤓",
-            "😎", "🥸", "🤩", "🥳", "😏", "😊"
-        ]);
-    } catch (e) {
-        reply(`❌ Error: ${e.message}`);
-    }
-});
+// Save the plugin information
+const pluginInfo = {
+    name: "Emoji Animations",
+    desc: "Auto-changing emoji animations for various emotions",
+    version: "1.0",
+    author: "Your Name"
+};
 
-// Sad Command
-cmd({
-    pattern: "sad",
-    alias: ["depressed", "cry"],
-    desc: "Sad emoji animation",
-    category: "fun",
-    react: "😢",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        await sendEmojiAnimation(conn, from, '😢', [
-            "😞", "😔", "😟", "😕", "🙁", "☹️",
-            "😣", "😖", "😫", "😩", "🥺", "😢",
-            "😭", "😤", "😠", "😡", "🤬", "😓",
-            "😥", "😰", "😨", "😧", "😦", "😮",
-            "😯", "😲", "😳", "😵", "😱", "🥶",
-            "😶", "😶‍🌫️", "😢"
-        ], 900);
-    } catch (e) {
-        reply(`❌ Error: ${e.message}`);
-    }
-});
-
-// Shy Command
-cmd({
-    pattern: "shy",
-    alias: ["blush", "embarrassed"],
-    desc: "Shy emoji animation",
-    category: "fun",
-    react: "🥺",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        await sendEmojiAnimation(conn, from, '🥺', [
-            "😳", "😊", "😌", "😚", "😙", "😗",
-            "😘", "🥰", "😍", "🤩", "😇", "☺️",
-            "🙈", "🙉", "🙊", "💘", "💝", "💖",
-            "💗", "💓", "💞", "💕", "🥺"
-        ]);
-    } catch (e) {
-        reply(`❌ Error: ${e.message}`);
-    }
-});
-
-// Beautiful Command
-cmd({
-    pattern: "beautiful",
-    alias: ["pretty", "gorgeous"],
-    desc: "Beautiful emoji animation",
-    category: "fun",
-    react: "🌸",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        await sendEmojiAnimation(conn, from, '🌸', [
-            "💐", "🌷", "🌹", "🥀", "🌺", "🌻",
-            "🌼", "🌞", "⭐", "🌟", "✨", "💫",
-            "🌈", "☀️", "🌤️", "🌥️", "🌦️", "🌧️",
-            "🌨️", "🌩️", "🌪️", "🌫️", "🌊", "💧",
-            "💦", "☔", "❄️", "⛄", "🔥", "🌸"
-        ], 700);
-    } catch (e) {
-        reply(`❌ Error: ${e.message}`);
-    }
-});
-
-// Confused Command
-cmd({
-    pattern: "confused",
-    alias: ["cunfuzed", "what"],
-    desc: "Confused emoji animation",
-    category: "fun",
-    react: "😕",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        await sendEmojiAnimation(conn, from, '😕', [
-            "🤔", "😐", "😑", "😶", "😶‍🌫️", "🙄",
-            "😏", "😣", "😖", "😫", "😩", "🥺",
-            "😮", "😯", "😲", "😳", "🥴", "😵",
-            "😵‍💫", "🤯", "🤠", "🥸", "😎", "🧐",
-            "🤓", "👽", "🤖", "👻", "💀", "😕"
-        ], 800);
-    } catch (e) {
-        reply(`❌ Error: ${e.message}`);
-    }
-});
-
-// Moon Command
-cmd({
-    pattern: "moon",
-    alias: ["luna", "lunar"],
-    desc: "Moon phase animation",
-    category: "fun",
-    react: "🌑",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        await sendEmojiAnimation(conn, from, '🌑', [
-            "🌒", "🌓", "🌔", "🌕", "🌖", "🌗",
-            "🌘", "🌑", "🌙", "🌚", "🌛", "🌜",
-            "🌝", "🌞", "⭐", "🌟", "✨", "💫",
-            "🌠", "🌌", "🪐", "🔭", "🌑"
-        ], 500);
-    } catch (e) {
-        reply(`❌ Error: ${e.message}`);
-    }
-});
-
-// Kiss Command
-cmd({
-    pattern: "kiss",
-    alias: ["smooch", "loveyou"],
-    desc: "Kissing emoji animation",
-    category: "fun",
-    react: "💋",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        await sendEmojiAnimation(conn, from, '💋', [
-            "😘", "😗", "😙", "😚", "🥰", "😍",
-            "🤩", "😻", "💌", "💘", "💝", "💖",
-            "💗", "💓", "💞", "💕", "💟", "❣️",
-            "💔", "❤️‍🔥", "❤️‍🩹", "💋"
-        ], 600);
-    } catch (e) {
-        reply(`❌ Error: ${e.message}`);
-    }
-});
-
-// Hurt Command
-cmd({
-    pattern: "hurt",
-    alias: ["pain", "injured"],
-    desc: "Hurt emoji animation",
-    category: "fun",
-    react: "🤕",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        await sendEmojiAnimation(conn, from, '🤕', [
-            "😣", "😖", "😫", "😩", "🥺", "😢",
-            "😭", "😤", "😠", "😡", "🤬", "😓",
-            "😥", "😰", "😨", "😧", "😦", "😮",
-            "😯", "😲", "😳", "😵", "😵‍💫", "🤯",
-            "🥴", "🤢", "🤮", "🤧", "😷", "🤒",
-            "🤕", "🩹", "💊", "💉", "🩸", "🤕"
-        ], 800);
-    } catch (e) {
-        reply(`❌ Error: ${e.message}`);
-    }
-});
-
-// Broke Command
-cmd({
-    pattern: "broke",
-    alias: ["broken", "poor"],
-    desc: "Broke emoji animation",
-    category: "fun",
-    react: "💔",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        await sendEmojiAnimation(conn, from, '💔', [
-            "😞", "😔", "😟", "😕", "🙁", "☹️",
-            "😣", "😖", "😫", "😩", "🥺", "😢",
-            "😭", "😤", "😠", "😡", "🤬", "😓",
-            "😥", "😰", "😨", "😧", "😦", "😮",
-            "😯", "😲", "😳", "😵", "😱", "🥶",
-            "💸", "💰", "💳", "🧾", "💔"
-        ], 700);
-    } catch (e) {
-        reply(`❌ Error: ${e.message}`);
-    }
-});
-
-// Hot Command
-cmd({
-    pattern: "hot",
-    alias: ["sexy", "attractive"],
-    desc: "Hot emoji animation",
-    category: "fun",
-    react: "🔥",
-    filename: __filename
-}, async (conn, mek, m, { from, reply }) => {
-    try {
-        await sendEmojiAnimation(conn, from, '🔥', [
-            "🥵", "❤️‍🔥", "💯", "♨️", "🌶️", "🥵",
-            "😈", "👿", "💦", "🍑", "🍆", "💋",
-            "👄", "👅", "🫦", "👀", "👁️", "🔥"
-        ], 600);
-    } catch (e) {
-        reply(`❌ Error: ${e.message}`);
-    }
-});
+fs.writeFileSync(
+    path.join(__dirname, 'emoji-animations.json'),
+    JSON.stringify(pluginInfo, null, 2)
+);

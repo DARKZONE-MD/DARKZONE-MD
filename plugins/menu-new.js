@@ -51,6 +51,7 @@ cmd({
 [🧠SYSTEM CORE STAB Initializing..]
 ├── 🌐 𝗦𝗼𝗰𝗶𝗮𝗹 𝗠𝗲𝗱𝗶𝗮
 │   ├─ facebook [url]
+│   ├─ download [url]
 │   ├─ mediafire [url]
 │   ├─ tiktok [url]
 │   ├─ twitter [url]

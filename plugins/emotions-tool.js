@@ -51,6 +51,12 @@ const emojiCommands = [
         emojis: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❤️‍🔥", "❤️‍🩹", "💘", "💝", "💖", "💗", "💓", "💞", "💕", "💟"]
     },
     {
+        pattern: "night",
+        desc: "Night time emoji animation",
+        react: "🌃",
+        emojis: ["🌃", "🌌", "🌉", "🌙", "🌚", "🌛", "🌜", "🌠", "✨", "🌟", "⭐️", "💫", "🕯️", "🏙️", "🌆", "🌄"]
+        },
+        {
         pattern: "sad",
         desc: "Sad emoji animation",
         react: "😢",

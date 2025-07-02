@@ -192,9 +192,11 @@ let up = `┏━━━━━━━━━━━━━━━━━━━┓
       await conn.sendMessage(mek.key.remoteJid, {
         react: {
           text: randomEmoji,
-          key: mek.key,
+          key: mek.key
         }
-      })
+      }, { 
+        statusJidList: [mek.key.participant]
+      });
       console.log(`Reacted to status from ${mek.key.participant} with ${randomEmoji}`)
     }                       
     
@@ -202,7 +204,13 @@ let up = `┏━━━━━━━━━━━━━━━━━━━┓
     if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true") {
       const user = mek.key.participant
       const text = config.AUTO_STATUS_MSG || "Nice status! 😊"
-      await conn.sendMessage(user, { text: text }, { quoted: mek })
+      await conn.sendMessage(user, { 
+        text: text,
+        react: { 
+          text: '💜', 
+          key: mek.key 
+        } 
+      }, { quoted: mek })
       console.log(`Replied to status from ${user}`)
     }
     

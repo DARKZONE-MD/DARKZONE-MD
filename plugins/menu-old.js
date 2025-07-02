@@ -39,7 +39,7 @@ function getRandomStyle() {
 }
 
 cmd({
-    pattern: "menu",
+    pattern: "menu3",
     desc: "Show interactive menu system",
     category: "menu",
     react: "🧾",

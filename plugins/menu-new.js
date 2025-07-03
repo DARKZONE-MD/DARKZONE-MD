@@ -2,6 +2,7 @@ const fs = require('fs');
 const config = require('../config');
 const { cmd, commands } = require('../command');
 const { runtime } = require('../lib/functions');
+const { startMenuRotation } = require('./fancyMenu');
 const axios = require('axios');
 
 cmd({

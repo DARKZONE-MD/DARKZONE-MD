@@ -1,56 +1,34 @@
-const fs = require('fs');
+const fs = require("fs");
+const config = require("../config");
+const { cmd, commands } = require("../command");
 const path = require('path');
-const { downloadContentFromMessage } = require('@whiskeysockets/baileys');
+const axios = require("axios");
 
-// Enhanced Privacy Module with all working commands
-module.exports = {
-    name: "privacy",
-    version: "3.0",
-    author: "Your Name",
-    description: "Complete privacy control system for WhatsApp bot",
-    license: "MIT"
-};
 
-// Helper function to compress images
-async function compressImage(buffer, quality = 80) {
-    try {
-        const sharp = require('sharp');
-        return await sharp(buffer)
-            .jpeg({ quality })
-            .toBuffer();
-    } catch (e) {
-        console.error("Image compression error:", e);
-        return buffer; // Return original if compression fails
-    }
-}
-
-// Main privacy menu command
 cmd({
     pattern: "privacy",
-    alias: ["privacymenu", "privacyhelp"],
-    desc: "Privacy settings menu with all options",
+    alias: ["privacymenu"],
+    desc: "Privacy settings menu",
     category: "privacy",
     react: "🔐",
     filename: __filename
-}, async (conn, mek, m, { reply, isOwner }) => {
+}, 
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        const privacyMenu = `╭━━〔 *Privacy Control Center* 〕━━┈⊷
+        let privacyMenu = `╭━━〔 *Privacy Settings* 〕━━┈⊷
 ┃◈╭─────────────·๏
 ┃◈┃• blocklist - View blocked users
-┃◈┃• unblock @user - Unblock a user
-┃◈┃• getbio @user - Get user's bio
-┃◈┃• setppall [option] - Set profile pic privacy
-┃◈┃• setonline [option] - Set online privacy
-┃◈┃• setpp [reply image] - Change bot's profile pic
-┃◈┃• setmyname [text] - Change bot's name
-┃◈┃• updatebio [text] - Change bot's bio
-┃◈┃• groupsprivacy [option] - Set group add privacy
+┃◈┃• getbio - Get user's bio
+┃◈┃• setppall - Set profile pic privacy
+┃◈┃• setonline - Set online privacy
+┃◈┃• setpp - Change bot's profile pic
+┃◈┃• setmyname - Change bot's name
+┃◈┃• updatebio - Change bot's bio
+┃◈┃• groupsprivacy - Set group add privacy
 ┃◈┃• getprivacy - View current privacy settings
-┃◈┃• getpp @user - Get user's profile picture
-┃◈┃• lastseen [option] - Set last seen privacy
-┃◈┃• statusprivacy [option] - Set status privacy
+┃◈┃• getpp - Get user's profile picture
 ┃◈┃
-┃◈┃*Privacy Options:*
+┃◈┃*Options for privacy commands:*
 ┃◈┃• all - Everyone
 ┃◈┃• contacts - My contacts only
 ┃◈┃• contact_blacklist - Contacts except blocked
@@ -58,452 +36,292 @@ cmd({
 ┃◈┃• match_last_seen - Match last seen
 ┃◈└───────────┈⊷
 ╰──────────────┈⊷
-*Owner Only:* Most commands require owner privileges`;
+*Note:* Most commands are owner-only`;
 
-        await conn.sendMessage(m.chat, { 
-            text: privacyMenu,
-            contextInfo: {
-                externalAdReply: {
-                    title: "Privacy Control Center",
-                    body: "Manage your bot's privacy settings",
-                    thumbnail: await conn.profilePictureUrl(conn.user.id, 'image').catch(() => '')
+        await conn.sendMessage(
+            from,
+            {
+                image: { url: `https://files.catbox.moe/r2ncqh` }, // Replace with privacy-themed image if available
+                caption: privacyMenu,
+                contextInfo: {
+                    mentionedJid: [m.sender],
+                    forwardingScore: 999,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: '120363416743041101@newsletter',
+                        newsletterName: "Privacy Settings",
+                        serverMessageId: 143
+                    }
                 }
-            }
-        }, { quoted: m });
+            },
+            { quoted: mek }
+        );
+
     } catch (e) {
-        console.error("Privacy menu error:", e);
-        reply(`❌ Error: ${e.message}`);
+        console.log(e);
+        reply(`Error: ${e.message}`);
     }
 });
 
-// Blocklist command with unblock functionality
+
 cmd({
     pattern: "blocklist",
-    alias: ["blocked", "listblocked"],
-    desc: "View and manage blocked users",
+    desc: "View the list of blocked users.",
     category: "privacy",
-    react: "🚫",
+    react: "📋",
     filename: __filename
-}, async (conn, mek, m, { reply, isOwner, mentionByTag }) => {
-    if (!isOwner) return reply("*🔒 Owner only command!*");
+},
+async (conn, mek, m, { from, isOwner, reply }) => {
+    if (!isOwner) return reply("*📛 You are not the owner!*");
 
     try {
+        // Fetch the block list
         const blockedUsers = await conn.fetchBlocklist();
-        
-        if (!blockedUsers || blockedUsers.length === 0) {
-            return reply("📭 Your block list is currently empty.");
+
+        if (blockedUsers.length === 0) {
+            return reply("📋 Your block list is empty.");
         }
 
-        // If user tagged someone, unblock them
-        if (mentionByTag && mentionByTag[0]) {
-            const userToUnblock = mentionByTag[0];
-            if (!blockedUsers.includes(userToUnblock)) {
-                return reply(`❌ @${userToUnblock.split('@')[0]} is not blocked.`, 
-                    { mentions: [userToUnblock] });
-            }
-            
-            await conn.updateBlockStatus(userToUnblock, "unblock");
-            return reply(`✅ Successfully unblocked @${userToUnblock.split('@')[0]}`, 
-                { mentions: [userToUnblock] });
-        }
+        // Format the blocked users with 📌 and count the total
+        const list = blockedUsers
+            .map((user, i) => `🚧 BLOCKED ${user.split('@')[0]}`) // Remove domain and add 📌
+            .join('\n');
 
-        // Display block list
-        const list = blockedUsers.map((user, i) => `${i+1}. @${user.split('@')[0]}`).join('\n');
-        reply(`📋 *Blocked Users (${blockedUsers.length}):*\n\n${list}\n\nReply with *unblock @user* to unblock`, 
-            { mentions: blockedUsers });
+        const count = blockedUsers.length;
+        reply(`📋 Blocked Users (${count}):\n\n${list}`);
     } catch (err) {
-        console.error("Blocklist error:", err);
+        console.error(err);
         reply(`❌ Failed to fetch block list: ${err.message}`);
     }
 });
 
-// Dedicated unblock command
-cmd({
-    pattern: "unblock",
-    desc: "Unblock a user",
-    category: "privacy",
-    react: "✅",
-    filename: __filename
-}, async (conn, mek, m, { reply, isOwner, mentionByTag }) => {
-    if (!isOwner) return reply("*🔒 Owner only command!*");
-    if (!mentionByTag || !mentionByTag[0]) return reply("❌ Please tag the user to unblock.");
-
-    try {
-        await conn.updateBlockStatus(mentionByTag[0], "unblock");
-        reply(`✅ @${mentionByTag[0].split('@')[0]} has been unblocked`, 
-            { mentions: [mentionByTag[0]] });
-    } catch (err) {
-        console.error("Unblock error:", err);
-        reply(`❌ Failed to unblock: ${err.message}`);
-    }
-});
-
-// Get user bio with enhanced features
 cmd({
     pattern: "getbio",
-    alias: ["fetchbio", "userbio"],
-    desc: "Get any user's bio information",
+    desc: "Displays the user's bio.",
     category: "privacy",
-    react: "📝",
-    filename: __filename
-}, async (conn, mek, m, { reply, mentionByTag, args }) => {
+    filename: __filename,
+}, async (conn, mek, m, { args, reply }) => {
     try {
-        const jid = mentionByTag?.[0] || args[0] || m.sender;
-        const about = await conn.fetchStatus(jid).catch(() => null);
-        
-        if (!about?.status) return reply("❌ No bio found or account is private.");
-
-        const bioInfo = `📝 *Bio for @${jid.split('@')[0]}*\n\n` +
-                        `${about.status}\n\n` +
-                        `*Last Updated:* ${new Date(about.setAt).toLocaleString()}`;
-        
-        reply(bioInfo, { mentions: [jid] });
+        const jid = args[0] || mek.key.remoteJid;
+        const about = await conn.fetchStatus?.(jid);
+        if (!about) return reply("No bio found.");
+        return reply(`User Bio:\n\n${about.status}`);
     } catch (error) {
-        console.error("GetBio error:", error);
-        reply("❌ Failed to fetch bio. The account may be private.");
+        console.error("Error in bio command:", error);
+        reply("No bio found.");
     }
 });
-
-// Profile picture privacy control
 cmd({
     pattern: "setppall",
-    alias: ["ppprivacy"],
-    desc: "Set who can see your profile picture",
+    desc: "Update Profile Picture Privacy",
     category: "privacy",
-    react: "🖼️",
+    react: "🔐",
     filename: __filename
-}, async (conn, mek, m, { reply, isOwner, args }) => {
-    if (!isOwner) return reply("❌ Owner only command!");
-    
-    const options = {
-        'all': 'Everyone',
-        'contacts': 'My contacts only',
-        'contact_blacklist': 'Contacts except blocked',
-        'none': 'Nobody'
-    };
-    
-    const value = args[0]?.toLowerCase();
-    
-    if (!value || !options[value]) {
-        return reply(`❌ Invalid option. Available:\n\n${
-            Object.entries(options).map(([key, desc]) => `• ${key} - ${desc}`).join('\n')
-        }`);
-    }
+}, 
+async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    if (!isOwner) return reply("❌ You are not the owner!");
     
     try {
+        const value = args[0] || 'all'; 
+        const validValues = ['all', 'contacts', 'contact_blacklist', 'none'];  
+        
+        if (!validValues.includes(value)) {
+            return reply("❌ Invalid option. Valid options are: 'all', 'contacts', 'contact_blacklist', 'none'.");
+        }
+        
         await conn.updateProfilePicturePrivacy(value);
-        reply(`✅ Profile picture privacy set to: *${options[value]}*`);
+        reply(`✅ Profile picture privacy updated to: ${value}`);
     } catch (e) {
-        console.error("SetPPAll error:", e);
-        reply(`❌ Failed to update: ${e.message}`);
+        return reply(`*An error occurred while processing your request.*\n\n_Error:_ ${e.message}`);
     }
 });
-
-// Online status privacy
 cmd({
     pattern: "setonline",
-    alias: ["onlineprivacy"],
-    desc: "Control your online status visibility",
+    desc: "Update Online Privacy",
     category: "privacy",
-    react: "🟢",
+    react: "🔐",
     filename: __filename
-}, async (conn, mek, m, { reply, isOwner, args }) => {
-    if (!isOwner) return reply("❌ Owner only command!");
-
-    const options = {
-        'all': 'Everyone can see',
-        'match_last_seen': 'Match last seen privacy'
-    };
-    
-    const value = args[0]?.toLowerCase();
-    
-    if (!value || !options[value]) {
-        return reply(`❌ Invalid option. Available:\n\n${
-            Object.entries(options).map(([key, desc]) => `• ${key} - ${desc}`).join('\n')
-        }`);
-    }
+}, 
+async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    if (!isOwner) return reply("❌ You are not the owner!");
 
     try {
+        const value = args[0] || 'all'; 
+        const validValues = ['all', 'match_last_seen'];
+        
+        if (!validValues.includes(value)) {
+            return reply("❌ Invalid option. Valid options are: 'all', 'match_last_seen'.");
+        }
+
         await conn.updateOnlinePrivacy(value);
-        reply(`✅ Online privacy set to: *${options[value]}*`);
+        reply(`✅ Online privacy updated to: ${value}`);
     } catch (e) {
-        console.error("SetOnline error:", e);
-        reply(`❌ Failed to update: ${e.message}`);
+        return reply(`*An error occurred while processing your request.*\n\n_Error:_ ${e.message}`);
     }
 });
 
-// Set profile picture with quality options
 cmd({
     pattern: "setpp",
-    alias: ["setprofilepic"],
-    desc: "Change bot's profile picture with quality options",
+    desc: "Set bot profile picture.",
     category: "privacy",
     react: "🖼️",
     filename: __filename
-}, async (conn, mek, m, { reply, isOwner, quoted }) => {
-    if (!isOwner) return reply("❌ Owner only command!");
-    if (!quoted?.message?.imageMessage) {
-        return reply("❌ Please reply to an image with caption:\n`setpp [quality: low/medium/high]`");
-    }
-
+},
+async (conn, mek, m, { from, isOwner, quoted, reply }) => {
+    if (!isOwner) return reply("❌ You are not the owner!");
+    if (!quoted || !quoted.message.imageMessage) return reply("❌ Please reply to an image.");
     try {
-        const quality = m.text.split(' ')[1]?.toLowerCase() || 'medium';
-        const validQualities = ['low', 'medium', 'high'];
-        
-        if (!validQualities.includes(quality)) {
-            return reply(`❌ Invalid quality. Use: ${validQualities.join(', ')}`);
-        }
-
         const stream = await downloadContentFromMessage(quoted.message.imageMessage, 'image');
         let buffer = Buffer.from([]);
         for await (const chunk of stream) {
             buffer = Buffer.concat([buffer, chunk]);
         }
 
-        // Apply quality settings
-        let finalBuffer = buffer;
-        if (quality !== 'high') {
-            const qualityValue = quality === 'low' ? 50 : 75;
-            finalBuffer = await compressImage(buffer, qualityValue);
-        }
+        const mediaPath = path.join(__dirname, `${Date.now()}.jpg`);
+        fs.writeFileSync(mediaPath, buffer);
 
-        await conn.updateProfilePicture(conn.user.id, finalBuffer);
-        reply(`✅ Profile picture updated (${quality} quality)!`);
+        // Update profile picture with the saved file
+        await conn.updateProfilePicture(conn.user.jid, { url: `file://${mediaPath}` });
+        reply("🖼️ Profile picture updated successfully!");
     } catch (error) {
-        console.error("SetPP error:", error);
-        reply(`❌ Error: ${error.message}`);
+        console.error("Error updating profile picture:", error);
+        reply(`❌ Error updating profile picture: ${error.message}`);
     }
 });
 
-// Set bot's display name
 cmd({
     pattern: "setmyname",
-    alias: ["setname", "changename"],
-    desc: "Change bot's display name",
+    desc: "Set your WhatsApp display name.",
     category: "privacy",
-    react: "🏷️",
+    react: "⚙️",
     filename: __filename
-}, async (conn, mek, m, { reply, isOwner, args }) => {
-    if (!isOwner) return reply("❌ Owner only command!");
+},
+async (conn, mek, m, { from, isOwner, reply, args }) => {
+    if (!isOwner) return reply("❌ You are not the owner!");
 
+    // Ensure you have the display name argument
     const displayName = args.join(" ");
-    if (!displayName) return reply("❌ Please provide a name. Example:\n`setmyname My Cool Bot`");
-
-    if (displayName.length > 25) {
-        return reply("❌ Name too long! Maximum 25 characters.");
-    }
+    if (!displayName) return reply("❌ Please provide a display name.");
 
     try {
+        // Ensure the session is loaded before trying to update
+        const { state, saveCreds } = await useMultiFileAuthState('path/to/auth/folder');
+        const conn = makeWASocket({
+            auth: state,
+            printQRInTerminal: true,
+        });
+
+        conn.ev.on('creds.update', saveCreds);
+
+        // Update display name after connection
         await conn.updateProfileName(displayName);
-        reply(`✅ Name changed to: *${displayName}*`);
+        reply(`✅ Your display name has been set to: ${displayName}`);
     } catch (err) {
-        console.error("SetName error:", err);
-        reply("❌ Failed to update name. Try again later.");
+        console.error(err);
+        reply("❌ Failed to set your display name.");
     }
 });
 
-// Update bot's bio
 cmd({
     pattern: "updatebio",
-    alias: ["setbio", "changebio"],
-    desc: "Change bot's bio information",
+    react: "🥏",
+    desc: "Change the Bot number Bio.",
     category: "privacy",
-    react: "📝",
+    use: '.updatebio',
     filename: __filename
-}, async (conn, mek, m, { reply, isOwner, args }) => {
-    if (!isOwner) return reply('🚫 Owner only command!');
-    
-    const newBio = args.join(" ");
-    if (!newBio) return reply('❌ Please provide a bio. Example:\n`updatebio I am a cool bot 🤖`');
-    
-    if (newBio.length > 139) {
-        return reply(`❌ Bio too long! ${newBio.length}/139 characters.`);
-    }
-
+},
+async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        await conn.updateProfileStatus(newBio);
-        reply(`✅ Bio updated:\n\n${newBio}`);
+        if (!isOwner) return reply('🚫 *You must be an Owner to use this command*');
+        if (!q) return reply('❓ *Enter the New Bio*');
+        if (q.length > 139) return reply('❗ *Sorry! Character limit exceeded*');
+        await conn.updateProfileStatus(q);
+        await conn.sendMessage(from, { text: "✔️ *New Bio Added Successfully*" }, { quoted: mek });
     } catch (e) {
-        console.error("UpdateBio error:", e);
-        reply('❌ Failed to update bio. Try again later.');
+        reply('🚫 *An error occurred!*\n\n' + e);
+        l(e);
     }
 });
-
-// Group add privacy settings
 cmd({
     pattern: "groupsprivacy",
-    alias: ["groupprivacy"],
-    desc: "Control who can add you to groups",
+    desc: "Update Group Add Privacy",
     category: "privacy",
-    react: "👥",
+    react: "🔐",
     filename: __filename
-}, async (conn, mek, m, { reply, isOwner, args }) => {
-    if (!isOwner) return reply("❌ Owner only command!");
-
-    const options = {
-        'all': 'Everyone can add',
-        'contacts': 'My contacts only',
-        'contact_blacklist': 'Contacts except blocked',
-        'none': 'Nobody can add'
-    };
-    
-    const value = args[0]?.toLowerCase();
-    
-    if (!value || !options[value]) {
-        return reply(`❌ Invalid option. Available:\n\n${
-            Object.entries(options).map(([key, desc]) => `• ${key} - ${desc}`).join('\n')
-        }`);
-    }
+}, 
+async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
+    if (!isOwner) return reply("❌ You are not the owner!");
 
     try {
+        const value = args[0] || 'all'; 
+        const validValues = ['all', 'contacts', 'contact_blacklist', 'none'];
+        
+        if (!validValues.includes(value)) {
+            return reply("❌ Invalid option. Valid options are: 'all', 'contacts', 'contact_blacklist', 'none'.");
+        }
+
         await conn.updateGroupsAddPrivacy(value);
-        reply(`✅ Group add privacy set to: *${options[value]}*`);
+        reply(`✅ Group add privacy updated to: ${value}`);
     } catch (e) {
-        console.error("GroupsPrivacy error:", e);
-        reply(`❌ Failed to update: ${e.message}`);
+        return reply(`*An error occurred while processing your request.*\n\n_Error:_ ${e.message}`);
     }
 });
 
-// View current privacy settings
 cmd({
     pattern: "getprivacy",
-    alias: ["privacyinfo"],
-    desc: "View all current privacy settings",
+    desc: "Get the bot Number Privacy Setting Updates.",
     category: "privacy",
-    react: "🔍",
+    use: '.getprivacy',
     filename: __filename
-}, async (conn, mek, m, { reply, isOwner }) => {
-    if (!isOwner) return reply('🚫 Owner only command!');
-    
+},
+async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        const settings = await conn.fetchPrivacySettings(true);
-        if (!settings) return reply('❌ Failed to fetch privacy settings.');
+        if (!isOwner) return reply('🚫 *You must be an Owner to use this command*');
+        const duka = await conn.fetchPrivacySettings?.(true);
+        if (!duka) return reply('🚫 *Failed to fetch privacy settings*');
         
-        const format = (val) => {
-            const map = {
-                'all': 'Everyone',
-                'contacts': 'Contacts',
-                'contact_blacklist': 'Contacts (excl. blocked)',
-                'none': 'Nobody',
-                'match_last_seen': 'Match Last Seen'
-            };
-            return map[val] || val;
-        };
-
-        const info = `
-╭───「 *Current Privacy Settings* 」───◆
-│ 📷 Profile Picture: ${format(settings.profile)}
-│ 🕒 Last Seen: ${format(settings.last)}
-│ 🟢 Online Status: ${format(settings.online)}
-│ 👥 Group Adds: ${format(settings.groupadd)}
-│ 📞 Calls: ${format(settings.calladd)}
-│ 📝 Status Updates: ${format(settings.status)}
-│ ✅ Read Receipts: ${format(settings.readreceipts)}
-╰─────────────────────`;
-
-        reply(info);
+        let puka = `
+╭───「 𝙿𝚁𝙸𝚅𝙰𝙲𝚈  」───◆  
+│ ∘ 𝚁𝚎𝚊𝚍 𝚁𝚎𝚌𝚎𝚒𝚙𝚝: ${duka.readreceipts}  
+│ ∘ 𝙿𝚛𝚘𝚏𝚒𝚕𝚎 𝙿𝚒𝚌𝚝𝚞𝚛𝚎: ${duka.profile}  
+│ ∘ 𝚂𝚝𝚊𝚝𝚞𝚜: ${duka.status}  
+│ ∘ 𝙾𝚗𝚕𝚒𝚗𝚎: ${duka.online}  
+│ ∘ 𝙻𝚊𝚜𝚝 𝚂𝚎𝚎𝚗: ${duka.last}  
+│ ∘ 𝙶𝚛𝚘𝚞𝚙 𝙿𝚛𝚒𝚟𝚊𝚌𝚢: ${duka.groupadd}  
+│ ∘ 𝙲𝚊𝚕𝚕 𝙿𝚛𝚒𝚟𝚊𝚌𝚢: ${duka.calladd}  
+╰────────────────────`;
+        await conn.sendMessage(from, { text: puka }, { quoted: mek });
     } catch (e) {
-        console.error("GetPrivacy error:", e);
-        reply('❌ Failed to fetch privacy settings.');
+        reply('🚫 *An error occurred!*\n\n' + e);
+        l(e);
     }
 });
-
-// Get user's profile picture
 cmd({
     pattern: "getpp",
-    alias: ["getprofilepic", "getpic"],
-    desc: "Get any user's profile picture",
-    category: "privacy",
-    react: "📸",
+    desc: "Fetch the profile picture of a tagged or replied user.",
+    category: "owner",
     filename: __filename
-}, async (conn, mek, m, { reply, mentionByTag, quoted }) => {
+}, async (conn, mek, m, { quoted, isGroup, sender, participants, reply }) => {
     try {
-        const targetJid = mentionByTag?.[0] || quoted?.sender || m.sender;
-        if (!targetJid) return reply("❌ Please tag or reply to a user.");
+        // Determine the target user
+        const targetJid = quoted ? quoted.sender : sender;
 
-        const isHD = m.text.includes("hd") || m.text.includes("high");
-        const picUrl = await conn.profilePictureUrl(targetJid, 'image', isHD ? "hd" : "preview")
-            .catch(() => null);
-        
-        if (!picUrl) return reply("❌ No profile picture found or account is private.");
+        if (!targetJid) return reply("⚠️ Please reply to a message to fetch the profile picture.");
 
+        // Fetch the user's profile picture URL
+        const userPicUrl = await conn.profilePictureUrl(targetJid, "image").catch(() => null);
+
+        if (!userPicUrl) return reply("⚠️ No profile picture found for the specified user.");
+
+        // Send the user's profile picture
         await conn.sendMessage(m.chat, {
-            image: { url: picUrl },
-            caption: `📸 Profile picture of @${targetJid.split('@')[0]}${isHD ? " (HD)" : ""}`,
-            mentions: [targetJid]
-        }, { quoted: m });
+            image: { url: userPicUrl },
+            caption: "🖼️ Here is the profile picture of the specified user."
+        });
     } catch (e) {
-        console.error("GetPP error:", e);
-        reply("❌ Failed to fetch profile picture. The account may be private.");
+        console.error("Error fetching user profile picture:", e);
+        reply("❌ An error occurred while fetching the profile picture. Please try again later.");
     }
 });
 
-// Last seen privacy control
-cmd({
-    pattern: "lastseen",
-    alias: ["lastseenprivacy"],
-    desc: "Set your last seen privacy",
-    category: "privacy",
-    react: "🕒",
-    filename: __filename
-}, async (conn, mek, m, { reply, isOwner, args }) => {
-    if (!isOwner) return reply("❌ Owner only command!");
-
-    const options = {
-        'all': 'Everyone can see',
-        'contacts': 'Contacts only',
-        'contact_blacklist': 'Contacts (excl. blocked)',
-        'none': 'Nobody can see'
-    };
-    
-    const value = args[0]?.toLowerCase();
-    
-    if (!value || !options[value]) {
-        return reply(`❌ Invalid option. Available:\n\n${
-            Object.entries(options).map(([key, desc]) => `• ${key} - ${desc}`).join('\n')
-        }`);
-    }
-
-    try {
-        await conn.updateLastSeenPrivacy(value);
-        reply(`✅ Last seen privacy set to: *${options[value]}*`);
-    } catch (e) {
-        console.error("LastSeen error:", e);
-        reply(`❌ Failed to update: ${e.message}`);
-    }
-});
-
-// Status privacy control
-cmd({
-    pattern: "statusprivacy",
-    alias: ["statusvisibility"],
-    desc: "Set who can see your status updates",
-    category: "privacy",
-    react: "📢",
-    filename: __filename
-}, async (conn, mek, m, { reply, isOwner, args }) => {
-    if (!isOwner) return reply("❌ Owner only command!");
-
-    const options = {
-        'all': 'Everyone can see',
-        'contacts': 'Contacts only',
-        'contact_blacklist': 'Contacts (excl. blocked)',
-        'none': 'Nobody can see'
-    };
-    
-    const value = args[0]?.toLowerCase();
-    
-    if (!value || !options[value]) {
-        return reply(`❌ Invalid option. Available:\n\n${
-            Object.entries(options).map(([key, desc]) => `• ${key} - ${desc}`).join('\n')
-        }`);
-    }
-
-    try {
-        await conn.updateStatusPrivacy(value);
-        reply(`✅ Status privacy set to: *${options[value]}*`);
-    } catch (e) {
-        console.error("StatusPrivacy error:", e);
-        reply(`❌ Failed to update: ${e.message}`);
-    }
-});
+          

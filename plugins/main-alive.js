@@ -51,7 +51,7 @@ ${config.DESCRIPTION || 'A powerful WhatsApp bot'}
         // Simple message options without the problematic buffer call
         const messageOptions = {
             image: { 
-                url: config.MENU_IMAGE_URL || 'https://i.imgur.com/8K7VhJt.jpg'
+                url: config.MENU_IMAGE_URL || 'https://i.ibb.co/MD6vtW8Y/glow.png'
             },
             caption: status,
             contextInfo: {

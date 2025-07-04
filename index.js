@@ -80,22 +80,68 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 9090;
   
-  //=============================================
+  //=================work============================
+  const { makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion, Browsers, DisconnectReason } = require('@whiskeysockets/baileys');
+const P = require('pino');
+const path = require('path');
+const qrcode = require('qrcode-terminal');
+
+async function connectToWA() {
+  console.log("Connecting to WhatsApp ⏳...");
   
-  async function connectToWA() {
-  console.log("Connecting to WhatsApp ⏳️...");
-  const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/')
-  var { version } = await fetchLatestBaileysVersion()
-  
-  const conn = makeWASocket({
-          logger: P({ level: 'silent' }),
-          printQRInTerminal: false,
-          browser: Browsers.macOS("Firefox"),
-          syncFullHistory: true,
-          auth: state,
-          version
-          })
+  try {
+    // 1. Auth & Session Management
+    const { state, saveCreds } = await useMultiFileAuthState(path.join(__dirname, 'sessions'));
+    
+    // 2. Fetch Latest Baileys Version
+    const { version, isLatest } = await fetchLatestBaileysVersion();
+    console.log(`Using WA v${version.join('.')} (${isLatest ? 'latest' : 'outdated'})`);
+    
+    // 3. Create Socket Connection
+    const conn = makeWASocket({
+      logger: P({ level: 'silent' }),
+      printQRInTerminal: true,  // Changed to TRUE for debugging
+      browser: Browsers.macOS("Chrome"), // Firefox sometimes has issues
+      syncFullHistory: false, // Disabled (causes slowdowns)
+      auth: state,
+      version,
+      getMessage: async (key) => null // Prevents message buffering errors
+    });
+
+    // 4. Connection Event Handling
+    conn.ev.on('connection.update', (update) => {
+      const { connection, lastDisconnect, qr } = update;
       
+      // QR Code Generation
+      if (qr) {
+        console.log('Scan QR Code:');
+        qrcode.generate(qr, { small: true });
+      }
+      
+      // Reconnection Logic
+      if (connection === 'close') {
+        const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
+        console.log(`Connection closed. ${shouldReconnect ? 'Reconnecting...' : 'Please relogin.'}`);
+        if (shouldReconnect) setTimeout(connectToWA, 5000);
+      } else if (connection === 'open') {
+        console.log('✅ Successfully connected to WhatsApp Business!');
+      }
+    });
+
+    // 5. Save Creds on Update
+    conn.ev.on('creds.update', saveCreds);
+
+    return conn;
+
+  } catch (err) {
+    console.error('❌ Connection Error:', err);
+    setTimeout(connectToWA, 10000); // Auto-retry after 10s
+  }
+}
+
+// Start the connection
+connectToWA();
+      //============================
   conn.ev.on('connection.update', (update) => {
   const { connection, lastDisconnect } = update
   if (connection === 'close') {

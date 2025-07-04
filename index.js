@@ -81,67 +81,100 @@ const app = express();
 const port = process.env.PORT || 9090;
   
   //=================work============================
-  const { makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion, Browsers, DisconnectReason } = require('@whiskeysockets/baileys');
+  const { makeWASocket, useMultiFileAuthState, fetchLatestBaileysVersion, DisconnectReason, Browsers } = require('@whiskeysockets/baileys');
 const P = require('pino');
 const path = require('path');
 const qrcode = require('qrcode-terminal');
+const fs = require('fs-extra');
 
-async function connectToWA() {
-  console.log("Connecting to WhatsApp ⏳...");
-  
-  try {
-    // 1. Auth & Session Management
-    const { state, saveCreds } = await useMultiFileAuthState(path.join(__dirname, 'sessions'));
-    
-    // 2. Fetch Latest Baileys Version
-    const { version, isLatest } = await fetchLatestBaileysVersion();
-    console.log(`Using WA v${version.join('.')} (${isLatest ? 'latest' : 'outdated'})`);
-    
-    // 3. Create Socket Connection
-    const conn = makeWASocket({
-      logger: P({ level: 'silent' }),
-      printQRInTerminal: true,  // Changed to TRUE for debugging
-      browser: Browsers.macOS("Chrome"), // Firefox sometimes has issues
-      syncFullHistory: false, // Disabled (causes slowdowns)
-      auth: state,
-      version,
-      getMessage: async (key) => null // Prevents message buffering errors
-    });
-
-    // 4. Connection Event Handling
-    conn.ev.on('connection.update', (update) => {
-      const { connection, lastDisconnect, qr } = update;
-      
-      // QR Code Generation
-      if (qr) {
-        console.log('Scan QR Code:');
-        qrcode.generate(qr, { small: true });
-      }
-      
-      // Reconnection Logic
-      if (connection === 'close') {
-        const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
-        console.log(`Connection closed. ${shouldReconnect ? 'Reconnecting...' : 'Please relogin.'}`);
-        if (shouldReconnect) setTimeout(connectToWA, 5000);
-      } else if (connection === 'open') {
-        console.log('✅ Successfully connected to WhatsApp Business!');
-      }
-    });
-
-    // 5. Save Creds on Update
-    conn.ev.on('creds.update', saveCreds);
-
-    return conn;
-
-  } catch (err) {
-    console.error('❌ Connection Error:', err);
-    setTimeout(connectToWA, 10000); // Auto-retry after 10s
-  }
+// Ensure sessions directory exists
+const sessionsDir = path.join(__dirname, 'sessions');
+if (!fs.existsSync(sessionsDir)) {
+    fs.mkdirSync(sessionsDir, { recursive: true });
 }
 
-// Start the connection
-connectToWA();
-      //============================
+async function connectToWhatsApp() {
+    console.log('🚀 Initializing WhatsApp Business Connection...');
+    
+    try {
+        // 1. Initialize session
+        const { state, saveCreds } = await useMultiFileAuthState(sessionsDir);
+        
+        // 2. Fetch latest version
+        const { version, isLatest } = await fetchLatestBaileysVersion();
+        console.log(`📌 Using WhatsApp v${version.join('.')} (${isLatest ? 'latest' : 'update available'})`);
+        
+        // 3. Create connection
+        const sock = makeWASocket({
+            version,
+            logger: P({ level: 'silent' }),
+            printQRInTerminal: true,
+            browser: Browsers.macOS("Safari"), // More stable for Business API
+            auth: state,
+            syncFullHistory: false, // Disabled for better performance
+            getMessage: async (key) => {
+                return null; // Prevents message buffering issues
+            }
+        });
+
+        // 4. Handle connection events
+        sock.ev.on('connection.update', (update) => {
+            const { connection, lastDisconnect, qr } = update;
+            
+            // QR Code Generation
+            if (qr) {
+                console.log('\n📳 Scan this QR Code with WhatsApp Business:');
+                qrcode.generate(qr, { small: true });
+            }
+            
+            // Connection status
+            if (connection === 'open') {
+                console.log('\n✅ Successfully connected to WhatsApp Business!');
+                console.log('🤖 Bot is now ready to receive messages');
+            }
+            
+            // Reconnection logic
+            if (connection === 'close') {
+                const shouldReconnect = (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut);
+                console.log(`Connection closed. ${shouldReconnect ? 'Reconnecting...' : 'Please relogin.'}`);
+                if (shouldReconnect) {
+                    setTimeout(connectToWhatsApp, 5000);
+                }
+            }
+        });
+
+        // 5. Save credentials when updated
+        sock.ev.on('creds.update', saveCreds);
+
+        // 6. Message handler
+        sock.ev.on('messages.upsert', async ({ messages }) => {
+            const msg = messages[0];
+            if (!msg.message) return;
+            
+            console.log('\n📩 New message received:');
+            console.log(JSON.stringify(msg, null, 2));
+            
+            // Add your command processing logic here
+        });
+
+        return sock;
+
+    } catch (error) {
+        console.error('❌ Connection Error:', error);
+        console.log('🔄 Attempting to reconnect in 10 seconds...');
+        setTimeout(connectToWhatsApp, 10000);
+    }
+}
+
+// Start the bot
+connectToWhatsApp().catch(err => console.error('Fatal Error:', err));
+
+// Handle process exits
+process.on('SIGINT', () => {
+    console.log('\n🛑 Shutting down bot gracefully...');
+    process.exit(0);
+});
+//============================
   conn.ev.on('connection.update', (update) => {
   const { connection, lastDisconnect } = update
   if (connection === 'close') {

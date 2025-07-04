@@ -33,7 +33,7 @@ async (conn, mek, m, { from, reply }) => {
 
         // Send image with caption
         await conn.sendMessage(from, {
-            image: { url: `https://files.catbox.moe/r2ncqh` },
+            image: { url: `https://i.ibb.co/MD6vtW8Y/glow.png` },
             caption: formattedInfo,
             contextInfo: { 
                 mentionedJid: [m.sender],

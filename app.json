@@ -1,7 +1,7 @@
 {
   "name": "DARKZONE-MD",
   "description": "Javascript WhatsApp bot made by 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟",
-  "logo": "https://files.catbox.moe/r2ncqh",
+  "logo": "https://i.ibb.co/MD6vtW8Y/glow.png",
   "keywords": ["DARKZONE-MD"],
   "success_url": "/",
 
@@ -131,13 +131,13 @@
     "MENU_IMAGE_URL": {
       "description": "add url for mention reply and menu if want.",
       "required": false,
-      "value": "https://files.catbox.moe/r2ncqh"
+      "value": "https://i.ibb.co/MD6vtW8Y/glow.png"
     },
     
      "DESCRIPTION": {
       "description": "add caption for menu and other",
       "required": false,
-      "value": "*CRESTATER 𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟*"
+      "value": "*CREATER 𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟*"
     },
 
       "DELETE_LINKS": {

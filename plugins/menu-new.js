@@ -34,36 +34,36 @@ cmd({
 ╔═══◇◆◇════════════╗
 『 📜 𝗠𝗘𝗡𝗨 𝗦𝗘𝗖𝗧𝗜𝗢𝗡𝗦 』
 ╚═══◇◆◇════════════╝
-│ 1️⃣  📥 Download Menu
-│ 2️⃣  👥 Group Menu
-│ 3️⃣  😄 Fun Menu
-│ 4️⃣  👑 Owner Menu
-│ 5️⃣  🤖 AI Menu
-│ 6️⃣  🎎 Anime Menu
-│ 7️⃣  🔄 Convert Menu
-│ 8️⃣  📌 Other Menu
-│ 9️⃣  💞 Reactions Menu
-│ 🔟  🏠 Main Menu
+│ 1️⃣  📥 *Download Menu*
+│ 2️⃣  👥 *Group Menu*
+│ 3️⃣  😄 *Fun Menu*
+│ 4️⃣  👑 *Owner Menu*
+│ 5️⃣  🤖 *AI Menu*
+│ 6️⃣  🎎 *Anime Menu*
+│ 7️⃣  🔄 *Convert Menu*
+│ 8️⃣  📌 *Other Menu*
+│ 9️⃣  💞 *Reactions Menu,
+│ 🔟  🏠 *Main Menu*
 ───────────────────
 ╔════◇◆◇══════════╗
-『📥 𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗 𝗠𝗘𝗡𝗨 』
+『📥 *𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗 𝗠𝗘𝗡𝗨* 』
 ╚════◇◆◇══════════╝
-[🧠SYSTEM CORE STAB Initializing..]
+[🧠*SYSTEM CORE STAB Initializing*..]
 ├── 🌐 𝗦𝗼𝗰𝗶𝗮𝗹 𝗠𝗲𝗱𝗶𝗮
-│   ├─ facebook [url]
-│   ├─ download [url]
-│   ├─ mediafire [url]
-│   ├─ tiktok [url]
-│   ├─ twitter [url]
-│   ├─ insta [url]
-│   ├─ apk [app]
-│   ├─ img [query]
-│   ├─ tt2 [url]
-│   ├─ pins [url]
-│   ├─ apk2 [app]
-│   ├─ fb2 [url]
-│   └─ pinterest [url]
-├── 🎵 𝗠𝘂𝘀𝗶𝗰/𝗩𝗶𝗱𝗲𝗼
+│   ├─ *facebook* [url]
+│   ├─ *download* [url]
+│   ├─ *mediafire* [url]
+│   ├─ *tiktok* [url]
+│   ├─ *twitter* [url]
+│   ├─ *insta* [url]
+│   ├─ *apk* [app]
+│   ├─ *img* [query]
+│   ├─ *tt2* [url]
+│   ├─ *pins* [url]
+│   ├─ *apk2* [app]
+│   ├─ *fb2* [url]
+│   └─ *pinterest* [url]
+├── 🎵 *𝗠𝘂𝘀𝗶𝗰/𝗩𝗶𝗱𝗲𝗼*
 │   ├─ spotify [query]
 │   ├─ play [song]
 │   ├─ play2-10 [song]
@@ -640,7 +640,7 @@ cmd({
                                 await conn.sendMessage(
                                     senderID,
                                     {
-                                        image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/r2ncqh' },
+                                        image: { url: config.MENU_IMAGE_URL || 'https://files.catbox.moe/8cb9h0.jpg' },
                                         caption: selectedMenu.content,
                                         contextInfo: contextInfo
                                     },

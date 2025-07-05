@@ -1,5 +1,4 @@
 const { cmd } = require("../command");
-const { getContentType } = require('@whiskeysockets/baileys');
 
 cmd({
   pattern: "send",
@@ -10,68 +9,50 @@ cmd({
   filename: __filename
 }, async (client, message, match, { from }) => {
   try {
-    // Check if message is quoted
-    if (!message.quoted) {
+    if (!match.quoted) {
       return await client.sendMessage(from, {
-        text: "*📤 Please reply to a message you want to save!*"
+        text: "*🍁 Please reply to a message!*"
       }, { quoted: message });
     }
 
-    const quoted = message.quoted;
-    const mtype = getContentType(quoted.message);
+    const buffer = await match.quoted.download();
+    const mtype = match.quoted.mtype;
     const options = { quoted: message };
 
-    // Handle different message types
+    let messageContent = {};
     switch (mtype) {
-      case 'imageMessage':
-      case 'stickerMessage':
-        const imageBuffer = await client.downloadMediaMessage(quoted);
-        return await client.sendMessage(from, {
-          image: imageBuffer,
-          caption: quoted.text || '',
-          mimetype: quoted.mimetype || 'image/jpeg'
-        }, options);
-
-      case 'videoMessage':
-        const videoBuffer = await client.downloadMediaMessage(quoted);
-        return await client.sendMessage(from, {
-          video: videoBuffer,
-          caption: quoted.text || '',
-          mimetype: quoted.mimetype || 'video/mp4'
-        }, options);
-
-      case 'audioMessage':
-        const audioBuffer = await client.downloadMediaMessage(quoted);
-        return await client.sendMessage(from, {
-          audio: audioBuffer,
-          mimetype: quoted.mimetype || 'audio/mp4',
-          ptt: quoted.ptt || false
-        }, options);
-
-      case 'conversation':
-      case 'extendedTextMessage':
-        return await client.sendMessage(from, {
-          text: quoted.text
-        }, options);
-
-      case 'documentMessage':
-        const docBuffer = await client.downloadMediaMessage(quoted);
-        return await client.sendMessage(from, {
-          document: docBuffer,
-          mimetype: quoted.mimetype,
-          fileName: quoted.fileName || 'document'
-        }, options);
-
+      case "imageMessage":
+        messageContent = {
+          image: buffer,
+          caption: match.quoted.text || '',
+          mimetype: match.quoted.mimetype || "image/jpeg"
+        };
+        break;
+      case "videoMessage":
+        messageContent = {
+          video: buffer,
+          caption: match.quoted.text || '',
+          mimetype: match.quoted.mimetype || "video/mp4"
+        };
+        break;
+      case "audioMessage":
+        messageContent = {
+          audio: buffer,
+          mimetype: "audio/mp4",
+          ptt: match.quoted.ptt || false
+        };
+        break;
       default:
         return await client.sendMessage(from, {
-          text: "❌ Unsupported message type\nOnly images, videos, audio, text and documents are supported"
-        }, options);
+          text: "❌ Only image, video, and audio messages are supported"
+        }, { quoted: message });
     }
 
+    await client.sendMessage(from, messageContent, options);
   } catch (error) {
-    console.error("Send Command Error:", error);
+    console.error("Forward Error:", error);
     await client.sendMessage(from, {
-      text: `❌ Failed to send message\n*Reason:* ${error.message}`
+      text: "❌ Error forwarding message:\n" + error.message
     }, { quoted: message });
   }
 });

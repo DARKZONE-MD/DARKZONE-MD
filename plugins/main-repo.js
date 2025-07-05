@@ -13,7 +13,7 @@ cmd({
     filename: __filename,
 },
 async (conn, mek, m, { from, reply }) => {
-    const githubRepoURL = 'https://github.com/DARKZONE-MD/DARKZONE-MD/fork';
+    const githubRepoURL = 'https://github.com/DARKZONE-MD/DARKZONE-MD';
 
     try {
         // Extract username and repo name from the URL
@@ -33,7 +33,7 @@ async (conn, mek, m, { from, reply }) => {
 
         // Send image with caption
         await conn.sendMessage(from, {
-            image: { url: `https://i.ibb.co/MD6vtW8Y/glow.png` },
+            image: { url: `https://files.catbox.moe/r2ncqh` },
             caption: formattedInfo,
             contextInfo: { 
                 mentionedJid: [m.sender],

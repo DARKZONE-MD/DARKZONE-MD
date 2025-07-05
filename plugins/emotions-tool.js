@@ -1,150 +1,347 @@
-// File: plugins/emoji-animations.js
 const { cmd } = require('../command');
-const fs = require('fs');
-const path = require('path');
 
-// Helper function to safely send animated messages
-async function animateEmojis(conn, from, initialEmoji, emojiSequence, delay = 800) {
+cmd({
+    pattern: "happy",
+    desc: "Displays a dynamic edit msg for fun.",
+    category: "tools",
+    react: "😂",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply }) => {
     try {
-        const loadingMessage = await conn.sendMessage(from, { text: initialEmoji });
-        
-        for (const emoji of emojiSequence) {
-            await new Promise(resolve => setTimeout(resolve, delay));
-            try {
-                await conn.relayMessage(
-                    from,
-                    {
-                        protocolMessage: {
-                            key: loadingMessage.key,
-                            type: 14, // Edited message type
-                            editedMessage: {
-                                conversation: emoji,
-                            },
+        const loadingMessage = await conn.sendMessage(from, { text: '😂' });
+        const emojiMessages = [
+            "😃", "😄", "😁", "😊", "😎", "🥳",
+            "😸", "😹", "🌞", "🌈", "😃", "😄",
+            "😁", "😊", "😎", "🥳", "😸", "😹",
+            "🌞", "🌈", "😃", "😄", "😁", "😊"
+        ];
+
+        for (const line of emojiMessages) {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Delay for 1 second
+            await conn.relayMessage(
+                from,
+                {
+                    protocolMessage: {
+                        key: loadingMessage.key,
+                        type: 14,
+                        editedMessage: {
+                            conversation: line,
                         },
                     },
-                    {}
-                );
-            } catch (editError) {
-                console.error('Edit error:', editError);
-                // If editing fails, send as new message
-                await conn.sendMessage(from, { text: emoji });
-            }
+                },
+                {}
+            );
         }
     } catch (e) {
-        console.error('Animation error:', e);
-        throw e;
+        console.log(e);
+        reply(`❌ *Error!* ${e.message}`);
     }
-}
-
-// Command configurations
-const emojiCommands = [
-    {
-        pattern: "happy",
-        desc: "Happy emoji animation",
-        react: "😊",
-        emojis: ["😀", "😃", "😄", "😁", "😆", "🥹", "😅", "😂", "🤣", "🥲", "☺️", "😊", "😇"]
-    },
-    {
-        pattern: "heart",
-        desc: "Heart emoji animation",
-        react: "❤️",
-        emojis: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❤️‍🔥", "❤️‍🩹", "💘", "💝", "💖", "💗", "💓", "💞", "💕", "💟"]
-    },
-    {
-        pattern: "night",
-        desc: "Night time emoji animation",
-        react: "🌃",
-        emojis: ["🌃", "🌌", "🌉", "🌙", "🌚", "🌛", "🌜", "🌠", "✨", "🌟", "⭐️", "💫", "🕯️", "🏙️", "🌆", "🌄"]
-        },
-        {
-        pattern: "sad",
-        desc: "Sad emoji animation",
-        react: "😢",
-        emojis: ["😔", "😟", "🙁", "☹️", "😕", "😞", "😢", "😥", "😪", "😭", "😿", "💔"]
-    },
-    {
-        pattern: "shy",
-        desc: "Shy emoji animation",
-        react: "😳",
-        emojis: ["🥺", "😳", "😊", "😚", "😙", "😗", "😘", "😍", "🤩", "🥰", "😇", "🙈", "🙊"]
-    },
-    {
-        pattern: "beautiful",
-        desc: "Beautiful emoji animation",
-        react: "✨",
-        emojis: ["✨", "🌟", "💫", "⭐️", "🌠", "🌞", "🌝", "🌹", "🥀", "🌺", "🌸", "🌼", "🌷"]
-    },
-    {
-        pattern: "confused",
-        desc: "Confused emoji animation",
-        react: "🤔",
-        emojis: ["🤔", "😕", "😟", "🙁", "😮", "😯", "😲", "😳", "🥴", "😵", "😵‍💫", "🧐"]
-    },
-    {
-        pattern: "moon",
-        desc: "Moon phase animation",
-        react: "🌚",
-        emojis: ["🌑", "🌒", "🌓", "🌔", "🌕", "🌖", "🌗", "🌘", "🌑", "🌙", "🌚", "🌛", "🌜"]
-    },
-    {
-        pattern: "kiss",
-        desc: "Kiss emoji animation",
-        react: "💋",
-        emojis: ["💋", "😘", "😗", "😙", "😚", "🥰", "😍", "🤩", "❤️", "💝", "💘", "💖"]
-    },
-    {
-        pattern: "hurt",
-        desc: "Hurt emoji animation",
-        react: "💔",
-        emojis: ["💔", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😿", "🤕", "🥴", "😵"]
-    },
-    {
-        pattern: "broke",
-        desc: "Broken heart animation",
-        react: "💔",
-        emojis: ["💔", "🖤", "💔", "🖤", "💔", "🖤", "💔", "🖤", "💔", "🖤", "💔"]
-    },
-    {
-        pattern: "hot",
-        desc: "Hot emoji animation",
-        react: "🔥",
-        emojis: ["🔥", "🥵", "♨️", "🌶️", "🧨", "💥", "🤯", "👹", "💫", "✨", "🌟", "⭐️"]
-    },
-    {
-        pattern: "love",
-        desc: "Love emoji animation",
-        react: "🥰",
-        emojis: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🤎", "🖤", "🤍", "💖", "💗", "💓", "💞", "💕", "💘", "💝", "💟", "❣️", "💌", "🥰"]
-    }
-];
-
-// Register all commands
-emojiCommands.forEach(cmdConfig => {
-    cmd({
-        pattern: cmdConfig.pattern,
-        desc: cmdConfig.desc,
-        category: "fun",
-        react: cmdConfig.react,
-        filename: __filename
-    }, async (conn, mek, m, { from, reply }) => {
-        try {
-            await animateEmojis(conn, from, cmdConfig.emojis[0], cmdConfig.emojis);
-        } catch (e) {
-            console.error(`Error in ${cmdConfig.pattern}:`, e);
-            reply(`❌ Failed to animate ${cmdConfig.pattern} emojis`);
-        }
-    });
 });
 
-// Save the plugin information
-const pluginInfo = {
-    name: "Emoji Animations",
-    desc: "Auto-changing emoji animations for various emotions",
-    version: "1.0",
-    author: "Your Name"
-};
+cmd({
+    pattern: "heart",
+    desc: "Displays a dynamic edit msg for fun.",
+    category: "tools",
+    react: "❤️",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply }) => {
+    try {
+        const loadingMessage = await conn.sendMessage(from, { text: '🖤' });
+        const emojiMessages = [
+            "💖", "💗", "💕", "🩷", "💛", "💚",
+            "🩵", "💙", "💜", "🖤", "🩶", "🤍",
+            "🤎", "❤️‍🔥", "💞", "💓", "💘", "💝",
+            "♥️", "💟", "❤️‍🩹", "❤️"
+        ];
 
-fs.writeFileSync(
-    path.join(__dirname, 'emoji-animations.json'),
-    JSON.stringify(pluginInfo, null, 2)
-);
+        for (const line of emojiMessages) {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Delay for 1 second
+            await conn.relayMessage(
+                from,
+                {
+                    protocolMessage: {
+                        key: loadingMessage.key,
+                        type: 14,
+                        editedMessage: {
+                            conversation: line,
+                        },
+                    },
+                },
+                {}
+            );
+        }
+    } catch (e) {
+        console.log(e);
+        reply(`❌ *Error!* ${e.message}`);
+    }
+});
+
+cmd({
+    pattern: "angry",
+    desc: "Displays a dynamic edit msg for fun.",
+    category: "tools",
+    react: "🤡",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply }) => {
+    try {
+        const loadingMessage = await conn.sendMessage(from, { text: '👽' });
+        const emojiMessages = [
+            "😡", "😠", "🤬", "😤", "😾", "😡",
+            "😠", "🤬", "😤", "😾"
+        ];
+
+        for (const line of emojiMessages) {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Delay for 1 second
+            await conn.relayMessage(
+                from,
+                {
+                    protocolMessage: {
+                        key: loadingMessage.key,
+                        type: 14,
+                        editedMessage: {
+                            conversation: line,
+                        },
+                    },
+                },
+                {}
+            );
+        }
+    } catch (e) {
+        console.log(e);
+        reply(`❌ *Error!* ${e.message}`);
+    }
+});
+
+cmd({
+    pattern: "sad",
+    desc: "Displays a dynamic edit msg for fun.",
+    category: "tools",
+    react: "😶",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply }) => {
+    try {
+        const loadingMessage = await conn.sendMessage(from, { text: '😔' });
+        const emojiMessages = [
+            "🥺", "😟", "😕", "😖", "😫", "🙁",
+            "😩", "😥", "😓", "😪", "😢", "😔",
+            "😞", "😭", "💔", "😭", "😿"
+        ];
+
+        for (const line of emojiMessages) {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Delay for 1 second
+            await conn.relayMessage(
+                from,
+                {
+                    protocolMessage: {
+                        key: loadingMessage.key,
+                        type: 14,
+                        editedMessage: {
+                            conversation: line,
+                        },
+                    },
+                },
+                {}
+            );
+        }
+    } catch (e) {
+        console.log(e);
+        reply(`❌ *Error!* ${e.message}`);
+    }
+});
+
+cmd({
+    pattern: "shy",
+    desc: "Displays a dynamic edit msg for fun.",
+    category: "tools",
+    react: "🧐",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply }) => {
+    try {
+        const loadingMessage = await conn.sendMessage(from, { text: '🧐' });
+        const emojiMessages = [
+            "😳", "😊", "😶", "🙈", "🙊",
+            "😳", "😊", "😶", "🙈", "🙊"
+        ];
+
+        for (const line of emojiMessages) {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Delay for 1 second
+            await conn.relayMessage(
+                from,
+                {
+                    protocolMessage: {
+                        key: loadingMessage.key,
+                        type: 14,
+                        editedMessage: {
+                            conversation: line,
+                        },
+                    },
+                },
+                {}
+            );
+        }
+    } catch (e) {
+        console.log(e);
+        reply(`❌ *Error!* ${e.message}`);
+    }
+});
+
+cmd({
+    pattern: "moon",
+    desc: "Displays a dynamic edit msg for fun.",
+    category: "tools",
+    react: "🌚",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply }) => {
+    try {
+        const loadingMessage = await conn.sendMessage(from, { text: '🌝' });
+        const emojiMessages = [
+            "🌗", "🌘", "🌑", "🌒", "🌓", "🌔",
+            "🌕", "🌖", "🌗", "🌘", "🌑", "🌒",
+            "🌓", "🌔", "🌕", "🌖", "🌗", "🌘",
+            "🌑", "🌒", "🌓", "🌔", "🌕", "🌖",
+            "🌗", "🌘", "🌑", "🌒", "🌓", "🌔",
+            "🌕", "🌖", "🌝🌚"
+        ];
+
+        for (const line of emojiMessages) {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Delay for 1 second
+            await conn.relayMessage(
+                from,
+                {
+                    protocolMessage: {
+                        key: loadingMessage.key,
+                        type: 14,
+                        editedMessage: {
+                            conversation: line,
+                        },
+                    },
+                },
+                {}
+            );
+        }
+    } catch (e) {
+        console.log(e);
+        reply(`❌ *Error!* ${e.message}`);
+    }
+});
+
+cmd({
+    pattern: "confused",
+    desc: "Displays a dynamic edit msg for fun.",
+    category: "tools",
+    react: "🤔",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply }) => {
+    try {
+        const loadingMessage = await conn.sendMessage(from, { text: '🤔' });
+        const emojiMessages = [
+            "😕", "😟", "😵", "🤔", "😖", 
+            "😲", "😦", "🤷", "🤷‍♂️", "🤷‍♀️"
+        ];
+
+        for (const line of emojiMessages) {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Delay for 1 second
+            await conn.relayMessage(
+                from,
+                {
+                    protocolMessage: {
+                        key: loadingMessage.key,
+                        type: 14,
+                        editedMessage: {
+                            conversation: line,
+                        },
+                    },
+                },
+                {}
+            );
+        }
+    } catch (e) {
+        console.log(e);
+        reply(`❌ *Error!* ${e.message}`);
+    }
+});
+
+cmd({
+    pattern: "hot",
+    desc: "Displays a dynamic edit msg for fun.",
+    category: "tools",
+    react: "💋",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply }) => {
+    try {
+        const loadingMessage = await conn.sendMessage(from, { text: '💋' });
+        const emojiMessages = [
+            "🥵", "❤️", "💋", "😫", "🤤", 
+            "😋", "🥵", "🥶", "🙊", "😻", 
+            "🙈", "💋", "🫂", "🫀", "👅", 
+            "👄", "💋"
+        ];
+
+        for (const line of emojiMessages) {
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Delay for 1 second
+            await conn.relayMessage(
+                from,
+                {
+                    protocolMessage: {
+                        key: loadingMessage.key,
+                        type: 14,
+                        editedMessage: {
+                            conversation: line,
+                        },
+                    },
+                },
+                {}
+            );
+        }
+    } catch (e) {
+        console.log(e);
+        reply(`❌ *Error!* ${e.message}`);
+    }
+});
+
+cmd({
+    pattern: "nikal",
+    desc: "Displays a dynamic edit msg for fun.",
+    category: "tools",
+    react: "🗿",
+    filename: __filename
+},
+async (conn, mek, m, { from, reply }) => {
+    try {
+        const loadingMessage = await conn.sendMessage(from, { text: 'DARKZONE-AI🗿' });
+        
+        // Define the ASCII art messages
+        const asciiMessages = [
+            "⠀⠀⠀⣠⣶⡾⠏⠉⠙⠳⢦⡀⠀⠀⠀⢠⠞⠉⠙⠲⡀⠀\n ⠀⣴⠿⠏⠀⠀⠀⠀⠀     ⢳⡀⠀⡏⠀⠀⠀   ⠀  ⢷\n⢠⣟⣋⡀⢀⣀⣀⡀⠀⣀⡀   ⣧⠀⢸⠀⠀⠀  ⠀    ⡇\n⢸⣯⡭⠁⠸⣛⣟⠆⡴⣻⡲     ⣿  ⣸   Nikal   ⡇\n ⣟⣿⡭⠀⠀⠀⠀⠀⢱⠀⠀      ⣿  ⢹⠀          ⡇\n  ⠙⢿⣯⠄⠀⠀⠀__⠀   ⠀   ⡿ ⠀⡇⠀⠀⠀⠀    ⡼\n⠀⠀⠀⠹⣶⠆⠀⠀⠀⠀⠀⡴⠃⠀   ⠘⠤⣄⣠⠞⠀\n⠀⠀⠀⠀⢸⣷⡦⢤⡤⢤⣞⣁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n⠀⢀⣤⣴⣿⣏⠁⠀⠀⠸⣏⢯⣷⣖⣦⡀⠀⠀⠀⠀⠀⠀\n⢀⣾⣽⣿⣿⣿⣿⠛⢲⣶⣾⢉⡷⣿⣿⠵⣿⠀⠀⠀⠀⠀⠀\n⣼⣿⠍⠉⣿⡭⠉⠙⢺⣇⣼⡏⠀⠀ ⠀⣄⢸⠀⠀⠀⠀⠀⠀`", "⠀⠀⠀⣠⣶⡾⠏⠉⠙⠳⢦⡀⠀⠀⠀⢠⠞⠉⠙⠲⡀⠀\n ⠀⣴⠿⠏⠀⠀⠀⠀⠀  ⠀  ⢳⡀⠀⡏⠀⠀⠀   ⠀  ⢷\n⢠⣟⣋⡀⢀⣀⣀⡀⠀⣀⡀   ⣧⠀⢸⠀⠀⠀       ⡇\n⢸⣯⡭⠁⠸⣛⣟⠆⡴⣻⡲     ⣿  ⣸   Lavde   ⡇\n ⣟⣿⡭⠀⠀⠀⠀⠀⢱⠀⠀      ⣿  ⢹⠀          ⡇\n  ⠙⢿⣯⠄⠀⠀|__|⠀⠀   ⡿ ⠀⡇⠀⠀⠀⠀    ⡼\n⠀⠀⠀⠹⣶⠆⠀⠀⠀⠀⠀⡴⠃⠀   ⠘⠤⣄⣠⠞⠀\n⠀⠀⠀⠀⢸⣷⡦⢤⡤⢤⣞⣁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n⠀⢀⣤⣴⣿⣏⠁⠀⠀⠸⣏⢯⣷⣖⣦⡀⠀⠀⠀⠀⠀⠀\n⢀⣾⣽⣿⣿⣿⣿⠛⢲⣶⣾⢉⡷⣿⣿⠵⣿⠀⠀⠀⠀⠀⠀\n⣼⣿⠍⠉⣿⡭⠉⠙⢺⣇⣼⡏⠀⠀ ⠀⣄⢸⠀⠀⠀⠀⠀⠀`", "⠀⠀⠀⣠⣶⡾⠏⠉⠙⠳⢦⡀⠀⠀⠀⢠⠞⠉⠙⠲⡀⠀\n ⠀⣴⠿⠏⠀⠀     ⠀   ⢳⡀⠀⡏⠀⠀    ⠀  ⢷\n⢠⣟⣋⡀⢀⣀⣀⡀⠀⣀⡀   ⣧⠀⢸⠀⠀⠀⠀      ⡇\n⢸⣯⡭⠁⠸⣛⣟⠆⡴⣻⡲    ⣿  ⣸   Pehli   ⡇\n ⣟⣿⡭⠀⠀⠀⠀⠀⢱⠀⠀     ⣿  ⢹⠀           ⡇\n  ⠙⢿⣯⠄⠀⠀(P)⠀⠀     ⡿ ⠀⡇⠀⠀⠀⠀    ⡼\n⠀⠀⠀⠹⣶⠆⠀⠀⠀⠀⠀⡴⠃⠀   ⠘⠤⣄⣠⠞⠀\n⠀⠀⠀⠀⢸⣷⡦⢤⡤⢤⣞⣁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n⠀⢀⣤⣴⣿⣏⠁⠀⠀⠸⣏⢯⣷⣖⣦⡀⠀⠀⠀⠀⠀⠀\n⢀⣾⣽⣿⣿⣿⣿⠛⢲⣶⣾⢉⡷⣿⣿⠵⣿⠀⠀⠀⠀⠀⠀\n⣼⣿⠍⠉⣿⡭⠉⠙⢺⣇⣼⡏⠀⠀ ⠀⣄⢸⠀⠀⠀⠀⠀⠀`", "⠀⠀⠀⣠⣶⡾⠏⠉⠙⠳⢦⡀⠀⠀⠀⢠⠞⠉⠙⠲⡀⠀\n ⠀⣴⠿⠏⠀⠀     ⠀   ⢳⡀⠀⡏⠀⠀    ⠀  ⢷\n⢠⣟⣋⡀⢀⣀⣀⡀⠀⣀⡀   ⣧⠀⢸⠀   ⠀     ⡇\n⢸⣯⡭⠁⠸⣛⣟⠆⡴⣻⡲    ⣿  ⣸  Fursat  ⡇\n ⣟⣿⡭⠀⠀⠀⠀⠀⢱⠀        ⣿  ⢹⠀          ⡇\n  ⠙⢿⣯⠄⠀⠀⠀__ ⠀  ⠀   ⡿ ⠀⡇⠀⠀⠀⠀    ⡼\n⠀⠀⠀⠹⣶⠆⠀⠀⠀⠀⠀⡴⠃⠀   ⠘⠤⣄⣠⠞⠀\n⠀⠀⠀⠀⢸⣷⡦⢤⡤⢤⣞⣁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n⠀⢀⣤⣴⣿⣏⠁⠀⠀⠸⣏⢯⣷⣖⣦⡀⠀⠀⠀⠀⠀⠀\n⢀⣾⣽⣿⣿⣿⣿⠛⢲⣶⣾⢉⡷⣿⣿⠵⣿⠀⠀⠀⠀⠀⠀\n⣼⣿⠍⠉⣿⡭⠉⠙⢺⣇⣼⡏⠀⠀ ⠀⣄⢸⠀⠀⠀⠀⠀⠀`", "⠀⠀⠀⣠⣶⡾⠏⠉⠙⠳⢦⡀⠀⠀⠀⢠⠞⠉⠙⠲⡀⠀\n ⠀⣴⠿⠏⠀⠀⠀⠀⠀      ⢳⡀⠀⡏⠀⠀    ⠀  ⢷\n⢠⣟⣋⡀⢀⣀⣀⡀⠀⣀⡀   ⣧⠀⢸⠀⠀ ⠀      ⡇\n⢸⣯⡭⠁⠸⣛⣟⠆⡴⣻⡲    ⣿  ⣸  Meeee   ⡇\n ⣟⣿⡭⠀⠀⠀⠀⠀⢱⠀⠀       ⣿  ⢹⠀          ⡇\n  ⠙⢿⣯⠄⠀⠀|__| ⠀    ⡿ ⠀⡇⠀⠀⠀⠀    ⡼\n⠀⠀⠀⠹⣶⠆⠀⠀⠀⠀⠀⡴⠃⠀   ⠘⠤⣄⣠⠞⠀\n⠀⠀⠀⠀⢸⣷⡦⢤⡤⢤⣞⣁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n⠀⢀⣤⣴⣿⣏⠁⠀⠀⠸⣏⢯⣷⣖⣦⡀⠀⠀⠀⠀⠀⠀\n⢀⣾⣽⣿⣿⣿⣿⠛⢲⣶⣾⢉⡷⣿⣿⠵⣿⠀⠀⠀⠀⠀⠀\n⣼⣿⠍⠉⣿⡭⠉⠙⢺⣇⣼⡏⠀⠀ ⠀⣄⢸⠀⠀⠀⠀⠀⠀`", "⠀⠀⠀⣠⣶⡾⠏⠉⠙⠳⢦⡀⠀⠀⠀⢠⠞⠉⠙⠲⡀⠀\n ⠀⣴⠿⠏⠀⠀⠀⠀   ⠀  ⠀⢳⡀⠀⡏⠀⠀       ⢷\n⢠⣟⣋⡀⢀⣀⣀⡀⠀⣀⡀   ⣧⠀⢸⠀  ⠀       ⡇\n⢸⣯⡭⠁⠸⣛⣟⠆⡴⣻⡲   ⣿  ⣸   Nikal   ⡇\n ⣟⣿⡭⠀⠀⠀⠀⠀⢱⠀       ⣿  ⢹⠀           ⡇\n  ⠙⢿⣯⠄⠀⠀lodu⠀⠀   ⡿ ⠀⡇⠀⠀⠀⠀   ⡼\n⠀⠀⠀⠹⣶⠆⠀⠀⠀⠀⠀  ⡴⠃⠀   ⠘⠤⣄⣠⠞⠀\n⠀⠀⠀⠀⢸⣷⡦⢤⡤⢤⣞⣁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n⠀⢀⣤⣴⣿⣏⠁⠀⠀⠸⣏⢯⣷⣖⣦⡀⠀⠀⠀⠀⠀⠀\n⢀⣾⣽⣿⣿⣿⣿⠛⢲⣶⣾⢉⡷⣿⣿⠵⣿⠀⠀⠀⠀⠀⠀\n⣼⣿⠍⠉⣿⡭⠉⠙⢺⣇⣼⡏⠀⠀ ⠀⣄⢸⠀"
+        ];
+
+        // Send the initial loading message
+        for (const asciiMessage of asciiMessages) {
+            await new Promise(resolve => setTimeout(resolve, 500)); // Delay for 500ms second
+            await conn.relayMessage(
+                from,
+                {
+                    protocolMessage: {
+                        key: loadingMessage.key,
+                        type: 14,
+                        editedMessage: {
+                            conversation: asciiMessage,
+                        },
+                    },
+                },
+                {}
+            );
+        }
+    } catch (e) {
+        console.log(e);
+        reply(`❌ *Error!* ${e.message}`);
+    }
+});

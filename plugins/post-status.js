@@ -1,5 +1,4 @@
 const { cmd } = require("../command");
-const { getContentType } = require('@whiskeysockets/baileys');
 
 cmd({
   pattern: "post",
@@ -10,49 +9,63 @@ cmd({
   filename: __filename
 }, async (client, message, match, { from, isCreator }) => {
   try {
-    // Owner check
     if (!isCreator) {
       return await client.sendMessage(from, {
         text: "*📛 This is an owner-only command.*"
       }, { quoted: message });
     }
 
-    // Get the quoted message or use the current message
-    const quotedMsg = message.quoted || message;
-    const mtype = getContentType(quotedMsg.message);
-    
-    // Validate media type
-    if (!['imageMessage', 'videoMessage', 'audioMessage'].includes(mtype)) {
-      return await client.sendMessage(from, {
-        text: "*❌ Please reply to an image, video, or audio message*"
+    const quotedMsg = message.quoted ? message.quoted : message;
+    const mimeType = (quotedMsg.msg || quotedMsg).mimetype || '';
+
+    if (!mimeType) {
+      return await client.sendMessage(message.chat, {
+        text: "*Please reply to an image, video, or audio file.*"
       }, { quoted: message });
     }
 
-    // Download the media
-    const buffer = await client.downloadMediaMessage(quotedMsg);
+    const buffer = await quotedMsg.download();
+    const mtype = quotedMsg.mtype;
     const caption = quotedMsg.text || '';
 
-    // Prepare status update
-    const statusUpdate = {
-      [mtype.replace('Message', '')]: buffer,
-      caption: caption,
-      mimetype: quotedMsg.mimetype || 
-        (mtype === 'imageMessage' ? 'image/jpeg' : 
-         mtype === 'videoMessage' ? 'video/mp4' : 'audio/mp4')
-    };
+    let statusContent = {};
 
-    // Post to status
-    await client.sendMessage("status@broadcast", statusUpdate);
+    switch (mtype) {
+      case "imageMessage":
+        statusContent = {
+          image: buffer,
+          caption: caption
+        };
+        break;
+      case "videoMessage":
+        statusContent = {
+          video: buffer,
+          caption: caption
+        };
+        break;
+      case "audioMessage":
+        statusContent = {
+          audio: buffer,
+          mimetype: "audio/mp4",
+          ptt: quotedMsg.ptt || false
+        };
+        break;
+      default:
+        return await client.sendMessage(message.chat, {
+          text: "Only image, video, and audio files can be posted to status."
+        }, { quoted: message });
+    }
 
-    // Confirm success
-    await client.sendMessage(from, {
-      text: "✅ *Status updated successfully!*"
+    await client.sendMessage("status@broadcast", statusContent);
+
+    await client.sendMessage(message.chat, {
+      text: "✅ Status Uploaded Successfully."
     }, { quoted: message });
 
   } catch (error) {
-    console.error("Status Post Error:", error);
-    await client.sendMessage(from, {
-      text: `❌ *Failed to post status:*\n${error.message}`
+    console.error("Status Error:", error);
+    await client.sendMessage(message.chat, {
+      text: "❌ Failed to post status:\n" + error.message
     }, { quoted: message });
   }
 });

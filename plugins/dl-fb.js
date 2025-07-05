@@ -1,6 +1,5 @@
 const axios = require("axios");
 const { cmd } = require("../command");
-const config = require("../config"); // Make sure you have this
 
 cmd({
   pattern: "fb",
@@ -9,69 +8,34 @@ cmd({
   category: "download",
   filename: __filename,
   use: "<Facebook URL>",
-}, async (Void, citel, text, { from }) => {
+}, async (conn, m, store, { from, args, q, reply }) => {
   try {
-    // Validate URL
-    if (!text || !text.match(/(facebook\.com|fb\.watch)/i)) {
-      return citel.reply(`❌ *Invalid Facebook URL!*\n\nExample: .fb https://www.facebook.com/...\nOr: .fb https://fb.watch/...`);
+    // Check if a URL is provided
+    if (!q || !q.startsWith("http")) {
+      return reply("*`Need a valid Facebook URL`*\n\nExample: `.fb https://www.facebook.com/...`");
     }
 
-    // Show processing message
-    await citel.reply("🔄 Processing your video... Please wait!");
+    // Add a loading react
+    await conn.sendMessage(from, { react: { text: '⏳', key: m.key } });
 
-    // List of working APIs (updated June 2024)
-    const apis = [
-      {
-        url: `https://api.erdwpe.com/api/downloader/facebook?url=${encodeURIComponent(text)}`,
-        getVideoUrl: (data) => data.result?.hd || data.result?.sd
-      },
-      {
-        url: `https://api.violetics.pw/api/downloader/facebook?apikey=beta&url=${encodeURIComponent(text)}`,
-        getVideoUrl: (data) => data.result?.url
-      },
-      {
-        url: `https://api.lolhuman.xyz/api/facebook?apikey=${config.LOLHUMAN_KEY || 'YOUR_API_KEY'}&url=${encodeURIComponent(text)}`,
-        getVideoUrl: (data) => data.result
-      }
-    ];
+    // Fetch video URL from the API
+    const apiUrl = `https://www.velyn.biz.id/api/downloader/facebookdl?url=${encodeURIComponent(q)}`;
+    const { data } = await axios.get(apiUrl);
 
-    let videoUrl;
-    let lastError;
-
-    // Try each API until success
-    for (const api of apis) {
-      try {
-        const { data } = await axios.get(api.url, { timeout: 20000 });
-        videoUrl = api.getVideoUrl(data);
-        if (videoUrl) break;
-      } catch (e) {
-        lastError = e;
-        console.log(`API failed: ${api.url}`);
-      }
+    // Check if the API response is valid
+    if (!data.status || !data.data || !data.data.url) {
+      return reply("❌ Failed to fetch the video. Please try another link.");
     }
 
-    if (!videoUrl) {
-      console.error("All APIs failed:", lastError);
-      return citel.reply(`❌ Download failed!\nPossible reasons:\n1. Private video\n2. Copyright content\n3. Invalid URL\n\nTry again later or use different link.`);
-    }
-
-    // Send the video
-    await Void.sendMessage(from, {
+    // Send the video to the user
+    const videoUrl = data.data.url;
+    await conn.sendMessage(from, {
       video: { url: videoUrl },
-      caption: `📥 *Facebook Video Downloaded*\n\n🔹 *Quality:* HD\n🔹 *Powered By:* 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟\n🔹 *Bot:* ${config.BOT_NAME || "YourBot"}`,
-      contextInfo: {
-        externalAdReply: {
-          title: "Facebook Video Downloader",
-          body: "Download successful!",
-          thumbnail: (await axios.get('https://i.imgur.com/8K7VhJt.jpg', { responseType: 'arraybuffer' })).data,
-          mediaType: 2,
-          sourceUrl: ''
-        }
-      }
-    }, { quoted: citel });
+      caption: "📥 *Facebook Video Downloaded*\n\n- Powered By 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟 ✅",
+    }, { quoted: m });
 
   } catch (error) {
-    console.error("FB Download Error:", error);
-    citel.reply("⚠️ An unexpected error occurred. Please try again later.");
+    console.error("Error:", error); // Log the error for debugging
+    reply("❌ Error fetching the video. Please try again.");
   }
 });

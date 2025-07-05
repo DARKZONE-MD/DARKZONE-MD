@@ -1,9 +1,27 @@
 const config = require('../config');
 const { cmd, commands } = require('../command');
 
+// Array of different fancy text styles for DARKZONE-MD
+const botNameStyles = [
+    "𝘿𝘼𝙍𝙆𝙕𝙊𝙉𝙀-𝙈𝘿",
+    "𝔇𝔄𝔯𝔨𝔷𝔬𝔫𝔢-𝔐𝔇",
+    "🅳🅰🆁🅺🆉🅾🅽🅴-🅼🅳",
+    "𝐃𝐀𝐑𝐊𝐙𝐎𝐍𝐄-𝐌𝐃",
+    "𝓓𝓐𝓡𝓚𝓩𝓞𝓝𝓔-𝓜𝓓",
+    "𝒟𝒜𝑅𝒦𝒵𝒪𝒩𝐸-𝑀𝒟",
+    "𝖉𝖆𝖗𝖐𝖟𝖔𝖓𝖊-𝖒𝖉",
+    "ＤＡＲＫＺＯＮＥ-ＭＤ",
+    "𝕯𝕬𝕽𝕶𝖅𝕺𝕹𝕰-𝕸𝕯",
+    "𝙳𝙰𝚁𝙺𝚉𝙾𝙽𝙴-𝙼𝙳"
+];
+
+// Track current style index
+let currentStyleIndex = 0;
+
 cmd({
     pattern: "ping",
-    alias: ["speed","pong"],use: '.ping',
+    alias: ["speed","pong"],
+    use: '.ping',
     desc: "Check bot's response time.",
     category: "main",
     react: "🌡️",
@@ -32,7 +50,11 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
         const end = new Date().getTime();
         const responseTime = (end - start) / 1000;
 
-        const text = `> *DARKZONE-MD SPEED: ${responseTime.toFixed(2)}ms ${reactionEmoji}*`;
+        // Get current fancy bot name and rotate for next time
+        const fancyBotName = botNameStyles[currentStyleIndex];
+        currentStyleIndex = (currentStyleIndex + 1) % botNameStyles.length;
+
+        const text = `> *${fancyBotName} SPEED: ${responseTime.toFixed(2)}ms ${reactionEmoji}*`;
 
         await conn.sendMessage(from, {
             text,
@@ -54,8 +76,7 @@ async (conn, mek, m, { from, quoted, sender, reply }) => {
     }
 });
 
-// ping2 
-
+// ping2 remains unchanged
 cmd({
     pattern: "ping2",
     desc: "Check bot's response time.",

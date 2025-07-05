@@ -17,14 +17,19 @@ async (conn, mek, m, { from, sender, reply }) => {
 ╭───〔 *🤖 ${config.BOT_NAME} STATUS* 〕───◉
 │✨ *Bot is Active & Online!*
 │
-│🧠 *Owner:* ${config.OWNER_NAME}
+│🎯 *Status:* *Active & Running!*
+│👑 *Owner:* *ERFAN*
 │⚡ *Version:* 4.0.0
-│📝 *Prefix:* [${config.PREFIX}]
-│📳 *Mode:* [${config.MODE}]
-│💾 *RAM:* ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${(os.totalmem() / 1024 / 1024).toFixed(2)}MB
-│🖥️ *Host:* ${os.hostname()}
-│⌛ *Uptime:* ${runtime(process.uptime())}
-╰────────────────────◉
+│🔮 *Prefix:* [ . ]
+╰───────────────◇
+╭───────────────◇
+│🖥️ *System Info:*
+│• *CPU: Intel(R) Xeon(R) Platinum 8375C CPU*
+│• *RAM: 57.41/63276.47 MB*
+│• *Free: 36992.82 MB*
+│• *Platform: linux x64*
+│⏱️ *Uptime:* 3 *hours*, 2 *minutes*, 42 *seconds*
+╰───────────────◇
 > ${config.DESCRIPTION}`;
 
         await conn.sendMessage(from, {

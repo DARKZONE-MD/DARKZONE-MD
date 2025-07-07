@@ -1,5 +1,7 @@
 const axios = require("axios");
 const { cmd } = require("../command");
+const fs = require("fs");
+const FormData = require("form-data");
 
 cmd({
   pattern: "fb",
@@ -11,81 +13,78 @@ cmd({
 }, async (conn, m, store, { from, args, q, reply }) => {
   try {
     // Check if a URL is provided
-    if (!q || !q.startsWith("http")) {
-      return reply("📌 *Please provide a valid Facebook URL*\n\nExample: `.fb https://www.facebook.com/...`\n\n🔗 URL should start with http or https");
+    if (!q || !q.includes("facebook.com")) {
+      return reply("📌 *Invalid URL Format*\n\nPlease send a valid Facebook video URL\nExample: `.fb https://www.facebook.com/.../video/...`");
     }
 
-    // Add a loading react
+    // Add loading reaction
     await conn.sendMessage(from, { react: { text: '⏳', key: m.key } });
 
-    // Options for RapidAPI
-    const options = {
-      method: 'GET',
-      url: 'https://facebook-realtimeapi.p.rapidapi.com/facebook/video',
-      params: {
-        url: q,
-        hd: 'true'
-      },
+    // Using a free and reliable API
+    const apiUrl = `https://fbdownloader.net/api/ajaxSearch`;
+    const formData = new FormData();
+    formData.append('q', q);
+    
+    const { data } = await axios.post(apiUrl, formData, {
       headers: {
-        'x-rapidapi-host': 'facebook-realtimeapi.p.rapidapi.com',
-        'x-rapidapi-key': '8f8214432dmshe2d6730ba6b5541p119a35jsna12406472100'
+        ...formData.getHeaders(),
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0'
       }
-    };
+    });
 
-    // Fetch video data from RapidAPI
-    const response = await axios.request(options);
-    const data = response.data;
-
-    // Check if API response is valid
-    if (!data || !data.hd_url) {
-      return reply("❌ *Download Failed*\n\nPossible reasons:\n1. Invalid or private video URL\n2. API limit reached\n3. Video is too long\n\nTry another link or try again later.");
+    // Check if download links are available
+    if (!data.links || !data.links.hd || !data.links.sd) {
+      return reply("❌ *No Download Links Found*\n\nThis video may be private or restricted\nTry another public video link");
     }
 
-    // Send the video with nice caption and design
-    const caption = `🎥 *Facebook Video Downloader*\n\n` +
-                   `✓ *HD Quality Available*\n` +
-                   `✓ *Powered by RapidAPI*\n` +
-                   `✓ *Bot maintained by ERFAN AHMAD*\n\n` +
-                   `📥 Click to download`;
+    // Send the video (try HD first, fallback to SD)
+    const videoUrl = data.links.hd || data.links.sd;
+    const caption = `⬇️ *Facebook Video Downloaded* \n\n` +
+                   `🔹 *Quality:* ${data.links.hd ? 'HD' : 'SD'}\n` +
+                   `🔹 *Duration:* ${data.duration || 'N/A'}\n` +
+                   `🔹 *Size:* ${data.size || 'N/A'}\n\n` +
+                   `🤖 *Powered by Your Bot Name*`;
 
     await conn.sendMessage(from, {
-      video: { url: data.hd_url || data.sd_url },
+      video: { url: videoUrl },
       caption: caption,
       contextInfo: {
         externalAdReply: {
           title: "Facebook Video Downloader",
-          body: "HD Quality Video",
-          thumbnail: await axios.get('https://i.imgur.com/2HeTWHa.png', { responseType: 'arraybuffer' }).then(res => res.data),
+          body: "Successfully downloaded!",
+          thumbnail: await axios.get('https://i.ibb.co/7n1k3Pj/fb-thumb.jpg', { responseType: 'arraybuffer' })
+                              .then(res => res.data)
+                              .catch(() => null),
           mediaType: 1,
-          mediaUrl: '',
           sourceUrl: q,
           showAdAttribution: true
         }
       }
     }, { quoted: m });
 
-    // Add success react
+    // Add success reaction
     await conn.sendMessage(from, { react: { text: '✅', key: m.key } });
 
   } catch (error) {
     console.error("Error:", error);
-    let errorMessage = "❌ *Download Error*\n\n";
+    let errorMsg = "❌ *Download Failed* \n\n";
     
     if (error.response) {
-      if (error.response.status === 429) {
-        errorMessage += "API limit reached. Please try again later.";
-      } else if (error.response.status === 404) {
-        errorMessage += "Video not found. Check the URL and try again.";
+      if (error.response.status === 404) {
+        errorMsg += "Video not found. The link may be broken or private.";
+      } else if (error.response.status === 403) {
+        errorMsg += "Access denied. The video may be age-restricted or private.";
       } else {
-        errorMessage += `Server responded with status ${error.response.status}`;
+        errorMsg += `Server error (${error.response.status}). Try again later.`;
       }
-    } else if (error.request) {
-      errorMessage += "No response from API server. Check your connection.";
+    } else if (error.code === 'ECONNREFUSED') {
+      errorMsg += "Service unavailable. Please try again later.";
     } else {
-      errorMessage += "An unexpected error occurred.";
+      errorMsg += "An unexpected error occurred. Check your link and try again.";
     }
     
-    await reply(errorMessage);
+    await reply(errorMsg);
     await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
   }
 });

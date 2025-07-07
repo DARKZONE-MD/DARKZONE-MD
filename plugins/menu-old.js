@@ -659,29 +659,37 @@ cmd({
 }, 
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        let dec = `╭━━〔 *Convert Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• sticker
-┃◈┃• sticker2
-┃◈┃• emojimix
-┃◈┃• fancy
-┃◈┃• take
-┃◈┃• tomp3
-┃◈┃• tts
-┃◈┃• trt
-┃◈┃• base64
-┃◈┃• unbase64
-┃◈┃• binary
-┃◈┃• dbinary
-┃◈┃• tinyurl
-┃◈┃• urldecode
-┃◈┃• urlencode
-┃◈┃• url
-┃◈┃• repeat 
-┃◈┃• ask
-┃◈┃• readmore
-┃◈└───────────┈⊷
-╰──────────────┈⊷
+        let dec = `‎╔════◇◆◇══════╗
+‎『 🔄 *𝗖𝗢𝗡𝗩𝗘𝗥𝗧 𝗠𝗘𝗡𝗨* 』
+‎╚════◇◆◇══════╝
+‎╭━[🛠️ *𝗠𝗘𝗗𝗜𝗔 𝗧𝗢𝗢𝗟𝗦* ]━━━━━╮
+‎│ • *sticker* [img]
+‎│ • *sticker2* [img]
+‎│ • *emojimix* 😎+😂
+‎│ • *take* [name,text]
+‎│ • *tomp3* [video]
+‎╰━━━━━━━━━━━━━━╯
+‎╭━[📝 *𝗧𝗘𝗫𝗧 𝗧𝗢𝗢𝗟𝗦* ]━━━━━━╮
+‎│ • *fancy* [text]
+‎│ • *tts* [text]
+‎│ • *trt* [text]
+‎│ • *base64* [text]
+‎│ • *unbase64* [text]
+‎│ • *binary* [text]
+‎│ • *dbinary* [text]
+‎╰━━━━━━━━━━━━━━╯
+‎╭━[🔗 *𝗨𝗥𝗟 𝗧𝗢𝗢𝗟𝗦* ]━━━━━━━━╮
+‎│ • *tinyurl* [url]
+‎│ • *urldecode* [url]
+‎│ • *urlencode* [url]
+‎│ • *url* [action]
+‎╰━━━━━━━━━━━━━━╯
+‎╭━[🎭 *𝗙𝗨𝗡 𝗧𝗢𝗢𝗟𝗦* ]━━━━━━━━╮
+‎│ • *repeat* [text]
+‎│ • *ask* [question]
+‎│ • *readmore* [text]
+‎╰━━━━━━━━━━━━━━╯
+‎────────────────
 > ${config.DESCRIPTION}`;
 
         await conn.sendMessage(
@@ -721,36 +729,34 @@ cmd({
 }, 
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-          let dec = `╭━━〔 *Anime Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• fack
-┃◈┃• dog
-┃◈┃• awoo
-┃◈┃• garl
-┃◈┃• waifu
-┃◈┃• neko
-┃◈┃• megnumin
-┃◈┃• neko
-┃◈┃• maid
-┃◈┃• loli
-┃◈┃• animegirl
-┃◈┃• animegirl
-┃◈┃• animegirl1
-┃◈┃• animegirl2
-┃◈┃• animegirl3
-┃◈┃• animegirl4
-┃◈┃• animegirl5
-┃◈┃• anime1
-┃◈┃• anime1
-┃◈┃• anime2
-┃◈┃• anime3
-┃◈┃• anime4
-┃◈┃• anime5
-┃◈┃• animenews
-┃◈┃• foxgirl
-┃◈┃• naruto
-┃◈└───────────┈⊷
-╰──────────────┈⊷
+          let dec = `‎╔════◇◆◇══════╗
+‎『🎎 *𝗔𝗡𝗜𝗠𝗘 𝗠𝗘𝗡𝗨* 』
+‎╚════◇◆◇══════╝
+‎╭━[🎭 *𝗔𝗡𝗜𝗠𝗘 𝗖𝗢𝗠𝗠𝗔𝗡𝗗𝗦* ]━━╮
+‎│ • *fack*
+‎│ • *dog*
+‎│ • *awoo*
+‎│ • *garl*
+‎│ • *waifu*
+‎│ • *neko*
+‎│ • *megnumin*
+‎│ • *maid*
+‎│ • *loli*
+‎│ • *animegirl*
+‎│ • *animegirl1*
+‎│ • *animegirl2*
+‎│ • *animegirl3*
+‎│ • *animegirl4*
+‎│ • *animegirl5*
+‎│ • *anime1*
+‎│ • *anime2*
+‎│ • *anime3*
+‎│ • *anime4*
+‎│ • *anime5*
+‎│ • *animenews*
+‎│ • *foxgirl*
+‎│ • *naruto*
+‎╰━━━━━━━━━━━━━━╯
 > ${config.DESCRIPTION}`;
 
         await conn.sendMessage(
@@ -790,26 +796,27 @@ cmd({
 }, 
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        let dec = `╭━━〔 *Ai Menu* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈┃• ai
-┃◈┃• gpt3
-┃◈┃• gpt2
-┃◈┃• gptmini
-┃◈┃• gpt
-┃◈┃• meta
-┃◈┃• blackbox
-┃◈┃• luma
-┃◈┃• dj 
-┃◈┃• khan
-┃◈┃• jawad
-┃◈┃• gpt4
-┃◈┃• bing
-┃◈┃• imagine 
-┃◈┃• imagine2
-┃◈┃• copilot
-┃◈└───────────┈⊷
-╰──────────────┈⊷
+        let dec = `‎╔════◇◆◇══════╗
+‎『🤖 *𝗔𝗜 𝗠𝗘𝗡𝗨* 』
+‎╚════◇◆◇══════╝
+‎╭━[🧠 *𝗔𝗜 𝗧𝗢𝗢𝗟𝗦* ]━━━━━━━━╮
+‎│ • *ai*
+‎│ • *gpt3*
+‎│ • *gpt2*
+‎│ • *gptmini*
+‎│ • *gpt*
+‎│ • *meta*
+‎│ • *blackbox*
+‎│ • *luma*
+‎│ • *dj*
+‎│ • *DARKZONE-MD*
+‎│ • *Erfan*
+‎│ • *gpt4*
+‎│ • *bing*
+‎│ • *imagine* [text]
+‎│ • *imagine2* [text]
+‎│ • *copilot*
+‎╰━━━━━━━━━━━━━━╯
 > ${config.DESCRIPTION}`;
 
         await conn.sendMessage(

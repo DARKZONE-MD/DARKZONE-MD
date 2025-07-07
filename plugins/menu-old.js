@@ -25,22 +25,22 @@ async (conn, mek, m, { from, sender, pushname, reply }) => {
 ╰━━━━━━━━━━━━━━━━━━━━━━━━╯
 
 ╭━━〔 🧩 *Command Categories* 〕━━╮
-┃ 📖 Quranmenu
-┃ 🕋 Prayertime
-┃ 🤖 Aimenu
-┃ 🎭 Anmiemenu
-┃ 😹 Reactions
-┃ 🔁 Convertmenu
-┃ 🎉 Funmenu
-┃ ⬇️ Dlmenu
-┃ ⚒️ Listcmd
-┃ 🏠 Mainmenu
-┃ 👥 Groupmenu
-┃ 📜 Allmenu
-┃ 👑 Ownermenu
-┃ 🧩 Othermenu
-┃ 🖌️ Logo
-┃ 📦 Repo
+┃ 📖 *Quranmenu*
+┃ 🕋 *Prayertime*
+┃ 🤖 *Aimenu*
+┃ 🎭 *Anmiemenu*
+┃ 😹 *Reactions*
+┃ 🔁 *Convertmenu*
+┃ 🎉 *Funmenu*
+┃ ⬇️ *Dlmenu*
+┃ ⚒️ *Listcmd*
+┃ 🏠 *Mainmenu*
+┃ 👥 *Groupmenu*
+┃ 📜 *Allmenu*
+┃ 👑 *Ownermenu*
+┃ 🧩 *Othermenu*
+┃ 🖌️ *Logo*
+┃ 📦 *Repo*
 ╰━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
 > ${config.DESCRIPTION}
 `;

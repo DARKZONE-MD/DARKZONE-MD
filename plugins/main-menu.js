@@ -17,330 +17,349 @@ cmd({
 }, 
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        let dec = `╭━━〔 🚀 *${config.BOT_NAME}* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 👑 Owner : *${config.OWNER_NAME}*
-┃◈┃• ⚙️ Prefix : *[${config.PREFIX}]*
-┃◈┃• 🌐 Platform : *Heroku*
-┃◈┃• 📦 Version : *4.0.0*
-┃◈┃• ⏱️ Runtime : *${runtime(process.uptime())}*
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-
-╭━━〔 📥 *DOWNLOAD MENU* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 🟦 facebook
-┃◈┃• 📁 mediafire
-┃◈┃• 🎵 tiktok
-┃◈┃• 🐦 twitter
-┃◈┃• 📷 insta
-┃◈┃• 📦 apk
-┃◈┃• 🖼️ img
-┃◈┃• ▶️ tt2
-┃◈┃• 📌 pins
-┃◈┃• 🔄 apk2
-┃◈┃• 🔵 fb2
-┃◈┃• 📍 pinterest
-┃◈┃• 🎶 spotify
-┃◈┃• 🎧 play
-┃◈┃• 🎧 play2
-┃◈┃• 🔉 audio
-┃◈┃• 🎬 video
-┃◈┃• 📹 video2
-┃◈┃• 🎵 ytmp3
-┃◈┃• 📹 ytmp4
-┃◈┃• 🎶 song
-┃◈┃• 🎬 darama
-┃◈┃• ☁️ gdrive
-┃◈┃• 🌐 ssweb
-┃◈┃• 🎵 tiks
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-
-╭━━〔 👥 *GROUP MENU* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 🔗 grouplink
-┃◈┃• 🚪 kickall
-┃◈┃• 🚷 kickall2
-┃◈┃• 🚫 kickall3
-┃◈┃• ➕ add
-┃◈┃• ➖ remove
-┃◈┃• 👢 kick
-┃◈┃• ⬆️ promote
-┃◈┃• ⬇️ demote
-┃◈┃• 🚮 dismiss
-┃◈┃• 🔄 revoke
-┃◈┃• 👋 setgoodbye
-┃◈┃• 🎉 setwelcome
-┃◈┃• 🗑️ delete
-┃◈┃• 🖼️ getpic
-┃◈┃• ℹ️ ginfo
-┃◈┃• ⏳ disappear on
-┃◈┃• ⏳ disappear off
-┃◈┃• ⏳ disappear 7D,24H
-┃◈┃• 📝 allreq
-┃◈┃• ✏️ updategname
-┃◈┃• 📝 updategdesc
-┃◈┃• 📩 joinrequests
-┃◈┃• 📨 senddm
-┃◈┃• 🏃 nikal
-┃◈┃• 🔇 mute
-┃◈┃• 🔊 unmute
-┃◈┃• 🔒 lockgc
-┃◈┃• 🔓 unlockgc
-┃◈┃• 📩 invite
-┃◈┃• #️⃣ tag
-┃◈┃• 🏷️ hidetag
-┃◈┃• @️⃣ tagall
-┃◈┃• 👔 tagadmins
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-
-╭━━〔 🎭 *REACTIONS MENU* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 👊 bully @tag
-┃◈┃• 🤗 cuddle @tag
-┃◈┃• 😢 cry @tag
-┃◈┃• 🤗 hug @tag
-┃◈┃• 🐺 awoo @tag
-┃◈┃• 💋 kiss @tag
-┃◈┃• 👅 lick @tag
-┃◈┃• 🖐️ pat @tag
-┃◈┃• 😏 smug @tag
-┃◈┃• 🔨 bonk @tag
-┃◈┃• 🚀 yeet @tag
-┃◈┃• 😊 blush @tag
-┃◈┃• 😄 smile @tag
-┃◈┃• 👋 wave @tag
-┃◈┃• ✋ highfive @tag
-┃◈┃• 🤝 handhold @tag
-┃◈┃• 🍜 nom @tag
-┃◈┃• 🦷 bite @tag
-┃◈┃• 🤗 glomp @tag
-┃◈┃• 👋 slap @tag
-┃◈┃• 💀 kill @tag
-┃◈┃• 😊 happy @tag
-┃◈┃• 😉 wink @tag
-┃◈┃• 👉 poke @tag
-┃◈┃• 💃 dance @tag
-┃◈┃• 😬 cringe @tag
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-
-╭━━〔 🎨 *LOGO MAKER* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 💡 neonlight
-┃◈┃• 🎀 blackpink
-┃◈┃• 🐉 dragonball
-┃◈┃• 🎭 3dcomic
-┃◈┃• 🇺🇸 america
-┃◈┃• 🍥 naruto
-┃◈┃• 😢 sadgirl
-┃◈┃• ☁️ clouds
-┃◈┃• 🚀 futuristic
-┃◈┃• 📜 3dpaper
-┃◈┃• ✏️ eraser
-┃◈┃• 🌇 sunset
-┃◈┃• 🍃 leaf
-┃◈┃• 🌌 galaxy
-┃◈┃• 💀 sans
-┃◈┃• 💥 boom
-┃◈┃• 💻 hacker
-┃◈┃• 😈 devilwings
-┃◈┃• 🇳🇬 nigeria
-┃◈┃• 💡 bulb
-┃◈┃• 👼 angelwings
-┃◈┃• ♈ zodiac
-┃◈┃• 💎 luxury
-┃◈┃• 🎨 paint
-┃◈┃• ❄️ frozen
-┃◈┃• 🏰 castle
-┃◈┃• 🖋️ tatoo
-┃◈┃• 🔫 valorant
-┃◈┃• 🐻 bear
-┃◈┃• 🔠 typography
-┃◈┃• 🎂 birthday
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-
-╭━━〔 👑 *OWNER MENU* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 👑 owner
-┃◈┃• 📜 menu
-┃◈┃• 📜 menu2
-┃◈┃• 📊 vv
-┃◈┃• 📋 listcmd
-┃◈┃• 📚 allmenu
-┃◈┃• 📦 repo
-┃◈┃• 🚫 block
-┃◈┃• ✅ unblock
-┃◈┃• 🖼️ fullpp
-┃◈┃• 🖼️ setpp
-┃◈┃• 🔄 restart
-┃◈┃• ⏹️ shutdown
-┃◈┃• 🔄 updatecmd
-┃◈┃• 💚 alive
-┃◈┃• 🏓 ping
-┃◈┃• 🆔 gjid
-┃◈┃• 🆔 jid
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-
-╭━━〔 🎉 *FUN MENU* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 🤪 shapar
-┃◈┃• ⭐ rate
-┃◈┃• 🤬 insult
-┃◈┃• 💻 hack
-┃◈┃• 💘 ship
-┃◈┃• 🎭 character
-┃◈┃• 💌 pickup
-┃◈┃• 😆 joke
-┃◈┃• ❤️ hrt
-┃◈┃• 😊 hpy
-┃◈┃• 😔 syd
-┃◈┃• 😠 anger
-┃◈┃• 😳 shy
-┃◈┃• 💋 kiss
-┃◈┃• 🧐 mon
-┃◈┃• 😕 cunfuzed
-┃◈┃• 🖼️ setpp
-┃◈┃• ✋ hand
-┃◈┃• 🏃 nikal
-┃◈┃• 🤲 hold
-┃◈┃• 🤗 hug
-┃◈┃• 🏃 nikal
-┃◈┃• 🎵 hifi
-┃◈┃• 👉 poke
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-
-╭━━〔 🔄 *CONVERT MENU* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 🏷️ sticker
-┃◈┃• 🏷️ sticker2
-┃◈┃• 😀 emojimix
-┃◈┃• ✨ fancy
-┃◈┃• 🖼️ take
-┃◈┃• 🎵 tomp3
-┃◈┃• 🗣️ tts
-┃◈┃• 🌐 trt
-┃◈┃• 🔢 base64
-┃◈┃• 🔠 unbase64
-┃◈┃• 010 binary
-┃◈┃• 🔤 dbinary
-┃◈┃• 🔗 tinyurl
-┃◈┃• 🌐 urldecode
-┃◈┃• 🌐 urlencode
-┃◈┃• 🌐 url
-┃◈┃• 🔁 repeat
-┃◈┃• ❓ ask
-┃◈┃• 📖 readmore
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-
-╭━━〔 🤖 *AI MENU* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 🧠 ai
-┃◈┃• 🤖 gpt3
-┃◈┃• 🤖 gpt2
-┃◈┃• 🤖 gptmini
-┃◈┃• 🤖 gpt
-┃◈┃• 🔵 meta
-┃◈┃• 📦 blackbox
-┃◈┃• 🌈 luma
-┃◈┃• 🎧 dj
-┃◈┃• 👑 khan
-┃◈┃• 🤵 jawad
-┃◈┃• 🧠 gpt4
-┃◈┃• 🔍 bing
-┃◈┃• 🎨 imagine
-┃◈┃• 🖼️ imagine2
-┃◈┃• 🤖 copilot
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-
-╭━━〔 ⚡ *MAIN MENU* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 🏓 ping
-┃◈┃• 🏓 ping2
-┃◈┃• 🚀 speed
-┃◈┃• 📡 live
-┃◈┃• 💚 alive
-┃◈┃• ⏱️ runtime
-┃◈┃• ⏳ uptime
-┃◈┃• 📦 repo
-┃◈┃• 👑 owner
-┃◈┃• 📜 menu
-┃◈┃• 📜 menu2
-┃◈┃• 🔄 restart
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-
-╭━━〔 🎎 *ANIME MENU* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 🤬 fack
-┃◈┃• ✅ truth
-┃◈┃• 😨 dare
-┃◈┃• 🐶 dog
-┃◈┃• 🐺 awoo
-┃◈┃• 👧 garl
-┃◈┃• 👰 waifu
-┃◈┃• 🐱 neko
-┃◈┃• 🧙 megnumin
-┃◈┃• 🐱 neko
-┃◈┃• 👗 maid
-┃◈┃• 👧 loli
-┃◈┃• 🎎 animegirl
-┃◈┃• 🎎 animegirl1
-┃◈┃• 🎎 animegirl2
-┃◈┃• 🎎 animegirl3
-┃◈┃• 🎎 animegirl4
-┃◈┃• 🎎 animegirl5
-┃◈┃• 🎬 anime1
-┃◈┃• 🎬 anime2
-┃◈┃• 🎬 anime3
-┃◈┃• 🎬 anime4
-┃◈┃• 🎬 anime5
-┃◈┃• 📰 animenews
-┃◈┃• 🦊 foxgirl
-┃◈┃• 🍥 naruto
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
-
-╭━━〔 ℹ️ *OTHER MENU* 〕━━┈⊷
-┃◈╭─────────────────·๏
-┃◈┃• 🕒 timenow
-┃◈┃• 📅 date
-┃◈┃• 🔢 count
-┃◈┃• 🧮 calculate
-┃◈┃• 🔢 countx
-┃◈┃• 🎲 flip
-┃◈┃• 🪙 coinflip
-┃◈┃• 🎨 rcolor
-┃◈┃• 🎲 roll
-┃◈┃• ℹ️ fact
-┃◈┃• 💻 cpp
-┃◈┃• 🎲 rw
-┃◈┃• 💑 pair
-┃◈┃• 💑 pair2
-┃◈┃• 💑 pair3
-┃◈┃• ✨ fancy
-┃◈┃• 🎨 logo <text>
-┃◈┃• 📖 define
-┃◈┃• 📰 news
-┃◈┃• 🎬 movie
-┃◈┃• ☀️ weather
-┃◈┃• 📦 srepo
-┃◈┃• 🤬 insult
-┃◈┃• 💾 save
-┃◈┃• 🌐 wikipedia
-┃◈┃• 🔑 gpass
-┃◈┃• 👤 githubstalk
-┃◈┃• 🔍 yts
-┃◈┃• 📹 ytv
-┃◈╰─────────────────┈⊷
-╰━━━━━━━━━━━━━━━━━━━┈⊷
+        let dec = `‎╔═〔 🚀 *${config.BOT_NAME}* 〕═⊷
+═╭─────────────────·๏
+═┃• 👑 Owner : *${config.OWNER_NAME}*
+═┃• ⚙️ Prefix : *[${config.PREFIX}]*
+═┃• 🌐 Platform : *Heroku*
+═┃• 📦 Version : *4.0.0*
+═┃• ⏱️ Runtime : *${runtime(process.uptime())}*
+═╰─────────────────┈⊷
+‎╚════◇◆◇══════════╝
+‎╔════◇◆◇══════════╗
+‎『📥 *𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗 𝗠𝗘𝗡𝗨* 』
+‎╚════◇◆◇══════════╝
+‎[🧠*SYSTEM CORE STAB Initializing*..]
+‎├── 🌐 𝗦𝗼𝗰𝗶𝗮𝗹 𝗠𝗲𝗱𝗶𝗮
+‎│   ├─ *facebook* [url]
+‎│   ├─ *download* [url]
+‎│   ├─ *mediafire* [url]
+‎│   ├─ *tiktok* [url]
+‎│   ├─ *twitter* [url]
+‎│   ├─ *insta* [url]
+‎│   ├─ *apk* [app]
+‎│   ├─ *img* [query]
+‎│   ├─ *tt2* [url]
+‎│   ├─ *pins* [url]
+‎│   ├─ *apk2* [app]
+‎│   ├─ *fb2* [url]
+‎│   └─ *pinterest* [url]
+‎├── 🎵 *𝗠𝘂𝘀𝗶𝗰/𝗩𝗶𝗱𝗲𝗼*
+‎│   ├─ *spotify* [query]
+‎│   ├─ *play* [song]
+‎│   ├─ *play2-10* [song]
+‎│   ├─ *audio* [url]
+‎│   ├─ *video* [url]
+‎│   ├─ *video2-10* [url]
+‎│   ├─ *ytmp3* [url]
+‎│   ├─ *ytmp4* [url]
+‎│   ├─ *song* [name]
+‎│   └─ *darama* [name]
+‎[+] *Payload Ready* ✔
+‎──────────────────
+╔════◇◆◇══════╗
+‎『👥 *𝗚𝗥𝗢𝗨𝗣 𝗠𝗘𝗡𝗨* 』
+‎╚════◇◆◇══════╝
+‎╭━[🌡️ *𝗠𝗔𝗡𝗔𝗚𝗘𝗠𝗘𝗡𝗧* ]━━╮
+‎│ • *grouplink*
+‎│ • *kickall*
+‎│ • *kickall2*
+‎│ • *kickall3*
+‎│ • *add* @user
+‎│ • *remove* @user
+‎│ • *kick* @user
+‎│ • *setgoodbye*
+‎│ • *setwelcome*
+‎│ • *delete*
+‎│ • *getpic*
+‎│ • *ginfo*
+‎│ • *disappear on*
+‎│ • *disappear off*
+‎│ • *disappear 7D,24H*
+‎│ • *allreq*
+‎│ • *updategname*
+‎│ • *updategdesc*
+‎│ • *joinrequests*
+‎│ • *senddm*
+‎│ • *nikal*
+‎╰━━━━━━━━━━━━━━╯
+‎╭─━⚡ *𝗔𝗗𝗠𝗜𝗡 𝗧𝗢𝗢𝗟𝗦* ─━╮
+‎│ • *promote* @user
+‎│ • *demote* @user
+‎│ • *dismiss*
+‎│ • *revoke*
+‎│ • *mute* [time]
+‎│ • *unmute*
+‎│ • *lockgc*
+‎│ • *unlockgc*
+‎╰──────────────╯
+‎╔══〔 🏷️ *𝗧𝗔𝗚𝗚𝗜𝗡𝗚* 〕══╗
+‎│ • *tag* @user
+‎│ • *hidetag* [msg]
+‎│ • *tagall*
+‎│ • *tagadmins*
+‎│ • *invite*
+‎╚══════════════╝
+‎╔═══◇◆◇═════════╗
+‎『*𝗥𝗘𝗔𝗖𝗧𝗜𝗢𝗡𝗦 𝗠𝗘𝗡𝗨*』
+‎╚═══◇◆◇═════════╝
+‎╭━[🎭 *𝗔𝗖𝗧𝗜𝗢𝗡𝗦* ]━━━━━━╮
+‎│ • *bully* @tag
+‎│ • *cuddle* @tag
+‎│ • *cry* @tag
+‎│ • *hug* @tag
+‎│ • *awoo* @tag
+‎│ • *kiss* @tag
+‎│ • *lick* @tag
+‎│ • *pat* @tag
+‎│ • *smug* @tag
+‎│ • *bonk* @tag
+‎│ • *yeet* @tag
+‎│ • *blush* @tag
+‎│ • *smile* @tag
+‎│ • *wave* @tag
+‎│ • *highfive* @tag
+‎│ • *handhold* @tag
+‎│ • *nom* @tag
+‎│ • *bite* @tag
+‎│ • *glomp* @tag
+‎│ • *slap* @tag
+‎│ • *kill* @tag
+‎│ • *happy* @tag
+‎│ • *wink* @tag
+‎│ • *poke* @tag
+‎│ • *dance* @tag
+‎│ • *cringe* @tag
+‎╰━━━━━━━━━━━━━━╯
+‎‎╔══◇◆◇════════╗
+‎ 『 🖼️ *𝗟𝗢𝗚𝗢 𝗟𝗜𝗦𝗧* 』
+‎╚══◇◆◇════════╝
+‎╭━[✨ *𝗟𝗢𝗚𝗢𝗢𝗦* ]━━━━━━━━━━╮
+‎│ • *neonlight*
+‎│ • *blackpink*
+‎│ • *dragonball*
+‎│ • *3dcomic*
+‎│ • *america*
+‎│ • *naruto*
+‎│ • *sadgirl*
+‎│ • *clouds*
+‎│ • *futuristic*
+‎│ • *3dpaper*
+‎│ • *eraser*
+‎│ • *sunset*
+‎│ • *leaf*
+‎│ • *galaxy*
+‎│ • *sans*
+‎│ • *boom*
+‎│ • *hacker*
+‎│ • *devilwings*
+‎│ • *nigeria*
+‎│ • *bulb*
+‎│ • *angelwings*
+‎│ • *zodiac*
+‎│ • *luxury*
+‎│ • *paint*
+‎│ • *frozen*
+‎│ • *castle*
+‎│ • *tatoo*
+‎│ • *valorant*
+‎│ • *bear*
+‎│ • *typography*
+‎│ • *birthday*
+‎╰━━━━━━━━━━━━━━━━━━━━━━━╯
+‎╔════◇◆◇══════╗
+‎『👑 *𝗢𝗪𝗡𝗘𝗥 𝗠𝗘𝗡𝗨* 』
+‎╚════◇◆◇══════╝
+‎╭━[⚡ *𝗢𝗪𝗡𝗘𝗥 𝗖𝗢𝗡𝗧𝗥𝗢𝗟𝗦* ]━━╮
+‎│ • *owner*
+‎│ • *menu*
+‎│ • *menu2*
+‎│ • *listcmd*
+‎│ • *allmenu*
+‎│ • *repo*
+‎│ • *block* @user
+‎│ • *unblock* @user
+‎│ • *fullpp*
+‎│ • *setpp*
+‎╰━━━━━━━━━━━━━━━━━━━━━╯
+‎╭─━🔧 *𝗦𝗬𝗦𝗧𝗘𝗠 𝗧𝗢𝗢𝗟𝗦* ─━╮
+‎│ • *restart*
+‎│ • *shutdown*
+‎│ • *updatecmd*
+‎│ • *alive*
+‎│ • *ping*
+‎│ • *gjid*
+‎│ • *jid*
+‎╰────────────────────╯
+╔════◇◆◇══════╗
+‎ 『 😄 *𝗙𝗨𝗡 𝗠𝗘𝗡𝗨* 』
+‎╚══════◇◆◇════╝
+‎╭━[🎭 *𝗜𝗡𝗧𝗘𝗥𝗔𝗖𝗧𝗜𝗩𝗘* ]━━━╮
+‎│ • *shapar*
+‎│ • *rate* @user
+‎│ • *insult* @user
+‎│ • *hack* @user
+‎│ • *ship* @user1 @user2
+‎│ • *character*
+‎│ • *pickup*
+‎│ • *joke*
+‎│ • *hrt*
+‎│ • *hpy*
+‎│ • *syd*
+‎│ • *anger*
+‎│ • *shy*
+‎│ • *kiss*
+‎│ • *mon*
+‎│ • *cunfuzed*
+‎│ • *setpp*
+‎│ • *hand*
+‎│ • *nikal*
+‎│ • *hold*
+‎│ • *hug*
+‎│ • *hifi*
+‎│ • *poke*
+‎╰━━━━━━━━━━━━━━╯
+╔════◇◆◇══════╗
+‎『 🔄 *𝗖𝗢𝗡𝗩𝗘𝗥𝗧 𝗠𝗘𝗡𝗨* 』
+‎╚════◇◆◇══════╝
+‎╭━[🛠️ *𝗠𝗘𝗗𝗜𝗔 𝗧𝗢𝗢𝗟𝗦* ]━━━━━╮
+‎│ • *sticker* [img]
+‎│ • *sticker2* [img]
+‎│ • *emojimix* 😎+😂
+‎│ • *take* [name,text]
+‎│ • *tomp3* [video]
+‎╰━━━━━━━━━━━━━━╯
+‎╭━[📝 *𝗧𝗘𝗫𝗧 𝗧𝗢𝗢𝗟𝗦* ]━━━━━━╮
+‎│ • *fancy* [text]
+‎│ • *tts* [text]
+‎│ • *trt* [text]
+‎│ • *base64* [text]
+‎│ • *unbase64* [text]
+‎│ • *binary* [text]
+‎│ • *dbinary* [text]
+‎╰━━━━━━━━━━━━━━╯
+‎╭━[🔗 *𝗨𝗥𝗟 𝗧𝗢𝗢𝗟𝗦* ]━━━━━━━━╮
+‎│ • *tinyurl* [url]
+‎│ • *urldecode* [url]
+‎│ • *urlencode* [url]
+‎│ • *url* [action]
+‎╰━━━━━━━━━━━━━━╯
+‎╭━[🎭 *𝗙𝗨𝗡 𝗧𝗢𝗢𝗟𝗦* ]━━━━━━━━╮
+‎│ • *repeat* [text]
+‎│ • *ask* [question]
+‎│ • *readmore* [text]
+‎╰━━━━━━━━━━━━━━╯
+‎────────────────
+╭════◇◆◇══════╗
+‎『🤖 *𝗔𝗜 𝗠𝗘𝗡𝗨* 』
+‎╚════◇◆◇══════╝
+‎╭━[🧠 *𝗔𝗜 𝗧𝗢𝗢𝗟𝗦* ]━━━━━━━━╮
+‎│ • *ai*
+‎│ • *gpt3*
+‎│ • *gpt2*
+‎│ • *gptmini*
+‎│ • *gpt*
+‎│ • *meta*
+‎│ • *blackbox*
+‎│ • *luma*
+‎│ • *dj*
+‎│ • *DARKZONE-MD*
+‎│ • *Erfan*
+‎│ • *gpt4*
+‎│ • *bing*
+‎│ • *imagine* [text]
+‎│ • *imagine2* [text]
+‎│ • *copilot*
+‎╰━━━━━━━━━━━━━━╯
+╔════◇◆◇══════╗
+‎ 『 🏠 *𝗠𝗔𝗜𝗡 𝗠𝗘𝗡𝗨* 』
+╚════◇◆◇══════╝
+╭━[⚡ *𝗕𝗢𝗧 𝗖𝗢𝗡𝗧𝗥𝗢𝗟𝗦* ]━━╮
+│ • *ping*
+│ • *ping2*
+│ • *speed*
+│ • *live*
+│ • *alive*
+│ • *runtime*
+│ • *uptime*
+│ • *repo*
+│ • *owner*
+│ • *menu*
+│ • *menu2*
+│ • *restart*
+╰━━━━━━━━━━━━━━╯
+╔════◇◆◇══════╗
+‎『🎎 *𝗔𝗡𝗜𝗠𝗘 𝗠𝗘𝗡𝗨* 』
+‎╚════◇◆◇══════╝
+‎╭━[🎭 *𝗔𝗡𝗜𝗠𝗘 𝗖𝗢𝗠𝗠𝗔𝗡𝗗𝗦* ]━━╮
+‎│ • *fack*
+‎│ • *dog*
+‎│ • *awoo*
+‎│ • *garl*
+‎│ • *waifu*
+‎│ • *neko*
+‎│ • *megnumin*
+‎│ • *maid*
+‎│ • *loli*
+‎│ • *animegirl*
+‎│ • *animegirl1*
+‎│ • *animegirl2*
+‎│ • *animegirl3*
+‎│ • *animegirl4*
+‎│ • *animegirl5*
+‎│ • *anime1*
+‎│ • *anime2*
+‎│ • *anime3*
+‎│ • *anime4*
+‎│ • *anime5*
+‎│ • *animenews*
+‎│ • *foxgirl*
+‎│ • *naruto*
+‎╰━━━━━━━━━━━━━━╯
+‎╔════◇◆◇══════╗
+‎『 *𝗢𝗧𝗛𝗘𝗥 𝗠𝗘𝗡𝗨* 』
+‎╚════◇◆◇══════╝
+‎╭━[🕒 *𝗧𝗜𝗠𝗘 & 𝗗𝗔𝗧𝗘* ]━━╮
+‎│ • *timenow*
+‎│ • *date*
+‎╰━━━━━━━━━━━━━━╯
+‎╭━[🧮 *𝗖𝗔𝗟𝗖𝗨𝗟𝗔𝗧𝗜𝗢𝗡𝗦* ]━╮
+‎│ • *count* [num]
+‎│ • *calculate* [expr]
+‎│ • *countx*
+‎╰━━━━━━━━━━━━━━╯
+‎╭━[🎲 *𝗥𝗔𝗡𝗗𝗢𝗠 & 𝗙𝗨𝗡* ]━━╮
+‎│ • *flip*
+‎│ • *coinflip*
+‎│ • *rcolor*
+‎│ • *roll*
+‎│ • *fact*
+‎│ • *rw*
+‎│ • *pair* @user
+‎│ • *pair2* @user
+‎│ • *pair3* @user
+‎╰━━━━━━━━━━━━━━╯
+‎╭━[✨ *𝗧𝗘𝗫𝗧 & 𝗧𝗢𝗢𝗟𝗦* ]━━╮
+‎│ • *fancy* [text]
+‎│ • *logo* [text]
+‎│ • *cpp* [code]
+‎│ • *save* [content]
+‎╰━━━━━━━━━━━━━━╯
+‎╭━[🔍 *𝗦𝗘𝗔𝗥𝗖𝗛 & 𝗜𝗡𝗙𝗢* ]━━╮
+‎│ • *define* [word]
+‎│ • *news* [query]
+‎│ • *movie* [name]
+‎│ • *weather* [location]
+‎│ • *wikipedia* [term]
+‎│ • *yts* [query]
+‎│ • *ytv* [query]
+‎│ • *githubstalk* [user]
+‎╰━━━━━━━━━━━━━━╯
+‎╭━[⚙️ *𝗦𝗬𝗦𝗧𝗘𝗠 𝗧𝗢𝗢𝗟𝗦* ]━━╮
+‎│ • *srepo*
+‎│ • *gpass*
+‎│ • *insult* @user
+‎╰━━━━━━━━━━━━━━╯
 > ${config.DESCRIPTION}`;
 
         await conn.sendMessage(

@@ -82,14 +82,6 @@ const port = process.env.PORT || 9090;
   
   //=============================================
 
-
-const { makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers } = require('@whiskeysockets/baileys');
-const P = require('pino');
-const fs = require('fs');
-const path = require('path');
-
-const prefix = '.'; // Your bot prefix
-
 async function connectToWA() {
     console.log("Connecting to WhatsApp ⏳️...");
     

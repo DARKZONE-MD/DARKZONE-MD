@@ -87,7 +87,7 @@ cmd({
 
     await conn.sendMessage(from, {
       video: { url: video },
-      caption: `🎬 *TikTok Video Downloader v3*\n👤 *User:* ${author.nickname || "User"}\n🆔 *@${author.uniqueId || "unknown"}*\n\n> Powered By JawadTechX 💜`
+      caption: `🎬 *TikTok Video Downloader v3*\n👤 *User:* ${author.nickname || "User"}\n🆔 *@${author.uniqueId || "unknown"}*\n\n> IT'S ERFAN AHMAD 🥺`
     }, { quoted: mek });
 
     await conn.sendMessage(from, { react: { text: '✅', key: m.key } });

@@ -6,8 +6,6 @@ const { igdl } = require("ruhend-scraper");
 const axios = require("axios");
 const { cmd, commands } = require('../command');
 
-const axios = require('axios');
-
 cmd({
     pattern: "ig2",
     desc: "Download Instagram videos using RapidAPI",

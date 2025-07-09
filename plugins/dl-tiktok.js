@@ -32,7 +32,7 @@ cmd({
 
     await conn.sendMessage(from, {
       video: { url: video },
-      caption: `🎬 *TikTok Downloader*\n👤 *Author:* ${author}\n💬 *Caption:* ${caption}\n\n> Powered By JawadTechX 💜`
+      caption: `🎬 *TikTok Downloader*\n👤 *Author:* ${author}\n💬 *Caption:* ${caption}\n\n> It's ERFAN AHMAD 💯`
     }, { quoted: mek });
 
     await conn.sendMessage(from, { react: { text: "✅", key: m.key } });

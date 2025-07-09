@@ -83,98 +83,59 @@ const port = process.env.PORT || 9090;
   //=============================================
 
 
+const { makeWASocket, useMultiFileAuthState, DisconnectReason, Browsers } = require('@whiskeysockets/baileys');
+const P = require('pino');
+const fs = require('fs');
+const path = require('path');
+
+const prefix = '.'; // Your bot prefix
+
 async function connectToWA() {
     console.log("Connecting to WhatsApp ⏳️...");
     
-    try {
-        const { state, saveCreds } = await useMultiFileAuthState(sessionPath);
-        const { version } = await fetchLatestBaileysVersion();
+    const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/');
+    const { version } = await fetchLatestBaileysVersion();
+    
+    const conn = makeWASocket({
+        logger: P({ level: 'silent' }),
+        printQRInTerminal: true,
+        browser: Browsers.macOS("Ubuntu"),
+        syncFullHistory: true,
+        auth: state,
+        version
+    });
+    
+    conn.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect } = update;
         
-        const conn = makeWASocket({
-            logger: P({ level: 'silent' }),
-            printQRInTerminal: true, // Changed to true for debugging
-            browser: Browsers.macOS("Firefox"),
-            syncFullHistory: true,
-            auth: state,
-            version
-        });
-        
-        // Handle connection updates
-        conn.ev.on('connection.update', async (update) => {
-            const { connection, lastDisconnect, qr } = update;
-            
-            if (qr) {
-                console.log('QR Code received, please scan it');
+        if (connection === 'close') {
+            if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) {
+                console.log('Reconnecting...');
+                setTimeout(connectToWA, 5000);
             }
+        } else if (connection === 'open') {
+            console.log('✅ Bot connected to WhatsApp');
             
-            if (connection === 'close') {
-                const shouldReconnect = lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut;
-                console.log(`Connection closed due to ${lastDisconnect.error}, reconnecting ${shouldReconnect}`);
-                
-                if (shouldReconnect) {
-                    await delay(5000); // Wait 5 seconds before reconnecting
-                    connectToWA();
+            // Load plugins
+            fs.readdirSync("./plugins/").forEach((plugin) => {
+                if (path.extname(plugin).toLowerCase() == ".js") {
+                    require("./plugins/" + plugin);
                 }
-            } else if (connection === 'open') {
-                console.log('🧬 Installing Plugins');
-                
-                // Load plugins
-                try {
-                    fs.readdirSync(pluginsPath).forEach((plugin) => {
-                        if (path.extname(plugin).toLowerCase() === ".js") {
-                            require(path.join(pluginsPath, plugin));
-                        }
-                    });
-                    console.log('Plugins installed successfully ✅');
-                } catch (err) {
-                    console.error('Error loading plugins:', err);
-                }
-                
-                console.log('Bot connected to WhatsApp ✅');
-                sendWelcomeMessage(conn);
-            }
-        });
-        
-        // Save credentials when updated
-        conn.ev.on('creds.update', saveCreds);
-        
-    } catch (error) {
-        console.error('Initial connection error:', error);
-        await delay(10000); // Wait 10 seconds before retrying
-        connectToWA();
-    }
-}
-
-function sendWelcomeMessage(conn) {
-    const greetings = [
-        "🤖 DARKZONE-MD BOT",
-        "🚀 DARKZONE-MD ONLINE",
-        "👾 POWERED BY DARKZONE",
-        "💡 INTELLIGENT BOT SYSTEM"
-    ];
-
-    const subtitles = [
-        "Ultra-Fast | Secure | Smart",
-        "Stable | Reliable | Instant",
-        "Modern | Lightweight | Intelligent",
-        "The Future of WhatsApp Bots"
-    ];
-
-    const outro = [
-        "Thanks for choosing DARKZONE-MD!",
-        "Powered by *𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟💻*",
-        "Built for your convenience ⚡",
-        "Leveling up your automation 🛠"
-    ];
-
-    const up = `┏━━━━━━━━━━━━━━━━━┓
-┃ ${greetings[Math.floor(Math.random() * greetings.length)]}
+            });
+            
+            // Send welcome message
+            const greetings = "🤖 DARKZONE-MD BOT ONLINE";
+            const subtitle = "Ultra-Fast | Secure | Smart";
+            const outro = "Powered by *𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟💻*";
+            
+            const welcomeMsg = `┏━━━━━━━━━━━━━━━━━┓
+┃ ${greetings}
 ┃━━━━━━━━━━━━━━━━━━━
-┃ 🔰 ${subtitles[Math.floor(Math.random() * subtitles.length)]}
+┃ 🔰 ${subtitle}
 ┗━━━━━━━━━━━━━━━━━┛
 
 📡 *Status:* _Online & Operational_
-🍁 ${outro[Math.floor(Math.random() * outro.length)]}
+🍁 ${outro}
 
 ┏━〔 🧩 *Bot Details* 〕━━
 ┃ ▸ *Prefix:* ${prefix}
@@ -186,17 +147,18 @@ function sendWelcomeMessage(conn) {
 *GitHub:* *github.com/DARKZONE-MD/DARKZONE-MD/fork*
 ┗━━━━━━━━━━━━━━━━━━━`;
 
-    // Send welcome message to the bot owner
-    conn.sendMessage(conn.user.id, { 
-        image: { url: `https://files.catbox.moe/8cb9h0.jpg` }, 
-        caption: up 
-    }).catch(err => {
-        console.error('Failed to send welcome message:', err);
+            conn.sendMessage(conn.user.id, { 
+                image: { url: `https://files.catbox.moe/8cb9h0.jpg` }, 
+                caption: welcomeMsg 
+            }).catch(err => console.log('Failed to send welcome message:', err));
+        }
     });
+    
+    conn.ev.on('creds.update', saveCreds);
 }
 
-// Start the bot
-connectToWA();
+// Start the connection
+connectToWA().catch(err => console.log('Initial connection error:', err));
   //==============================
 
   conn.ev.on('messages.update', async updates => {

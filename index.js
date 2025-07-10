@@ -52,7 +52,7 @@ const {
   }
   
   const clearTempDir = () => {
-      fs.readdir(TempDir, (err, files) => {
+      fs.readdir(tempDir, (err, files) => {
           if (err) throw err;
           for (const file of files) {
               fs.unlink(path.join(tempDir, file), err => {
@@ -90,7 +90,7 @@ const port = process.env.PORT || 9090;
   const conn = makeWASocket({
           logger: P({ level: 'silent' }),
           printQRInTerminal: false,
-          browser: Browsers.macOS("Ubuntu"),
+          browser: Browsers.macOS("Firefox"),
           syncFullHistory: true,
           auth: state,
           version
@@ -113,53 +113,45 @@ const port = process.env.PORT || 9090;
   console.log('Plugins installed successful ✅')
   console.log('Bot connected to whatsapp ✅')
   
-  // Enhanced connection message
-  const up = `╭─「 *DARKZONE-MD CONNECTED* 」
-│
-│ *🤖 Bot Name:* DARKZONE-MD
-│ *⚡ Version:* 3.0.0
-│ *👑 Owner:* 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟
-│ *🔰 Prefix:* [ ${prefix} ]
-│ *🛡️ Mode:* ${config.MODE || 'public'}
-│ *📊 Status:* Fully Operational
-│ *🔄 Uptime:* ${runtime(process.uptime())}
-│
-│ *🌐 GitHub:* github.com/DARKZONE-MD
-│ *📢 Channel:* whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J
-│
-╰─「 *Thank you for using DARKZONE-MD* 」`;
+  let greetings = [
+  "🤖 DARKZONE-MD BOT",
+  "🚀 DARKZONE-MD ONLINE",
+  "👾 POWERED BY DARKZONE",
+  "💡 INTELLIGENT BOT SYSTEM"
+];
 
-    // Send connection message with image
-    conn.sendMessage(conn.user.id, { 
-      image: { 
-        url: `https://files.catbox.moe/r2ncqh` 
-      }, 
-      caption: up,
-      contextInfo: {
-        externalAdReply: {
-          title: "DARKZONE-MD ONLINE",
-          body: "Ultra-Fast | Secure | Smart",
-          thumbnail: await getBuffer(`https://files.catbox.moe/r2ncqh`),
-          mediaType: 1,
-          mediaUrl: "",
-          sourceUrl: "https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J"
-        }
-      }
-    });
-    
-    // Send additional system info
-    const sysInfo = `╭─「 *SYSTEM INFO* 」
-│
-│ *🖥️ Hostname:* ${os.hostname()}
-│ *📱 Platform:* ${os.platform()} ${os.arch()}
-│ *💾 Memory:* ${(os.totalmem() / (1024 ** 3)).toFixed(2)} GB
-│ *🔄 Uptime:* ${runtime(os.uptime())}
-│ *👤 User:* ${os.userInfo().username}
-│ *📅 Date:* ${new Date().toLocaleString()}
-│
-╰─「 *DARKZONE-MD* 」`;
-    
-    conn.sendMessage(conn.user.id, { text: sysInfo });
+let subtitles = [
+  "Ultra-Fast | Secure | Smart",
+  "Stable | Reliable | Instant",
+  "Modern | Lightweight | Intelligent",
+  "The Future of WhatsApp Bots"
+];
+
+let outro = [
+  "Thanks for choosing DARKZONE-MD!",
+  "Powered by *𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟💻*",
+  "Built for your convenience ⚡",
+  "Leveling up your automation 🛠"
+];
+
+let up = `┏━━━━━━━━━━━━━━━━━━━┓
+┃ ${greetings[Math.floor(Math.random() * greetings.length)]}
+┃━━━━━━━━━━━━━━━━━━━
+┃ 🔰 ${subtitles[Math.floor(Math.random() * subtitles.length)]}
+┗━━━━━━━━━━━━━━━━━━━┛
+
+📡 *Status:* _Online & Operational_
+🍁 ${outro[Math.floor(Math.random() * outro.length)]}
+
+┏━〔 🧩 *Bot Details* 〕━━
+┃ ▸ *Prefix:* ${prefix}
+┃ ▸ *Mode:* Public
+┃ ▸ *Owner:* 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟
+┗━━━━━━━━━━━━━━━━━━━
+     *channel*: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J
+⭐ *GitHub:* github.com/DARKZONE-MD/DARKZONE-MD.git`;
+
+    conn.sendMessage(conn.user.id, { image: { url: `https://files.catbox.moe/r2ncqh` }, caption: up })
   }
   })
   conn.ev.on('creds.update', saveCreds)

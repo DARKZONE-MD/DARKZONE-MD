@@ -52,7 +52,7 @@ const {
   }
   
   const clearTempDir = () => {
-      fs.readdir(tempDir, (err, files) => {
+      fs.readdir(TempDir, (err, files) => {
           if (err) throw err;
           for (const file of files) {
               fs.unlink(path.join(tempDir, file), err => {
@@ -113,74 +113,53 @@ const port = process.env.PORT || 9090;
   console.log('Plugins installed successful ✅')
   console.log('Bot connected to whatsapp ✅')
   
-  // Improved connection message
-  const botName = "DARKZONE-MD";
-  const botVersion = "v2.0";
-  const uptime = new Date().toLocaleString();
-  const totalCommands = 150; // Update with your actual command count
-  const totalPlugins = fs.readdirSync("./plugins/").filter(file => path.extname(file).toLowerCase() === ".js").length;
-  
-  const connectionMessage = `
-╭━━━━━━━━━━━━━━━━━━╮
-┃  *${botName.toUpperCase()} ${botVersion}*
-┃━━━━━━━━━━━━━━━━━━
-┃  🔹 *Status:* Online
-┃  🔹 *Uptime:* ${uptime}
-┃  🔹 *Prefix:* [ ${prefix} ]
-┃  🔹 *Commands:* ${totalCommands}+
-┃  🔹 *Plugins:* ${totalPlugins}
-╰━━━━━━━━━━━━━━━━━━╯
+  // Enhanced connection message
+  const up = `╭─「 *DARKZONE-MD CONNECTED* 」
+│
+│ *🤖 Bot Name:* DARKZONE-MD
+│ *⚡ Version:* 3.0.0
+│ *👑 Owner:* 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟
+│ *🔰 Prefix:* [ ${prefix} ]
+│ *🛡️ Mode:* ${config.MODE || 'public'}
+│ *📊 Status:* Fully Operational
+│ *🔄 Uptime:* ${runtime(process.uptime())}
+│
+│ *🌐 GitHub:* github.com/DARKZONE-MD
+│ *📢 Channel:* whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J
+│
+╰─「 *Thank you for using DARKZONE-MD* 」`;
 
-╭━━━━━━━━━━━━━━━━━━╮
-┃  *SYSTEM INFORMATION*
-┃━━━━━━━━━━━━━━━━━━
-┃  🔸 *Owner:* 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟
-┃  🔸 *Mode:* ${config.MODE || "public"}
-┃  🔸 *Platform:* ${os.platform()}
-┃  🔸 *Memory:* ${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)}GB
-╰━━━━━━━━━━━━━━━━━━╯
-
-╭━━━━━━━━━━━━━━━━━━╮
-┃  *CONNECTED SUCCESSFULLY*
-┃━━━━━━━━━━━━━━━━━━
-┃  ✅ *WhatsApp Connection:* Established
-┃  ✅ *Database Connection:* Active
-┃  ✅ *Plugin System:* Loaded
-┃  ✅ *Anti-Delete System:* Enabled
-╰━━━━━━━━━━━━━━━━━━╯
-
-*🔗 GitHub:* github.com/DARKZONE-MD/DARKZONE-MD
-*📢 Channel:* whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J
-
-*💻 Powered by 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟*
-*🚀 Ready to serve ${conn.user.name || conn.user.id}*`;
-
+    // Send connection message with image
     conn.sendMessage(conn.user.id, { 
-      image: { url: `https://files.catbox.moe/8cb9h0.jpg` }, 
-      caption: connectionMessage,
+      image: { 
+        url: `https://files.catbox.moe/r2ncqh` 
+      }, 
+      caption: up,
       contextInfo: {
         externalAdReply: {
-          title: `${botName} ${botVersion}`,
-          body: "Now Online & Ready!",
-          thumbnail: await getBuffer(`https://files.catbox.moe/8cb9h0.jpg`),
-          sourceUrl: "https://github.com/DARKZONE-MD/DARKZONE-MD"
+          title: "DARKZONE-MD ONLINE",
+          body: "Ultra-Fast | Secure | Smart",
+          thumbnail: await getBuffer(`https://files.catbox.moe/r2ncqh`),
+          mediaType: 1,
+          mediaUrl: "",
+          sourceUrl: "https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J"
         }
       }
     });
     
-    console.log(`
-╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
-│  🚀 ${botName} ${botVersion} CONNECTED SUCCESSFULLY  │
-╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+    // Send additional system info
+    const sysInfo = `╭─「 *SYSTEM INFO* 」
 │
-│ 🔹 User: ${conn.user.name || conn.user.id}
-│ 🔹 Platform: ${os.platform()} ${os.arch()}
-│ 🔹 Memory: ${(os.freemem() / 1024 / 1024).toFixed(2)}MB free
-│ 🔹 Plugins: ${totalPlugins} loaded
-│ 🔹 Commands: ${totalCommands} available
-│ 
-╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
-    `);
+│ *🖥️ Hostname:* ${os.hostname()}
+│ *📱 Platform:* ${os.platform()} ${os.arch()}
+│ *💾 Memory:* ${(os.totalmem() / (1024 ** 3)).toFixed(2)} GB
+│ *🔄 Uptime:* ${runtime(os.uptime())}
+│ *👤 User:* ${os.userInfo().username}
+│ *📅 Date:* ${new Date().toLocaleString()}
+│
+╰─「 *DARKZONE-MD* 」`;
+    
+    conn.sendMessage(conn.user.id, { text: sysInfo });
   }
   })
   conn.ev.on('creds.update', saveCreds)
@@ -199,7 +178,7 @@ const port = process.env.PORT || 9090;
 
   conn.ev.on("group-participants.update", (update) => GroupEvents(conn, update));	  
 	  
-  //=============status handling=======
+  //=============readstatus=======
         
   conn.ev.on('messages.upsert', async(mek) => {
     mek = mek.messages[0]
@@ -207,84 +186,67 @@ const port = process.env.PORT || 9090;
     mek.message = (getContentType(mek.message) === 'ephemeralMessage') 
     ? mek.message.ephemeralMessage.message 
     : mek.message;
-    
-    // Status view (mark as seen)
-    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN === "true") {
+    //console.log("New Message Detected:", JSON.stringify(mek, null, 2));
+  if (config.READ_MESSAGE === 'true') {
+    await conn.readMessages([mek.key]);  // Mark message as read
+    console.log(`Marked message from ${mek.key.remoteJid} as read.`);
+  }
+    if(mek.message.viewOnceMessageV2)
+    mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
+    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN === "true"){
       await conn.readMessages([mek.key])
-      console.log(`Marked status from ${mek.key.participant} as seen`)
     }
-    
-    // Status react
-    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true") {
-      const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
-      const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-      await conn.sendMessage(mek.key.remoteJid, {
-        react: {
-          text: randomEmoji,
-          key: mek.key
-        }
-      }, { 
-        statusJidList: [mek.key.participant]
-      });
-      console.log(`Reacted to status from ${mek.key.participant} with ${randomEmoji}`)
-    }                       
-    
-    // Status reply
-    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true") {
-      const user = mek.key.participant
-      const text = config.AUTO_STATUS_MSG || "Nice status! 😊"
-      await conn.sendMessage(user, { 
-        text: text,
-        react: { 
-          text: '💜', 
-          key: mek.key 
-        } 
-      }, { quoted: mek })
-      console.log(`Replied to status from ${user}`)
-    }
-    
-    // Mark regular messages as read if enabled
-    if (config.READ_MESSAGE === 'true') {
-      await conn.readMessages([mek.key]);
-      console.log(`Marked message from ${mek.key.remoteJid} as read.`);
-    }
-    
-    await Promise.all([
-      saveMessage(mek),
-    ]);
-    
-    const m = sms(conn, mek)
-    const type = getContentType(mek.message)
-    const content = JSON.stringify(mek.message)
-    const from = mek.key.remoteJid
-    const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
-    const body = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : ''
-    const isCmd = body.startsWith(prefix)
-    var budy = typeof mek.text == 'string' ? mek.text : false;
-    const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
-    const args = body.trim().split(/ +/).slice(1)
-    const q = args.join(' ')
-    const text = args.join(' ')
-    const isGroup = from.endsWith('@g.us')
-    const sender = mek.key.fromMe ? (conn.user.id.split(':')[0]+'@s.whatsapp.net' || conn.user.id) : (mek.key.participant || mek.key.remoteJid)
-    const senderNumber = sender.split('@')[0]
-    const botNumber = conn.user.id.split(':')[0]
-    const pushname = mek.pushName || 'Sin Nombre'
-    const isMe = botNumber.includes(senderNumber)
-    const isOwner = ownerNumber.includes(senderNumber) || isMe
-    const botNumber2 = await jidNormalizedUser(conn.user.id);
-    const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => {}) : ''
-    const groupName = isGroup ? groupMetadata.subject : ''
-    const participants = isGroup ? await groupMetadata.participants : ''
-    const groupAdmins = isGroup ? await getGroupAdmins(participants) : ''
-    const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false
-    const isAdmins = isGroup ? groupAdmins.includes(sender) : false
-    const isReact = m.message.reactionMessage ? true : false
-    const reply = (teks) => {
-    conn.sendMessage(from, { text: teks }, { quoted: mek })
-    }
+  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
+    const jawadlike = await conn.decodeJid(conn.user.id);
+    const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
+    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+    await conn.sendMessage(mek.key.remoteJid, {
+      react: {
+        text: randomEmoji,
+        key: mek.key,
+      } 
+    }, { statusJidList: [mek.key.participant, erfanlike] });
+  }                       
+  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){
+  const user = mek.key.participant
+  const text = `${config.AUTO_STATUS_MSG}`
+  await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
+            }
+            await Promise.all([
+              saveMessage(mek),
+            ]);
+  const m = sms(conn, mek)
+  const type = getContentType(mek.message)
+  const content = JSON.stringify(mek.message)
+  const from = mek.key.remoteJid
+  const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
+  const body = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : ''
+  const isCmd = body.startsWith(prefix)
+  var budy = typeof mek.text == 'string' ? mek.text : false;
+  const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
+  const args = body.trim().split(/ +/).slice(1)
+  const q = args.join(' ')
+  const text = args.join(' ')
+  const isGroup = from.endsWith('@g.us')
+  const sender = mek.key.fromMe ? (conn.user.id.split(':')[0]+'@s.whatsapp.net' || conn.user.id) : (mek.key.participant || mek.key.remoteJid)
+  const senderNumber = sender.split('@')[0]
+  const botNumber = conn.user.id.split(':')[0]
+  const pushname = mek.pushName || 'Sin Nombre'
+  const isMe = botNumber.includes(senderNumber)
+  const isOwner = ownerNumber.includes(senderNumber) || isMe
+  const botNumber2 = await jidNormalizedUser(conn.user.id);
+  const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => {}) : ''
+  const groupName = isGroup ? groupMetadata.subject : ''
+  const participants = isGroup ? await groupMetadata.participants : ''
+  const groupAdmins = isGroup ? await getGroupAdmins(participants) : ''
+  const isBotAdmins = isGroup ? groupAdmins.includes(botNumber2) : false
+  const isAdmins = isGroup ? groupAdmins.includes(sender) : false
+  const isReact = m.message.reactionMessage ? true : false
+  const reply = (teks) => {
+  conn.sendMessage(from, { text: teks }, { quoted: mek })
+  }
 
-    const udp = botNumber.split('@')[0];
+  const udp = botNumber.split('@')[0];
     const erfan = ('923346690239', '923306137477', '923347572367');
     
     const ownerFilev2 = JSON.parse(fs.readFileSync('./lib/sudo.json', 'utf-8'));  
@@ -392,7 +354,6 @@ if (isBanned) return; // Ignore banned users completely
   cmd.function(conn, mek, m,{from, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply});
   } catch (e) {
   console.error("[PLUGIN ERROR] " + e);
-  }
   }
   }
   }

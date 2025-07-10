@@ -81,76 +81,110 @@ const app = express();
 const port = process.env.PORT || 9090;
   
   //=============================================
+  
+  async function connectToWA() {
+  console.log("Connecting to WhatsApp ⏳️...");
+  const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/')
+  var { version } = await fetchLatestBaileysVersion()
+  
+  const conn = makeWASocket({
+          logger: P({ level: 'silent' }),
+          printQRInTerminal: false,
+          browser: Browsers.macOS("Firefox"),
+          syncFullHistory: true,
+          auth: state,
+          version
+          })
+      
+  conn.ev.on('connection.update', (update) => {
+  const { connection, lastDisconnect } = update
+  if (connection === 'close') {
+  if (lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut) {
+  connectToWA()
+  }
+  } else if (connection === 'open') {
+  console.log('🧬 Installing Plugins')
+  const path = require('path');
+  fs.readdirSync("./plugins/").forEach((plugin) => {
+  if (path.extname(plugin).toLowerCase() == ".js") {
+  require("./plugins/" + plugin);
+  }
+  });
+  console.log('Plugins installed successful ✅')
+  console.log('Bot connected to whatsapp ✅')
+  
+  // Improved connection message
+  const botName = "DARKZONE-MD";
+  const botVersion = "v2.0";
+  const uptime = new Date().toLocaleString();
+  const totalCommands = 150; // Update with your actual command count
+  const totalPlugins = fs.readdirSync("./plugins/").filter(file => path.extname(file).toLowerCase() === ".js").length;
+  
+  const connectionMessage = `
+╭━━━━━━━━━━━━━━━━━━╮
+┃  *${botName.toUpperCase()} ${botVersion}*
+┃━━━━━━━━━━━━━━━━━━
+┃  🔹 *Status:* Online
+┃  🔹 *Uptime:* ${uptime}
+┃  🔹 *Prefix:* [ ${prefix} ]
+┃  🔹 *Commands:* ${totalCommands}+
+┃  🔹 *Plugins:* ${totalPlugins}
+╰━━━━━━━━━━━━━━━━━━╯
 
-async function connectToWA() {
-    console.log("Connecting to WhatsApp ⏳️...");
-    
-    const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/');
-    const { version } = await fetchLatestBaileysVersion();
-    
-    const conn = makeWASocket({
-        logger: P({ level: 'silent' }),
-        printQRInTerminal: true,
-        browser: Browsers.macOS("Ubuntu"),
-        syncFullHistory: true,
-        auth: state,
-        version
-    });
-    
-    conn.ev.on('connection.update', (update) => {
-        const { connection, lastDisconnect } = update;
-        
-        if (connection === 'close') {
-            if (lastDisconnect.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-                console.log('Reconnecting...');
-                setTimeout(connectToWA, 5000);
-            }
-        } else if (connection === 'open') {
-            console.log('✅ Bot connected to WhatsApp');
-            
-            // Load plugins
-            fs.readdirSync("./plugins/").forEach((plugin) => {
-                if (path.extname(plugin).toLowerCase() == ".js") {
-                    require("./plugins/" + plugin);
-                }
-            });
-            
-            // Send welcome message
-            const greetings = "🤖 DARKZONE-MD BOT ONLINE";
-            const subtitle = "Ultra-Fast | Secure | Smart";
-            const outro = "Powered by *𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟💻*";
-            
-            const welcomeMsg = `┏━━━━━━━━━━━━━━━━━┓
-┃ ${greetings}
-┃━━━━━━━━━━━━━━━━━━━
-┃ 🔰 ${subtitle}
-┗━━━━━━━━━━━━━━━━━┛
+╭━━━━━━━━━━━━━━━━━━╮
+┃  *SYSTEM INFORMATION*
+┃━━━━━━━━━━━━━━━━━━
+┃  🔸 *Owner:* 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟
+┃  🔸 *Mode:* ${config.MODE || "public"}
+┃  🔸 *Platform:* ${os.platform()}
+┃  🔸 *Memory:* ${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)}GB
+╰━━━━━━━━━━━━━━━━━━╯
 
-📡 *Status:* _Online & Operational_
-🍁 ${outro}
+╭━━━━━━━━━━━━━━━━━━╮
+┃  *CONNECTED SUCCESSFULLY*
+┃━━━━━━━━━━━━━━━━━━
+┃  ✅ *WhatsApp Connection:* Established
+┃  ✅ *Database Connection:* Active
+┃  ✅ *Plugin System:* Loaded
+┃  ✅ *Anti-Delete System:* Enabled
+╰━━━━━━━━━━━━━━━━━━╯
 
-┏━〔 🧩 *Bot Details* 〕━━
-┃ ▸ *Prefix:* ${prefix}
-┃ ▸ *Mode:* Public
-┃ ▸ *Owner:* 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟
-┗━━━━━━━━━━━━━━━━━━━
-┏━━━━━━━━━━━━━━━━━━━━
-*CHANNEL*: *https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J*
-*GitHub:* *github.com/DARKZONE-MD/DARKZONE-MD/fork*
-┗━━━━━━━━━━━━━━━━━━━`;
+*🔗 GitHub:* github.com/DARKZONE-MD/DARKZONE-MD
+*📢 Channel:* whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J
 
-            conn.sendMessage(conn.user.id, { 
-                image: { url: `https://files.catbox.moe/8cb9h0.jpg` }, 
-                caption: welcomeMsg 
-            }).catch(err => console.log('Failed to send welcome message:', err));
+*💻 Powered by 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟*
+*🚀 Ready to serve ${conn.user.name || conn.user.id}*`;
+
+    conn.sendMessage(conn.user.id, { 
+      image: { url: `https://files.catbox.moe/8cb9h0.jpg` }, 
+      caption: connectionMessage,
+      contextInfo: {
+        externalAdReply: {
+          title: `${botName} ${botVersion}`,
+          body: "Now Online & Ready!",
+          thumbnail: await getBuffer(`https://files.catbox.moe/8cb9h0.jpg`),
+          sourceUrl: "https://github.com/DARKZONE-MD/DARKZONE-MD"
         }
+      }
     });
     
-    conn.ev.on('creds.update', saveCreds);
-}
+    console.log(`
+╭━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╮
+│  🚀 ${botName} ${botVersion} CONNECTED SUCCESSFULLY  │
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+│
+│ 🔹 User: ${conn.user.name || conn.user.id}
+│ 🔹 Platform: ${os.platform()} ${os.arch()}
+│ 🔹 Memory: ${(os.freemem() / 1024 / 1024).toFixed(2)}MB free
+│ 🔹 Plugins: ${totalPlugins} loaded
+│ 🔹 Commands: ${totalCommands} available
+│ 
+╰━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╯
+    `);
+  }
+  })
+  conn.ev.on('creds.update', saveCreds)
 
-// Start the connection
-connectToWA().catch(err => console.log('Initial connection error:', err));
   //==============================
 
   conn.ev.on('messages.update', async updates => {
@@ -358,6 +392,7 @@ if (isBanned) return; // Ignore banned users completely
   cmd.function(conn, mek, m,{from, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply});
   } catch (e) {
   console.error("[PLUGIN ERROR] " + e);
+  }
   }
   }
   }

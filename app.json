@@ -192,7 +192,7 @@
     "WELCOME": {
       "description": "make it true if want goodbye and welcome message in groups.",
       "required": false,
-      "value": "true"
+      "value": "false"
     },
 
     "READ_MESSAGE": {

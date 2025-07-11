@@ -169,23 +169,41 @@ cmd({
 },
 async (conn, mek, m, { from, isOwner, quoted, reply }) => {
     if (!isOwner) return reply("❌ You are not the owner!");
-    if (!quoted || !quoted.message.imageMessage) return reply("❌ Please reply to an image.");
+    if (!quoted || !quoted.message?.imageMessage) return reply("❌ Please reply to an image.");
+    
     try {
         const stream = await downloadContentFromMessage(quoted.message.imageMessage, 'image');
         let buffer = Buffer.from([]);
+        
         for await (const chunk of stream) {
             buffer = Buffer.concat([buffer, chunk]);
         }
 
-        const mediaPath = path.join(__dirname, `${Date.now()}.jpg`);
-        fs.writeFileSync(mediaPath, buffer);
-
-        // Update profile picture with the saved file
-        await conn.updateProfilePicture(conn.user.jid, { url: `file://${mediaPath}` });
-        reply("🖼️ Profile picture updated successfully!");
+        // Create a temporary file path
+        const tempFilePath = `./temp_${Date.now()}.jpg`;
+        
+        // Write the buffer to a file
+        await fs.promises.writeFile(tempFilePath, buffer);
+        
+        // Update profile picture
+        await conn.updateProfilePicture(conn.user.id, { url: tempFilePath })
+            .then(() => {
+                reply("✅ Profile picture updated successfully!");
+            })
+            .catch(err => {
+                console.error("Update PP Error:", err);
+                reply("❌ Failed to update profile picture. Please try again.");
+            })
+            .finally(() => {
+                // Clean up: delete the temporary file
+                fs.unlink(tempFilePath, (err) => {
+                    if (err) console.error("Error deleting temp file:", err);
+                });
+            });
+            
     } catch (error) {
-        console.error("Error updating profile picture:", error);
-        reply(`❌ Error updating profile picture: ${error.message}`);
+        console.error("Error in setpp command:", error);
+        reply(`❌ Error: ${error.message}`);
     }
 });
 

@@ -325,19 +325,3 @@ cmd({
 });
 
 
-smd({
-	pattern: 'mypp',
-	fromMe: true,
-	desc: 'privacy setting profile picture',
-	type: 'privacy'
-}, async (message, match) => {
-    try{
-	if (!match) return await message.send(`_*Example:-* .mypp all_\n_to change *profile picture*  privacy settings_`);
-	const available_privacy = ['all', 'contacts', 'contact_blacklist', 'none'];
-	if (!available_privacy.includes(match)) return await message.send(`_action must be *${available_privacy.join('/')}* values_`);
-	await message.bot.updateProfilePicturePrivacy(match)
-	await message.send(`_Privacy Updated to *${match}*_`);
-}catch(e){ message.error(`${e}\n\nCommand : mypp` , e, false) }
-})
-
-          

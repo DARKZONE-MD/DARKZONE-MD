@@ -105,7 +105,7 @@ const emojiCommands = [
         emojis: ["🔥", "🥵", "♨️", "🌶️", "🧨", "💥", "🤯", "👹", "💫", "✨", "🌟", "⭐️"]
     },
     {
-        pattern: "love",
+        pattern: "luv",
         desc: "Love emoji animation",
         react: "🥰",
         emojis: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🤎", "🖤", "🤍", "💖", "💗", "💓", "💞", "💕", "💘", "💝", "💟", "❣️", "💌", "🥰"]

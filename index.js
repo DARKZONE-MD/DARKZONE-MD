@@ -148,10 +148,10 @@ let up = `┏━━━━━━━━━━━━━━━━━━━┓
 ┃ ▸ *Mode:* Public
 ┃ ▸ *Owner:* 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟
 ┗━━━━━━━━━━━━━━━━━━━
-     *channel*: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J
-⭐ *GitHub:* github.com/DARKZONE-MD/DARKZONE-MD.git`;
+     > *channel*: https://whatsapp.com/channel/0029Vb5dDVO59PwTnL86j13J
+> ⭐ *GitHub:*  github.com/DARKZONE-MD/DARKZONE-MD.git`;
 
-    conn.sendMessage(conn.user.id, { image: { url: `https://files.catbox.moe/r2ncqh` }, caption: up })
+    conn.sendMessage(conn.user.id, { image: { url: `https://files.catbox.moe/8cb9h0.jpg` }, caption: up })
   }
   })
   conn.ev.on('creds.update', saveCreds)

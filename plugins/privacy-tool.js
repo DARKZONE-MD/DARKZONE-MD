@@ -159,6 +159,9 @@ async (conn, mek, m, { from, l, quoted, body, isCmd, command, args, q, isGroup, 
         return reply(`*An error occurred while processing your request.*\n\n_Error:_ ${e.message}`);
     }
 });
+const fs = require('fs');
+const path = require('path');
+const { downloadContentFromMessage } = require('@whiskeysockets/baileys'); // Adjust import based on your library
 
 cmd({
     pattern: "setpp",
@@ -167,46 +170,42 @@ cmd({
     react: "🖼️",
     filename: __filename
 },
-async (conn, mek, m, { from, isOwner, quoted, reply }) => {
-    if (!isOwner) return reply("❌ You are not the owner!");
-    if (!quoted || !quoted.message?.imageMessage) return reply("❌ Please reply to an image.");
+async (Void, citel, text, { isCreator }) => {
+    if (!isCreator) return citel.reply("❌ This command is only for bot owner!");
     
+    if (!citel.quoted || !citel.quoted.mtype === 'imageMessage') {
+        return citel.reply("❌ Please reply to an image!");
+    }
+
     try {
-        const stream = await downloadContentFromMessage(quoted.message.imageMessage, 'image');
+        // Download the image
+        const media = await downloadContentFromMessage(citel.quoted.message, 'image');
         let buffer = Buffer.from([]);
         
-        for await (const chunk of stream) {
+        for await (const chunk of media) {
             buffer = Buffer.concat([buffer, chunk]);
         }
 
-        // Create a temporary file path
-        const tempFilePath = `./temp_${Date.now()}.jpg`;
-        
-        // Write the buffer to a file
-        await fs.promises.writeFile(tempFilePath, buffer);
-        
+        // Save temporarily
+        const tempPath = `./temp_pp_${Date.now()}.jpg`;
+        await fs.promises.writeFile(tempPath, buffer);
+
         // Update profile picture
-        await conn.updateProfilePicture(conn.user.id, { url: tempFilePath })
-            .then(() => {
-                reply("✅ Profile picture updated successfully!");
-            })
-            .catch(err => {
-                console.error("Update PP Error:", err);
-                reply("❌ Failed to update profile picture. Please try again.");
-            })
-            .finally(() => {
-                // Clean up: delete the temporary file
-                fs.unlink(tempFilePath, (err) => {
-                    if (err) console.error("Error deleting temp file:", err);
-                });
+        await Void.updateProfilePicture(Void.user.id, { url: tempPath });
+        citel.reply("✅ Profile picture updated successfully!");
+
+        // Delete temp file after 5 seconds
+        setTimeout(() => {
+            fs.unlink(tempPath, (err) => {
+                if (err) console.error("Error deleting temp file:", err);
             });
-            
+        }, 5000);
+
     } catch (error) {
-        console.error("Error in setpp command:", error);
-        reply(`❌ Error: ${error.message}`);
+        console.error("Profile Picture Error:", error);
+        citel.reply(`❌ Failed to update profile picture: ${error.message}`);
     }
 });
-
 cmd({
     pattern: "setmyname",
     desc: "Set your WhatsApp display name.",

@@ -1,41 +1,51 @@
 const axios = require("axios");
 const { cmd } = require("../command");
 
+// Facebook Downloader 
 cmd({
   pattern: "fb",
   alias: ["facebook", "fbdl"],
-  desc: "Download Facebook videos",
+  react: '📥',
+  desc: "Download videos from Facebook (API v4)",
   category: "download",
-  filename: __filename,
-  use: "<Facebook URL>",
-}, async (conn, m, store, { from, args, q, reply }) => {
+  use: ".fb <Facebook video URL>",
+  filename: __filename
+}, async (conn, mek, m, { from, reply, args }) => {
   try {
-    // Check if a URL is provided
-    if (!q || !q.startsWith("http")) {
-      return reply("*`Need a valid Facebook URL`*\n\nExample: `.fb https://www.facebook.com/...`");
+    const fbUrl = args[0];
+    if (!fbUrl || !fbUrl.includes("facebook.com")) {
+      return reply('❌ Please provide a valid Facebook video URL.\n\nExample:\n.fb https://facebook.com/...');
     }
 
-    // Add a loading react
     await conn.sendMessage(from, { react: { text: '⏳', key: m.key } });
 
-    // Fetch video URL from the API
-    const apiUrl = `https://www.velyn.biz.id/api/downloader/facebookdl?url=${encodeURIComponent(q)}`;
-    const { data } = await axios.get(apiUrl);
+    const apiUrl = `https://jawad-tech.vercel.app/downloader?url=${encodeURIComponent(fbUrl)}`;
+    const response = await axios.get(apiUrl);
 
-    // Check if the API response is valid
-    if (!data.status || !data.data || !data.data.url) {
-      return reply("❌ Failed to fetch the video. Please try another link.");
+    const data = response.data;
+
+    if (!data.status || !data.result || !Array.isArray(data.result)) {
+      return reply('❌ Unable to fetch the video. Please check the URL and try again.');
     }
 
-    // Send the video to the user
-    const videoUrl = data.data.url;
-    await conn.sendMessage(from, {
-      video: { url: videoUrl },
-      caption: "📥 *Facebook Video Downloaded*\n\n- Powered By 𝐸𝑅𝐹𝒜𝒩 𝒜𝐻𝑀𝒜𝒟 ✅",
-    }, { quoted: m });
+    // Prefer HD, fallback to SD
+    const hd = data.result.find(v => v.quality === "HD");
+    const sd = data.result.find(v => v.quality === "SD");
+    const video = hd || sd;
 
+    if (!video) return reply("❌ Video not found in the response.");
+
+    await reply(`Downloading ${video.quality} video... Please wait.📥`);
+
+    await conn.sendMessage(from, {
+      video: { url: video.url },
+      caption: `🎥 *Facebook Video Downloader*\n> Quality: ${video.quality}\n\n>  IT'S ERFAN AHMAD 💔`
+    }, { quoted: mek });
+
+    await conn.sendMessage(from, { react: { text: '✅', key: m.key } });
   } catch (error) {
-    console.error("Error:", error); // Log the error for debugging
-    reply("❌ Error fetching the video. Please try again.");
+    console.error('fb Error:', error);
+    reply('❌ Failed to download the video. Please try again later.');
+    await conn.sendMessage(from, { react: { text: '❌', key: m.key } });
   }
 });

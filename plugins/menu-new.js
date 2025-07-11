@@ -16,31 +16,269 @@ cmd({
         const totalCommands = Object.keys(commands).length;
         
         const menuCaption = `╭━━━〔 *${config.BOT_NAME}* 〕━━━┈⊷
-┃★╭──────────────
-┃★│ 👑 Owner : *${config.OWNER_NAME}*
-┃★│ 🤖 Baileys : *Multi Device*
-┃★│ 💻 Type : *NodeJs*
-┃★│ 🚀 Platform : *Heroku*
-┃★│ ⚙️ Mode : *[${config.MODE}]*
-┃★│ 🔣 Prefix : *[${config.PREFIX}]*
-┃★│ 🏷️ Version : *5.0.0 Bᴇᴛᴀ*
-┃★│ 📚 Commands : *${totalCommands}*
-┃★╰──────────────
-╰━━━━━━━━━━━━━━━┈⊷
-╭━━〔 *Menu List* 〕━━┈⊷
-┃◈╭─────────────·๏
-┃◈│1️⃣  📥 *Download Menu*
-┃◈│2️⃣  👥 *Group Menu*
-┃◈│3️⃣  😄 *Fun Menu*
-┃◈│4️⃣  👑 *Owner Menu*
-┃◈│5️⃣  🤖 *AI Menu*
-┃◈│6️⃣  🎎 *Anime Menu*
-┃◈│7️⃣  🔄 *Convert Menu*
-┃◈│8️⃣  📌 *Other Menu*
-┃◈│9️⃣  💞 *Reactions Menu*
-┃◈│🔟  🏠 *Main Menu*
-┃◈╰───────────┈⊷
-╰──────────────┈⊷
+╔═══════◇◆◇═══════╗
+『𝗨𝗟𝗧𝗜𝗠𝗔𝗧𝗘 𝗕𝗢𝗧 𝗠𝗘𝗡𝗨』
+╚═══════◇◆◇═══════╝
+⟬★⟭────────────────
+⟬★⟭ 𝗕𝗢𝗧 𝗜𝗡𝗙𝗢𝗥𝗠𝗔𝗧𝗜𝗢𝗡
+⟬★⟭────────────────
+│ 👑  Owner » *ERFAN*
+│ 🤖  Baileys » *Multi Device*
+│ 💻  Type » *NodeJs*
+│ 🚀  Platform » *Heroku*
+│ ⚙️  Mode » *[public]*
+│ 🔣  Prefix » *[.]*
+│ 🏷️  creater » *ERFAN AHMAD*
+│ 📚  Commands » *332*
+⟬★⟭─────────────────
+╔═══◇◆◇════════════╗
+『 📜 𝗠𝗘𝗡𝗨 𝗦𝗘𝗖𝗧𝗜𝗢𝗡𝗦 』
+╚═══◇◆◇════════════╝
+│ 1️⃣  📥 *Download Menu*
+│ 2️⃣  👥 *Group Menu*
+│ 3️⃣  😄 *Fun Menu*
+│ 4️⃣  👑 *Owner Menu*
+│ 5️⃣  🤖 *AI Menu*
+│ 6️⃣  🎎 *Anime Menu*
+│ 7️⃣  🔄 *Convert Menu*
+│ 8️⃣  📌 *Other Menu*
+│ 9️⃣  💞 *Reactions Menu*
+│ 🔟  🏠 *Main Menu*
+───────────────────
+╔════◇◆◇══════════╗
+『📥 *𝗗𝗢𝗪𝗡𝗟𝗢𝗔𝗗 𝗠𝗘𝗡𝗨* 』
+╚════◇◆◇══════════╝
+[ *SYSTEM* *CORE* *STAB* *Initializing*..]
+├── 🌐 𝗦𝗼𝗰𝗶𝗮𝗹 𝗠𝗲𝗱𝗶𝗮
+│   ├─ *facebook* [url]
+│   ├─ *download* [url]
+│   ├─ *mediafire* [url]
+│   ├─ *tiktok* [url]
+│   ├─ *twitter* [url]
+│   ├─ *insta* [url]
+│   ├─ *apk* [app]
+│   ├─ *img* [query]
+│   ├─ *tt2* [url]
+│   ├─ *pins* [url]
+│   ├─ *apk2* [app]
+│   ├─ *fb2* [url]
+│   └─ *pinterest* [url]
+├── 🎵 *𝗠𝘂𝘀𝗶𝗰/𝗩𝗶𝗱𝗲𝗼*
+│   ├─ *spotify* [query]
+│   ├─ *play* [song]
+│   ├─ *play2-10* [song]
+│   ├─ *audio* [url]
+│   ├─ *video* [url]
+│   ├─ *video2-10* [url]
+│   ├─ *ytmp3* [url]
+│   ├─ *ytmp4* [url]
+│   ├─ *song* [name]
+│   └─ *darama* [name]
+[+] *Payload Ready* ✔
+──────────────────
+╔════◇◆◇══════════╗
+ 『 👥 *𝗚𝗥𝗢𝗨𝗣 𝗠𝗘𝗡𝗨* 』
+╚════◇◆◇══════════╝
+╭━[🌡️*𝗠𝗔𝗡𝗔𝗚𝗘𝗠𝗘𝗡𝗧* ]━━╮
+│ • *grouplink*
+│ • *kickall*
+│ • *kickall2*
+│ • *kickall3*
+│ • *add @user*
+│ • *remove @user*
+│ • *kick @user*
+╰━━━━━━━━━━━━━━━━━╯
+╭─━⚡*𝗔𝗗𝗠𝗜𝗡 𝗧𝗢𝗢𝗟𝗦* ─━╮
+│ • *promote* @user
+│ • *demote* @user
+│ • *dismiss*
+│ • *revoke*
+│ • *mute* [time]
+│ • *unmute*
+│ • *lockgc*
+│ • *unlockgc*
+╰─────────────────╯
+╔══〔 🏷️ *𝗧𝗔𝗚𝗚𝗜𝗡𝗚* 〕══╗
+│ • *tag* @user
+│ • *hidetag* [msg]
+│ • *tagall*
+│ • *tagadmins*
+│ • *invite*
+╚═════════════════╝
+╔══════◇◆◇═════════╗
+  『  *𝗙𝗨𝗡 𝗠𝗘𝗡𝗨* 』
+╚══════◇◆◇═════════╝
+╔🎭*𝗜𝗡𝗧𝗘𝗥𝗔𝗖𝗧𝗜𝗩𝗘 𝗠𝗘𝗡𝗨* ╗
+│ • *shapar*
+│ • *rate* @user
+│ • *insult* @user
+│ • *hack* @user
+│ • *ship* @user1 @user2
+│ • *character*
+│ • *pickup*
+│ • *joke*
+╚═════════════════╝
+───────────────────
+╔═👿 *𝗥𝗘𝗔𝗖𝗧𝗜𝗢𝗡𝗘 𝗠𝗘𝗡𝗨*═╗
+│ • *love*
+│ • *happy*
+│ • *sad*
+│ • *hot*
+│ • *heart*
+│ • *shy*
+│ • *beautiful*
+│ • *cunfuzed*
+│ • *mon*
+│ • *kiss*
+│ • *broke*
+│ • *hurt*
+╚═════════════════╝
+───────────────────
+╔════◇◆◇══════════╗
+ 『  *𝗢𝗪𝗡𝗘𝗥 𝗠𝗘𝗡𝗨* 
+╚════◇◆◇══════════╝
+╔══ 💗 *𝗨𝘀𝗘𝗥 𝗠𝗘𝗡𝗨* ══╗
+│ • *Restricted Commands*
+│ • *block*
+│ • *unblock*
+│ • *fullpp*
+│ • *setpp*
+│ • *restart*
+│ • *shutdown*
+│ • *updatecmd*
+╚═════════════════╝
+╔══ ⚠️ *𝗜𝗡𝗙𝗢 𝗧𝗢𝗢𝗟𝗦* ══╗
+│ • *gjid*
+│ • *jid*
+│ • *listcmd*
+│ • *allmenu*
+╚═════════════════╝
+╔═══🔑 *𝗔𝗜 𝗠𝗘𝗡𝗨* ════╗
+│ •  💬 *Chat AI*
+│ • *ai*
+│ • *gpt3*
+│ • *gpt2*
+│ • *gpt*
+│ • *gptmini*
+│ • *meta*
+╚═════════════━═══╝
+╔══◇ *𝗜𝗠𝗚 𝗠𝗘𝗡𝗨* ◇══╗
+‎│ ╭──────────────
+‎│ │ . *image*
+‎│ │ • *imagine l[text]*
+‎│ │ • *imagine2 [text]*
+‎│ ╰──────────────
+‎│ ╭──────────────
+‎│ │ 🔍 *Specialized*
+‎│ │ • *blackbox* [query]
+‎│ │ • *luma* [query]
+‎│ │ • *dj* [query]
+‎│ │ • *irfan* [query]
+‎│ ╰──────────────
+‎╚═════════════════╝
+╔═════◇◆◇═════════╗
+  『  *𝗔𝗡𝗜𝗠𝗘 𝗠𝗘𝗡𝗨* 』
+╚═════◇◆◇═════════╝
+╔═ 🎭 *𝗔𝗡𝗜𝗠𝗘 𝗠𝗘𝗡𝗨* ══╗
+│ •  *Images*
+│ • *fack*
+│ • *dog*
+│ • *awoo*
+│ • *garl*
+│ • *waifu*
+‎│ • *neko*
+│ • *megnumin*
+│ • *maid*
+│ • *loli*
+╚════════════════╝
+╔ *𝗖H𝗔𝗥𝗔𝗖𝗧𝗘𝗥S 𝗠𝗘𝗡𝗨* ╗
+│ • *animegirl*
+│ • *animegirl1-5*
+│ • *anime1-5*
+‎│ • *foxgirl*
+│ • *naruto*
+╚════════════════╝
+╔═ *𝗖𝗢𝗡𝗩𝗘𝗥𝗧 𝗠𝗘𝗡𝗨* ═══╗
+│ • *Media Conversion*
+│ • *sticker* [img]
+│ • *sticker2* [img]
+│ • *emojimix* 😎+😂
+│ • *take* [name,text]
+│ • *tomp3* [video]
+╔═🎭 *Text Tools* ═╗
+│ • *fancy* [text]
+│ • *tts* [text] 
+│ • *trt* [text]
+│ • *base64* [text]
+│ • *unbase64* [text]
+╚═════════════════╝
+╔════◇◆◇══════════╗
+『  *𝗢𝗧H𝗘𝗥 𝗠𝗘𝗡𝗨* 』
+╚════◇◆◇══════════╝
+╔═ 🎭 *𝗢𝗧H𝗘𝗥 𝗠𝗘𝗡𝗨* ══╗
+│ • *timenow*  
+│ • *date* 
+│ • *count* [num]  
+│ • *calculate* [expr]  
+│ • *countx*
+╚═════════════════╝
+╔═══ 🎭 *𝗥𝗘𝗡D𝗢𝗠* ════╗
+│ • *flip*
+│ • *coinflip*  
+│ • *rcolor*  
+│ • *roll*  
+│ • *fact*
+╚═════════════════╝
+╔══🎭 *SEARCH* 🔎 ═══╗
+│ • *define* [word]  
+│ • *news* [query]  
+│ • *movie* [name]  
+│ • *weather* [loc]   
+╚═════════════════╝
+╔═════◇◆◇═════════╗
+ 『 *𝗥𝗘𝗔𝗖𝗧I𝗢𝗡 𝗠𝗘𝗡𝗨* 』
+╚═════◇◆◇═════════╝
+╔══ 🎭 *𝗔𝗙𝗙𝗘𝗖𝗧I𝗢𝗡*  ══╗
+│ • *cuddle* @user  
+│ • *hug* @user  
+│ • *kiss* @user  
+│ • *lick* @user  
+│ • *pat* @user  
+╚═════════════════╝
+╔════ 🎭 *𝗙U𝗡𝗡Y* ════╗
+│ • *bully* @user  
+│ • *bonk* @user  
+│ • *yeet* @user  
+│ • *slap* @user  
+│ • *kill* @user  
+╚═════════════════╝
+╔═ 🎭 *EXPRESSIONS* ═╗
+│ • *blush* @user  
+│ • *smile* @user  
+│ • *happy* @user  
+│ • *wink* @user  
+│ • *poke* @user  
+╚═════════════════╝
+╔════◇◆◇══════════╗
+『  *𝗠𝗔I𝗡 𝗠𝗘𝗡𝗨* 』
+╚════◇◆◇══════════╝
+╔═══🎭 *𝗕𝗢𝗧 𝗜𝗡𝗙𝗢*  ═══╗
+│ • *ping*
+‎│ • *live*
+‎│ • *alive*
+‎│ • *runtime*
+│ • *uptime*
+‎│ • *repo*
+‎│ • *owner*
+╚═════════════════╝
+╔═══════◇◆◇═══════╗
+『✨*𝗕𝗢𝗧 𝗖𝗢𝗡𝗧𝗥𝗢𝗟𝗦*✨ 』
+╚═══════◇◆◇═══════╝
+⟦★⟧────────────────
+│ • *menu*
+│ • *menu2*
+│ • *restart*
+⟦★⟧────────────────
 > ${config.DESCRIPTION}`;
 
         const contextInfo = {

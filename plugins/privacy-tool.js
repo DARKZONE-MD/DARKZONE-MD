@@ -41,7 +41,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         await conn.sendMessage(
             from,
             {
-                image: { url: `https://files.catbox.moe/r2ncqh` }, // Replace with privacy-themed image if available
+                image: { url: `https://files.catbox.moe/8cb9h0.jpg` }, // Replace with privacy-themed image if available
                 caption: privacyMenu,
                 contextInfo: {
                     mentionedJid: [m.sender],
@@ -323,5 +323,21 @@ cmd({
         reply("❌ An error occurred while fetching the profile picture. Please try again later.");
     }
 });
+
+
+smd({
+	pattern: 'mypp',
+	fromMe: true,
+	desc: 'privacy setting profile picture',
+	type: 'privacy'
+}, async (message, match) => {
+    try{
+	if (!match) return await message.send(`_*Example:-* .mypp all_\n_to change *profile picture*  privacy settings_`);
+	const available_privacy = ['all', 'contacts', 'contact_blacklist', 'none'];
+	if (!available_privacy.includes(match)) return await message.send(`_action must be *${available_privacy.join('/')}* values_`);
+	await message.bot.updateProfilePicturePrivacy(match)
+	await message.send(`_Privacy Updated to *${match}*_`);
+}catch(e){ message.error(`${e}\n\nCommand : mypp` , e, false) }
+})
 
           
